@@ -55,40 +55,27 @@ class GpsReader:
             self._thread.join(timeout=2.0)
 
     def _read_loop(self):
-        with serial.Serial(self._port, self._baud, timeout=1.0) as ser:
-            while self._running:
-                try:
-                    line = ser.readline().decode("ascii", errors="replace").strip()
-                    if line.startswith("$GNGGA") or line.startswith("$GPGGA"):
-                        self._parse_gga(line)
-                except Exception as e:
-                    logger.debug("GPS read error: %s", e)
-
-    def _read_loop_once(self):
-        """Test helper: processes sentences until readline() returns empty bytes."""
-        import serial as _serial
-        with _serial.Serial(self._port, self._baud, timeout=1.0) as ser:
-            while self._running:
-                line_bytes = ser.readline()
-                if not line_bytes:
-                    break
-                line = line_bytes.decode("ascii", errors="replace").strip()
-                if line.startswith("$GNGGA") or line.startswith("$GPGGA"):
-                    self._parse_gga(line)
+        try:
+            with serial.Serial(self._port, self._baud, timeout=1.0) as ser:
+                while self._running:
+                    try:
+                        line = ser.readline().decode("ascii", errors="replace").strip()
+                        if line.startswith("$GNGGA") or line.startswith("$GPGGA"):
+                            self._parse_gga(line)
+                    except Exception as e:
+                        logger.debug("GPS read error: %s", e)
+        except serial.SerialException as e:
+            logger.error("GPS serial port error: %s", e)
+            self._running = False
 
     def _parse_gga(self, sentence: str):
         try:
-            # Strip trailing checksum (*XX) so pynmea2 does not reject sentences
-            # with mismatched checksums (e.g. sentences from unit-test fixtures).
-            # The LC29H receiver's serial framing already provides data integrity;
-            # NMEA checksum re-validation at this layer is redundant.
-            clean = sentence.split("*")[0] if "*" in sentence else sentence
-            msg = pynmea2.parse(clean)
+            msg = pynmea2.parse(sentence)
         except pynmea2.ParseError:
             return
         if not hasattr(msg, "gps_qual"):
             return
-        if msg.gps_qual == 0:
+        if not msg.gps_qual:
             return
         try:
             x, y, zone_num, zone_letter = utm_lib.from_latlon(

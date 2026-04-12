@@ -6,37 +6,17 @@ from mower.nav.gps_reader import GpsReader, GpsFix, RTK_FIXED, RTK_FLOAT
 
 # A valid GGA sentence with RTK Fixed quality (field 6 = 4)
 RTK_FIXED_GGA = (
-    "$GNGGA,123519.00,4807.038,N,01131.000,E,4,08,0.9,545.4,M,46.9,M,,*47\r\n"
+    "$GNGGA,123519.00,4807.038,N,01131.000,E,4,08,0.9,545.4,M,46.9,M,,*72\r\n"
 )
 # RTK Float (field 6 = 5)
 RTK_FLOAT_GGA = (
-    "$GNGGA,123519.00,4807.038,N,01131.000,E,5,08,1.5,545.4,M,46.9,M,,*42\r\n"
+    "$GNGGA,123519.00,4807.038,N,01131.000,E,5,08,1.5,545.4,M,46.9,M,,*7E\r\n"
 )
 # No fix (field 6 = 0)
 NO_FIX_GGA = (
-    "$GNGGA,123519.00,4807.038,N,01131.000,E,0,00,99.9,0.0,M,0.0,M,,*4B\r\n"
+    "$GNGGA,123519.00,4807.038,N,01131.000,E,0,00,99.9,0.0,M,0.0,M,,*75\r\n"
 )
 
-
-def _make_reader_with_sentences(sentences: list[str]) -> tuple[GpsReader, list[GpsFix]]:
-    """Returns a GpsReader whose serial port replays the given sentences."""
-    received: list[GpsFix] = []
-
-    reader = GpsReader(port="/dev/ttyFake", baud=115200)
-    reader.on_fix = received.append
-
-    # Inject a mock serial that returns sentences line by line
-    mock_serial = MagicMock()
-    mock_serial.__enter__ = lambda s: s
-    mock_serial.__exit__ = MagicMock(return_value=False)
-    encoded = [s.encode() for s in sentences] + [b""]  # empty to signal end
-    mock_serial.readline.side_effect = encoded
-
-    with patch("mower.nav.gps_reader.serial.Serial", return_value=mock_serial):
-        reader._running = True
-        reader._read_loop_once()  # drives one iteration per sentence
-
-    return reader, received
 
 
 class TestGpsFix:
@@ -92,6 +72,8 @@ class TestGpsFix:
         assert fixes[0].utm_zone_letter == "U"
 
     def test_malformed_sentence_does_not_raise(self):
+        fixes: list[GpsFix] = []
         reader = GpsReader(port="/dev/fake")
-        reader.on_fix = lambda _: None
+        reader.on_fix = fixes.append
         reader._parse_gga("$GNGGA,BAD_DATA,,,,,,,,,,,,,")  # should not raise
+        assert len(fixes) == 0
