@@ -1,0 +1,4 @@
+pyserial==3.5
+crcmod==1.7
+pytest==8.3.5
+pytest-mock==3.14.0
