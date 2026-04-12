@@ -2,7 +2,7 @@ pyserial==3.5
 crcmod==1.7
 pytest==8.3.5
 pytest-mock==3.14.0
-filterpy==0.1.9
+filterpy==1.4.5
 pynmea2==1.19.0
 utm==0.7.0
 shapely==2.0.6
