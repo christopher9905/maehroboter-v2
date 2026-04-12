@@ -1,9 +1,10 @@
+import base64
 import queue
 import socket
 import threading
 import time
 import pytest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 from mower.nav.ntrip_client import NtripClient
 
 
@@ -31,7 +32,6 @@ class TestNtripClientConnect:
         assert "GET /MY_MOUNT HTTP/1.0" in combined
 
     def test_http_request_contains_basic_auth(self):
-        import base64
         client = _make_client(user="testuser", password="secret")
         sent_data: list[bytes] = []
 
@@ -63,12 +63,15 @@ class TestNtripClientSendGga:
         client = _make_client()
         client.send_gga("$GNGGA,123519,...,*47")
         assert not client._gga_queue.empty()
+        queued = client._gga_queue.get_nowait()
+        assert queued.endswith("\r\n")
 
     def test_send_gga_queue_does_not_block_when_full(self):
         client = _make_client()
         for _ in range(10):  # overfill the maxsize=4 queue
             client.send_gga("$GNGGA,test")
         # Should not raise or block
+        assert client._gga_queue.full()
 
 
 class TestNtripClientRtcmCallback:
@@ -83,24 +86,17 @@ class TestNtripClientRtcmCallback:
             b"ICY 200 OK\r\n\r\n",
             rtcm_data,
             socket.timeout(),
+            b"",  # empty = connection closed, causes break out of inner loop
         ]
         mock_sock.sendall = MagicMock()
 
-        call_count = [0]
-
-        def fake_connect(addr, timeout=None):
-            call_count[0] += 1
-            if call_count[0] > 1:
-                raise OSError("stop")
-            return mock_sock
+        def stop_on_sleep(seconds):
+            client._running = False
 
         with patch("mower.nav.ntrip_client.socket.create_connection",
-                   side_effect=fake_connect), \
-             patch("mower.nav.ntrip_client.time.sleep"):
+                   return_value=mock_sock), \
+             patch("mower.nav.ntrip_client.time.sleep", side_effect=stop_on_sleep):
             client._running = True
-            try:
-                client._run()
-            except OSError:
-                pass
+            client._run()
 
         assert rtcm_data in received

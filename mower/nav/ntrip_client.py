@@ -73,29 +73,32 @@ class NtripClient:
         while self._running:
             try:
                 sock = self._connect()
-                sock.settimeout(5.0)
-                logger.info("NTRIP connected to %s/%s", self._host, self._mountpoint)
-                while self._running:
-                    try:
-                        gga = self._gga_queue.get_nowait()
-                        sock.sendall(gga.encode())
-                    except queue.Empty:
-                        pass
-                    try:
-                        data = sock.recv(4096)
-                        if data and self.on_rtcm:
-                            self.on_rtcm(data)
-                        elif data == b"":
-                            break  # connection closed
-                    except socket.timeout:
-                        pass
-                    except OSError:
-                        break  # socket error — reconnect
-            except ConnectionError as e:
+                try:
+                    sock.settimeout(5.0)
+                    logger.info("NTRIP connected to %s/%s", self._host, self._mountpoint)
+                    while self._running:
+                        try:
+                            gga = self._gga_queue.get_nowait()
+                            sock.sendall(gga.encode())
+                        except queue.Empty:
+                            pass
+                        except OSError:
+                            break
+                        try:
+                            data = sock.recv(4096)
+                            if data and self.on_rtcm:
+                                self.on_rtcm(data)
+                            elif data == b"":
+                                break  # connection closed
+                        except socket.timeout:
+                            pass
+                        except OSError:
+                            break  # socket error — reconnect
+                finally:
+                    sock.close()
+            except (ConnectionError, OSError) as e:
                 logger.warning("NTRIP error: %s — reconnecting in 5 s", e)
                 time.sleep(5.0)
-            except OSError:
-                raise
             except Exception as e:
                 logger.warning("NTRIP error: %s — reconnecting in 5 s", e)
                 time.sleep(5.0)
