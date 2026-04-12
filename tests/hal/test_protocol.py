@@ -1,3 +1,5 @@
+import struct
+
 import pytest
 from mower.hal.protocol import (
     CmdType, encode_frame, decode_frame, FrameError,
@@ -63,9 +65,15 @@ class TestCommandEncoding:
         # speed must be clamped to [-1.0, 1.0]
         frame = encode_drive(speed=2.5, steering=0.0)
         _, payload = decode_frame(frame)
-        import struct
         speed, _ = struct.unpack('<ff', payload)
         assert speed == pytest.approx(1.0)
+
+    def test_encode_drive_steering_clipped(self):
+        # Issue 4: steering must be clamped to [-45.0, 45.0]
+        frame = encode_drive(speed=0.0, steering=99.0)
+        _, payload = decode_frame(frame)
+        _, steering = struct.unpack('<ff', payload)
+        assert steering == pytest.approx(45.0)
 
     def test_encode_blade_on(self):
         frame = encode_blade(True)
@@ -93,7 +101,6 @@ class TestCommandEncoding:
 
 class TestTelemetryDecoding:
     def test_decode_sensors(self):
-        import struct
         payload = struct.pack('<HBI', 512, 0, 1024)  # rain_adc, lift, encoder
         data = decode_sensors(payload)
         assert data['rain_adc'] == 512
@@ -101,20 +108,17 @@ class TestTelemetryDecoding:
         assert data['encoder_ticks'] == 1024
 
     def test_decode_sensors_lift_true(self):
-        import struct
         payload = struct.pack('<HBI', 700, 1, 0)
         data = decode_sensors(payload)
         assert data['lift'] is True
 
     def test_decode_soc(self):
-        import struct
         payload = struct.pack('<BH', 75, 14800)  # 75%, 14.8V
         data = decode_soc(payload)
         assert data['soc_percent'] == 75
         assert data['voltage_mv'] == 14800
 
     def test_decode_status(self):
-        import struct
         payload = struct.pack('<BBB', 1, 0, 0)  # watchdog_ok, blade_running, error_flags
         data = decode_status(payload)
         assert data['watchdog_ok'] is True
