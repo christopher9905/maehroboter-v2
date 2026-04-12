@@ -35,6 +35,7 @@ class TestOdometry:
         result = odo.update(ticks=0x10, timestamp=1.0)
         assert result is not None
         assert result.delta_distance_m > 0  # wrap handled, not negative
+        assert abs(result.delta_distance_m - 0x110 * 0.01) < 1e-6  # 272 ticks * 0.01
 
     def test_zero_dt_returns_none(self):
         odo = Odometry()

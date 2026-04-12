@@ -1,4 +1,3 @@
-import time
 from dataclasses import dataclass
 from typing import Optional
 
@@ -43,6 +42,7 @@ class Odometry:
 
         dt = timestamp - self._prev_timestamp
         if dt <= 0:
+            # Duplicate or out-of-order timestamp: discard without updating state
             return None
 
         # 32-bit unsigned wrap-around: delta = (new - old) mod 2^32
