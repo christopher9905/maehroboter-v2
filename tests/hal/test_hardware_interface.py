@@ -66,3 +66,68 @@ def mock_serial():
     s.write.return_value = None
     s.in_waiting = 0
     return s
+
+
+from mower.hal.hardware_interface import HardwareInterface
+
+
+class TestHardwareInterface:
+    def test_drive_sends_drive_frame(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        hw.drive(speed=0.3, steering=10.0)
+        mock_driver.send.assert_called_once()
+        frame = mock_driver.send.call_args[0][0]
+        from mower.hal.protocol import decode_frame, CmdType
+        cmd, payload = decode_frame(frame)
+        assert cmd == CmdType.DRIVE
+
+    def test_estop_sends_estop_frame(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        hw.estop()
+        frame = mock_driver.send.call_args[0][0]
+        from mower.hal.protocol import decode_frame, CmdType
+        cmd, _ = decode_frame(frame)
+        assert cmd == CmdType.ESTOP
+
+    def test_blade_on_sends_blade_frame(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        hw.set_blade(True)
+        frame = mock_driver.send.call_args[0][0]
+        from mower.hal.protocol import decode_frame, CmdType
+        cmd, payload = decode_frame(frame)
+        assert cmd == CmdType.BLADE
+        assert payload == b'\x01'
+
+    def test_telemetry_callback_on_sensors(self, mock_driver):
+        import struct
+        from mower.hal.protocol import encode_frame, CmdType, decode_frame
+        hw = HardwareInterface(driver=mock_driver)
+        received = []
+        hw.on_sensors = lambda d: received.append(d)
+        payload = struct.pack('<HBI', 300, 0, 1000)
+        frame = encode_frame(CmdType.SENSORS, payload)
+        cmd, p = decode_frame(frame)
+        hw._on_frame(cmd, p)
+        assert len(received) == 1
+        assert received[0]['rain_adc'] == 300
+        assert received[0]['encoder_ticks'] == 1000
+
+    def test_lift_triggers_estop(self, mock_driver):
+        import struct
+        from mower.hal.protocol import encode_frame, CmdType, decode_frame
+        hw = HardwareInterface(driver=mock_driver)
+        payload = struct.pack('<HBI', 100, 1, 0)  # lift=True
+        frame = encode_frame(CmdType.SENSORS, payload)
+        cmd, p = decode_frame(frame)
+        hw._on_frame(cmd, p)
+        # estop must have been sent
+        frames_sent = [mock_driver.send.call_args_list[i][0][0]
+                       for i in range(mock_driver.send.call_count)]
+        cmds = [decode_frame(f)[0] for f in frames_sent]
+        assert CmdType.ESTOP in cmds
+
+
+@pytest.fixture
+def mock_driver():
+    d = MagicMock()
+    return d
