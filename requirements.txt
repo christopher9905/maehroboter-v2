@@ -2,3 +2,9 @@ pyserial==3.5
 crcmod==1.7
 pytest==8.3.5
 pytest-mock==3.14.0
+filterpy==0.1.9
+pynmea2==1.19.0
+utm==0.7.0
+shapely==2.0.6
+adafruit-blinka==8.48.0
+adafruit-circuitpython-bno08x==1.4.3
