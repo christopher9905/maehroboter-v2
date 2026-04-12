@@ -56,6 +56,8 @@ class ImuReader:
             self._thread.join(timeout=2.0)
 
     def _init_sensor(self):
+        if self._i2c is None:
+            raise RuntimeError("No I2C bus available — call start() or inject i2c in constructor")
         self._sensor = BNO08X_I2C(self._i2c)
         self._sensor.enable_feature(BNO_REPORT_EULER)
         self._sensor.enable_feature(BNO_REPORT_GYROSCOPE)

@@ -54,6 +54,7 @@ class TestImuReader:
     def test_heading_wraps_to_0_360(self):
         _, readings = _make_reader_with_mock_sensor(heading=370.0)
         assert 0.0 <= readings[0].heading_deg < 360.0
+        assert abs(readings[0].heading_deg - 10.0) < 0.01
 
     def test_timestamp_is_recent(self):
         _, readings = _make_reader_with_mock_sensor()
