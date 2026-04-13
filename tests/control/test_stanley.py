@@ -22,11 +22,8 @@ class TestStanleyController:
         assert hasattr(out, 'cross_track_error_m')
 
     def test_perfectly_aligned_on_path_zero_steering(self):
-        """Robot at (0,1) heading East (0 rad), path going East, 1m right of path."""
-        # Path: (0,0)→(10,0) going East. Robot at (0,1) — 1m to LEFT of path.
-        # cross_track_error should be NEGATIVE (robot is left of path).
+        """Robot on path heading East, path going East → zero cross-track and zero steering."""
         ctrl = StanleyController()
-        # Place robot ON the path, heading East, path going East
         out = ctrl.compute(_pose(0, 0, 0.0), (0.0, 0.0), (10.0, 0.0))
         assert abs(out.cross_track_error_m) < 1e-9
         assert abs(out.heading_error_deg) < 1e-6

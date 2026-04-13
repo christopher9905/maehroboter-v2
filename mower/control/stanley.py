@@ -1,3 +1,11 @@
+"""Stanley lateral controller for a differential-drive lawn mower.
+
+Coordinate conventions (all inputs and outputs share these):
+  - utm_x / utm_y: UTM easting / northing in metres
+  - heading_rad: angle from East, counter-clockwise positive (math convention)
+  - cross_track_error_m: positive means the robot is to the RIGHT of the path
+  - steering_deg: positive means steer LEFT (counter-clockwise)
+"""
 import math
 from dataclasses import dataclass
 
@@ -29,8 +37,8 @@ class StanleyController:
     def compute(
         self,
         pose: Pose,
-        path_start: tuple,
-        path_end: tuple,
+        path_start: tuple[float, float],
+        path_end: tuple[float, float],
     ) -> StanleyOutput:
         ax, ay = path_start
         bx, by = path_end
