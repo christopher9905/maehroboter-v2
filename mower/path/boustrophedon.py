@@ -61,14 +61,15 @@ def compute_boustrophedon(
             segments = [g for g in inter.geoms
                         if isinstance(g, LineString) and not g.is_empty]
 
-        for seg in segments:
-            p1 = (seg.coords[0][0], seg.coords[0][1])
-            p2 = (seg.coords[-1][0], seg.coords[-1][1])
-            if lane_idx % 2 == 1:
-                p1, p2 = p2, p1
-            waypoints.append(_rotate_point(p1[0], p1[1], angle_rad, cx, cy))
-            waypoints.append(_rotate_point(p2[0], p2[1], angle_rad, cx, cy))
-        lane_idx += 1
+        if segments:
+            for seg in segments:
+                p1 = (seg.coords[0][0], seg.coords[0][1])
+                p2 = (seg.coords[-1][0], seg.coords[-1][1])
+                if lane_idx % 2 == 1:
+                    p1, p2 = p2, p1
+                waypoints.append(_rotate_point(p1[0], p1[1], angle_rad, cx, cy))
+                waypoints.append(_rotate_point(p2[0], p2[1], angle_rad, cx, cy))
+            lane_idx += 1
         y += lane_spacing
 
     return waypoints
