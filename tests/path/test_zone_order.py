@@ -27,7 +27,7 @@ class TestNearestNeighborOrder:
     def test_start_idx_respected(self):
         zones = [_square(0, 0), _square(2, 0), _square(10, 0)]
         order = nearest_neighbor_order(zones, start_idx=2)
-        assert order[0] == 2
+        assert order == [2, 1, 0]
 
     def test_all_zones_visited_exactly_once(self):
         zones = [_square(i * 3.0, 0) for i in range(5)]
@@ -37,6 +37,10 @@ class TestNearestNeighborOrder:
     def test_invalid_start_raises(self):
         with pytest.raises(IndexError):
             nearest_neighbor_order([_square(0, 0)], start_idx=5)
+
+    def test_negative_start_raises(self):
+        with pytest.raises(IndexError):
+            nearest_neighbor_order([_square(0, 0)], start_idx=-1)
 
     def test_returns_list_of_ints(self):
         zones = [_square(0, 0), _square(5, 0)]
