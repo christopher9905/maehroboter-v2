@@ -84,6 +84,8 @@ class TeachIn:
         if len(self._points) >= self._min_points:
             start_x, start_y = self._points[0]
             if _distance(start_x, start_y, x, y) < self._close_thresh:
+                # Record the closing pose so the final boundary segment is complete
+                self._record(x, y, ts)
                 logger.info("TeachIn auto-closed after %d points", len(self._points))
                 self._state = TeachInState.CLOSED
 
@@ -91,6 +93,8 @@ class TeachIn:
         self._state = TeachInState.CANCELLED
 
     def to_geojson_feature(self) -> dict:
+        if not self._points:
+            raise RuntimeError("No points recorded — call start() and update() before to_geojson_feature()")
         is_draft = self._state != TeachInState.CLOSED
         coords = [[x, y] for x, y in self._points]
         if coords and coords[0] != coords[-1]:

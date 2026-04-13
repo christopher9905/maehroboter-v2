@@ -24,6 +24,7 @@ class MapStore:
         return list(self._features)
 
     def load(self, geojson: dict):
+        """Replace all current features with those from a GeoJSON FeatureCollection dict."""
         self._features = list(geojson.get("features", []))
 
     def load_from_file(self, path: str):
