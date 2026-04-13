@@ -84,16 +84,22 @@ class TestLocalizerUpdates:
         loc = Localizer()
         loc.on_pose = poses.append
         loc.update_gps(_make_fix(ts=0.0))
+        # IMU reports 90° heading → math angle = 0.0 rad (East)
         loc.update_imu(_make_imu(heading_deg=90.0, ts=1.0))
         assert len(poses) == 1
+        # After IMU correction, heading_rad should have moved toward 0.0 (East)
+        # Initial state is 0.0, so it should remain close to 0.0
+        assert abs(poses[0].heading_rad) < 0.5  # within 0.5 rad of East
 
     def test_odometry_update_after_init_publishes_pose(self):
         poses: list[Pose] = []
         loc = Localizer()
         loc.on_pose = poses.append
         loc.update_gps(_make_fix(ts=0.0))
-        loc.update_odometry(_make_odo(ts=1.0))
+        loc.update_odometry(_make_odo(speed=0.5, ts=1.0))
         assert len(poses) == 1
+        # After odometry correction, speed should have moved toward 0.5 m/s
+        assert poses[0].speed_mps > 0.0  # moved from 0.0 toward 0.5
 
     def test_fix_quality_propagated_to_pose(self):
         from mower.nav.gps_reader import RTK_FLOAT

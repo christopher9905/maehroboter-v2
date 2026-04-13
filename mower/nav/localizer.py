@@ -52,6 +52,14 @@ _R_IMU = np.diag([math.radians(2.0) ** 2,          # 2° heading noise
 _R_ODO = np.array([[0.05 ** 2]])                    # 5 cm/s speed noise
 
 
+def _residual_imu(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Custom residual for IMU: wrap heading component to (-π, π]."""
+    y = a - b
+    # component 0 is heading_rad — wrap to (-pi, pi]
+    y[0] = (y[0] + math.pi) % (2 * math.pi) - math.pi
+    return y
+
+
 def _compass_to_rad(heading_deg: float) -> float:
     """Convert compass heading (North=0, CW) to math angle (East=0, CCW)."""
     return math.radians(90.0 - heading_deg)
@@ -110,7 +118,9 @@ class Localizer:
                 z=np.array([fix.utm_x, fix.utm_y]),
                 hx=_hx_gps, R=_R_GPS,
             )
-            self._publish(fix.timestamp)
+            pose = self._publish(fix.timestamp)
+        if self.on_pose:
+            self.on_pose(pose)
 
     def update_imu(self, reading: ImuReading):
         with self._lock:
@@ -118,12 +128,20 @@ class Localizer:
                 return
             self._predict(reading.timestamp)
             heading_rad = _compass_to_rad(reading.heading_deg)
+            # yaw_rate_dps is CCW-positive (BNO085 ENU frame), same as UKF state[4]
             yaw_rate_rps = math.radians(reading.yaw_rate_dps)
-            self._ukf.update(
-                z=np.array([heading_rad, yaw_rate_rps]),
-                hx=_hx_imu, R=_R_IMU,
-            )
-            self._publish(reading.timestamp)
+            _default_residual_z = self._ukf.residual_z
+            self._ukf.residual_z = _residual_imu
+            try:
+                self._ukf.update(
+                    z=np.array([heading_rad, yaw_rate_rps]),
+                    hx=_hx_imu, R=_R_IMU,
+                )
+            finally:
+                self._ukf.residual_z = _default_residual_z
+            pose = self._publish(reading.timestamp)
+        if self.on_pose:
+            self.on_pose(pose)
 
     def update_odometry(self, odo: OdometryUpdate):
         with self._lock:
@@ -134,7 +152,9 @@ class Localizer:
                 z=np.array([odo.speed_mps]),
                 hx=_hx_odo, R=_R_ODO,
             )
-            self._publish(odo.timestamp)
+            pose = self._publish(odo.timestamp)
+        if self.on_pose:
+            self.on_pose(pose)
 
     def _predict(self, timestamp: float):
         dt = timestamp - self._last_predict_time
@@ -142,9 +162,9 @@ class Localizer:
             self._ukf.predict(dt=dt)
         self._last_predict_time = timestamp
 
-    def _publish(self, timestamp: float):
+    def _publish(self, timestamp: float) -> Pose:
         x = self._ukf.x
-        pose = Pose(
+        return Pose(
             utm_x=float(x[0]),
             utm_y=float(x[1]),
             heading_rad=float(x[2]),
@@ -153,5 +173,3 @@ class Localizer:
             timestamp=timestamp,
             fix_quality=self._latest_fix_quality,
         )
-        if self.on_pose:
-            self.on_pose(pose)

@@ -23,7 +23,7 @@ class ImuReading:
     heading_deg: float      # 0–360, 0 = North, clockwise
     pitch_deg: float        # positive = nose up
     roll_deg: float         # positive = right side down
-    yaw_rate_dps: float     # degrees/s, positive = clockwise (around Z)
+    yaw_rate_dps: float     # degrees/s, CCW positive (ENU frame, standard math convention)
     timestamp: float        # time.monotonic()
 
 
