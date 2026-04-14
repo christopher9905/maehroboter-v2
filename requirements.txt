@@ -8,3 +8,4 @@ utm==0.7.0
 shapely==2.0.6
 adafruit-blinka==8.48.0
 adafruit-circuitpython-bno08x==1.4.3
+opencv-python>=4.8.0
