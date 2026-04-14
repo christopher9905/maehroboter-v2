@@ -8,7 +8,6 @@ COCO class IDs (1-indexed, COCO 2017 label map):
 """
 import logging
 import threading
-import time
 from dataclasses import dataclass
 from typing import Callable, Optional
 
@@ -72,19 +71,32 @@ class ObstacleDetector:
         self._frame_source = frame_source
         self._class_ids = class_ids
         self._min_confidence = min_confidence
-        self._running = False
+        self._stop_event = threading.Event()
         self._thread: Optional[threading.Thread] = None
-        self.on_obstacle: Optional[Callable[[list[Detection]], None]] = None
+        self._on_obstacle: Optional[Callable[[list[Detection]], None]] = None
+        self._callback_lock = threading.Lock()
+
+    @property
+    def on_obstacle(self):
+        with self._callback_lock:
+            return self._on_obstacle
+
+    @on_obstacle.setter
+    def on_obstacle(self, callback):
+        with self._callback_lock:
+            self._on_obstacle = callback
 
     def start(self):
         """Start the background detection loop."""
-        self._running = True
+        if self._thread is not None and self._thread.is_alive():
+            return  # already running — prevent double-start
+        self._stop_event.clear()
         self._thread = threading.Thread(target=self._run_loop, daemon=True)
         self._thread.start()
 
     def stop(self):
         """Stop the background detection loop."""
-        self._running = False
+        self._stop_event.set()
         if self._thread:
             self._thread.join(timeout=2.0)
 
@@ -126,17 +138,18 @@ class ObstacleDetector:
         Called directly from tests — no threading required.
         """
         detections = self._detect_once(frame)
-        if detections and self.on_obstacle:
-            self.on_obstacle(detections)
+        with self._callback_lock:
+            cb = self._on_obstacle
+        if detections and cb:
+            cb(detections)
 
     def _run_loop(self):
         interval = 1.0 / TARGET_FPS
-        while self._running:
+        while not self._stop_event.is_set():
             try:
                 frame = self._frame_source()
                 if frame is not None:
                     self._run_frame(frame)
-                time.sleep(interval)
-            except Exception as e:
-                logger.error("Obstacle detection error: %s", e)
-                time.sleep(interval)
+            except Exception:
+                logger.exception("Obstacle detection error")
+            self._stop_event.wait(timeout=interval)  # interruptible sleep
