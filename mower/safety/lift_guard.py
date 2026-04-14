@@ -19,6 +19,10 @@ class LiftGuard:
         self._was_lifted = False
         self.on_lift: Optional[Callable[[], None]] = None
 
+    @property
+    def is_lifted(self) -> bool:
+        return self._was_lifted
+
     def check(self, sensors: dict):
         lifted = bool(sensors.get('lift', False))
         if lifted and not self._was_lifted:
