@@ -32,10 +32,14 @@ class RainGuard:
         self._debounce_interval_s = debounce_interval_s
         self._resume_after_s = resume_after_s
         self._is_raining = False
-        self._wet_times: list = []
+        self._wet_times: list[float] = []
         self._dry_since: Optional[float] = None
         self.on_rain_detected: Optional[Callable[[], None]] = None
         self.on_rain_cleared: Optional[Callable[[], None]] = None
+
+    @property
+    def is_raining(self) -> bool:
+        return self._is_raining
 
     def check(self, rain_adc: int, timestamp: float):
         is_wet = rain_adc > self._threshold
