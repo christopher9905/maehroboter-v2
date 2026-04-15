@@ -1,66 +1,615 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-state="IDLE">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mähroboter V2</title>
+  <title>MV2 — Feldkommando</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,600;0,700;1,300&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; height: 100vh; }
-    header { background: #16213e; padding: .75rem 1rem; display: flex; align-items: center; gap: 1rem; }
-    header h1 { font-size: 1.1rem; }
-    #status-badge { padding: .3rem .7rem; border-radius: 1rem; font-size: .85rem; font-weight: bold; background: #444; }
-    #status-badge.IDLE      { background: #2d6a4f; }
-    #status-badge.MOWING    { background: #1b7f2e; }
-    #status-badge.ERROR     { background: #c0392b; }
-    #status-badge.RETURNING { background: #e67e22; }
-    main { display: flex; flex: 1; overflow: hidden; }
-    #map { flex: 1; }
-    aside { width: 260px; background: #16213e; padding: 1rem; display: flex; flex-direction: column; gap: .75rem; overflow-y: auto; }
-    .btn { padding: .6rem 1rem; border: none; border-radius: .4rem; cursor: pointer; font-size: .9rem; font-weight: bold; width: 100%; }
-    .btn-green  { background: #27ae60; color: #fff; }
-    .btn-red    { background: #c0392b; color: #fff; }
-    .btn-orange { background: #e67e22; color: #fff; }
-    .btn-blue   { background: #2980b9; color: #fff; }
-    .btn:disabled { opacity: .4; cursor: not-allowed; }
-    .section-title { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: #aaa; margin-bottom: .25rem; }
-    .telemetry-row { display: flex; justify-content: space-between; font-size: .85rem; padding: .2rem 0; border-bottom: 1px solid #2a2a4a; }
-    #error-log { font-size: .8rem; color: #f39c12; white-space: pre-wrap; max-height: 100px; overflow-y: auto; }
+    /* ── Reset ─────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Design Tokens ──────────────────────────────────────────────────── */
+    :root {
+      --accent:       #4ade80;
+      --accent-rgb:   74, 222, 128;
+      --bg:           #060905;
+      --surface-1:    #0b1009;
+      --surface-2:    #10180d;
+      --border:       rgba(255,255,255,0.06);
+      --text-primary: #c4dbb9;
+      --text-muted:   #46603f;
+      --text-dim:     #1e2d1a;
+      --sidebar-w:    288px;
+      --header-h:     50px;
+      --ease-state:   0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-fast:    0.15s ease;
+    }
+
+    /* Per-state accent — whole UI shifts colour */
+    [data-state="IDLE"]               { --accent: #4ade80; --accent-rgb: 74,222,128;   }
+    [data-state="MOWING"]             { --accent: #a3f542; --accent-rgb: 163,245,66;   }
+    [data-state="OBSTACLE_AVOIDANCE"] { --accent: #fb923c; --accent-rgb: 251,146,60;   }
+    [data-state="RETURNING"]          { --accent: #38bdf8; --accent-rgb: 56,189,248;   }
+    [data-state="DOCKING"]            { --accent: #22d3ee; --accent-rgb: 34,211,238;   }
+    [data-state="CHARGING"]           { --accent: #facc15; --accent-rgb: 250,204,21;   }
+    [data-state="TEACH_IN"]           { --accent: #c084fc; --accent-rgb: 192,132,252;  }
+    [data-state="ERROR"]              { --accent: #f87171; --accent-rgb: 248,113,113;  }
+
+    /* ── Base ────────────────────────────────────────────────────────────── */
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    /* Scanlines — subtle CRT texture */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 2px,
+        rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px
+      );
+      pointer-events: none;
+      z-index: 9000;
+    }
+
+    /* ── Layout grid ─────────────────────────────────────────────────────── */
+    .shell {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      grid-template-rows: var(--header-h) 1fr;
+      height: 100vh;
+    }
+
+    /* ── Header ──────────────────────────────────────────────────────────── */
+    .header {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 14px;
+      background: var(--surface-1);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Accent glow line across bottom of header */
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--accent-rgb), 0.5) 30%,
+        rgba(var(--accent-rgb), 0.5) 70%,
+        transparent 100%
+      );
+      transition: background var(--ease-state);
+    }
+
+    .logo {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      text-transform: uppercase;
+      transition: color var(--ease-state);
+      white-space: nowrap;
+    }
+    .logo em {
+      font-style: normal;
+      font-weight: 300;
+      opacity: 0.45;
+      letter-spacing: 0.1em;
+    }
+
+    .hdiv {
+      width: 1px; height: 18px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .header-state {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      transition: color var(--ease-state);
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-coords {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ws-pip {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      transition: background var(--ease-fast), box-shadow var(--ease-fast);
+      flex-shrink: 0;
+    }
+    .ws-pip.on  {
+      background: var(--accent);
+      box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+      animation: pip-breathe 3s ease-in-out infinite;
+      transition: background var(--ease-state), box-shadow var(--ease-state);
+    }
+    .ws-pip.err { background: #f87171; }
+
+    @keyframes pip-breathe {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.45; }
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────────────────── */
+    .sidebar {
+      background: var(--surface-1);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Subtle dot-grid texture */
+    .sidebar::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 18px 18px;
+      pointer-events: none;
+    }
+
+    /* ── State Hero Block ─────────────────────────────────────────────────── */
+    .state-hero {
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Radial accent bloom behind state name */
+    .state-hero::before {
+      content: '';
+      position: absolute;
+      top: -30px; left: -20px; right: -20px; bottom: -20px;
+      background: radial-gradient(
+        ellipse 200px 100px at 50% 0%,
+        rgba(var(--accent-rgb), 0.1),
+        transparent 70%
+      );
+      transition: background var(--ease-state);
+      pointer-events: none;
+    }
+
+    .state-eyebrow {
+      font-size: 8.5px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 7px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .state-name {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 28px;
+      line-height: 1;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--accent);
+      transition: color var(--ease-state);
+      position: relative;
+    }
+
+    .state-name.pop {
+      animation: state-pop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes state-pop {
+      0%   { opacity: 0; transform: translateY(-5px) scale(0.96); }
+      100% { opacity: 1; transform: translateY(0)   scale(1); }
+    }
+
+    [data-state="ERROR"] .state-name {
+      animation: state-pop 0.38s cubic-bezier(0.34,1.56,0.64,1), err-shake 0.35s ease 0.1s;
+    }
+    @keyframes err-shake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-4px); }
+      40%     { transform: translateX(4px); }
+      60%     { transform: translateX(-3px); }
+      80%     { transform: translateX(3px); }
+    }
+
+    [data-state="CHARGING"] .state-name {
+      animation: charge-breathe 2.2s ease-in-out infinite;
+    }
+    @keyframes charge-breathe {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.55; }
+    }
+
+    /* Activity bar */
+    .state-track {
+      margin-top: 12px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .state-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--accent);
+      transition: background var(--ease-state), width 0.6s ease;
+      width: 0%;
+    }
+
+    [data-state="IDLE"]               .state-fill { width: 0%; }
+    [data-state="MOWING"]             .state-fill { width: 100%; animation: scan-fwd 1.8s linear infinite; }
+    [data-state="OBSTACLE_AVOIDANCE"] .state-fill { width: 65%;  animation: pulse-bar 0.7s ease-in-out infinite; }
+    [data-state="RETURNING"]          .state-fill { width: 80%; }
+    [data-state="DOCKING"]            .state-fill { width: 92%; }
+    [data-state="CHARGING"]           .state-fill { width: 100%; animation: charge-bar 2.5s ease-in-out infinite; }
+    [data-state="TEACH_IN"]           .state-fill { width: 40%;  animation: scan-fwd 1.2s linear infinite; }
+    [data-state="ERROR"]              .state-fill { width: 100%; background: #f87171; }
+
+    @keyframes scan-fwd {
+      0%   { transform: translateX(-110%); }
+      100% { transform: translateX(110%); }
+    }
+    @keyframes pulse-bar {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.25; }
+    }
+    @keyframes charge-bar {
+      0%   { width: 55%; }
+      50%  { width: 100%; }
+      100% { width: 55%; }
+    }
+
+    /* ── Controls ────────────────────────────────────────────────────────── */
+    .controls {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+      scrollbar-width: none;
+      position: relative;
+    }
+    .controls::-webkit-scrollbar { display: none; }
+
+    .sect {
+      font-size: 8.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sect::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: var(--border);
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .btn-row.full { grid-template-columns: 1fr; }
+
+    .btn {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 3px;
+      padding: 9px 10px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-primary);
+      transition: opacity var(--ease-fast), transform var(--ease-fast),
+                  border-color var(--ease-fast), background var(--ease-fast),
+                  box-shadow var(--ease-fast);
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:not(:disabled):hover { background: rgba(255,255,255,0.04); }
+    .btn:not(:disabled):active { transform: scale(0.95); }
+    .btn:disabled { opacity: 0.22; cursor: not-allowed; }
+
+    /* Ripple on click */
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(var(--accent-rgb), 0.12);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .btn:not(:disabled):active::after { opacity: 1; }
+
+    .btn-go {
+      border-color: rgba(var(--accent-rgb), 0.28);
+      color: var(--accent);
+      background: rgba(var(--accent-rgb), 0.06);
+      transition: border-color var(--ease-state), color var(--ease-state),
+                  background var(--ease-state), opacity var(--ease-fast),
+                  transform var(--ease-fast), box-shadow var(--ease-fast);
+    }
+    .btn-go:not(:disabled):hover {
+      border-color: rgba(var(--accent-rgb), 0.55);
+      background: rgba(var(--accent-rgb), 0.11);
+      box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.14);
+    }
+
+    .btn-stop {
+      border-color: rgba(248,113,113,0.25);
+      color: #f87171;
+      background: rgba(248,113,113,0.05);
+    }
+    .btn-stop:not(:disabled):hover {
+      border-color: rgba(248,113,113,0.5);
+      background: rgba(248,113,113,0.1);
+    }
+
+    .btn-warn {
+      border-color: rgba(251,146,60,0.25);
+      color: #fb923c;
+      background: rgba(251,146,60,0.05);
+    }
+    .btn-warn:not(:disabled):hover {
+      border-color: rgba(251,146,60,0.5);
+      background: rgba(251,146,60,0.1);
+    }
+
+    /* ── Telemetry Grid ──────────────────────────────────────────────────── */
+    .tel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .tel-cell {
+      background: var(--surface-1);
+      padding: 9px 11px;
+    }
+
+    .tel-label {
+      font-size: 8px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .tel-val {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+    .tel-val.live { color: var(--accent); transition: color var(--ease-state); }
+
+    .tel-unit {
+      font-size: 8px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .bat-track {
+      margin-top: 5px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .bat-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.6s ease, background var(--ease-state);
+    }
+
+    /* ── Error log ───────────────────────────────────────────────────────── */
+    .err-wrap {
+      padding: 0 16px 14px;
+      flex-shrink: 0;
+    }
+
+    .err-log {
+      background: rgba(248,113,113,0.05);
+      border: 1px solid rgba(248,113,113,0.18);
+      border-radius: 3px;
+      padding: 8px 11px;
+      font-size: 9.5px;
+      color: #f87171;
+      font-family: 'DM Mono', monospace;
+      max-height: 72px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.55;
+      scrollbar-width: none;
+      display: none;
+    }
+    .err-log.visible { display: block; }
+    .err-log::-webkit-scrollbar { display: none; }
+
+    /* ── Map ─────────────────────────────────────────────────────────────── */
+    #map { position: relative; z-index: 0; }
+
+    .leaflet-container { background: #060905 !important; }
+
+    /* Robot marker */
+    .r-wrap { position: relative; width: 14px; height: 14px; }
+    .r-dot  {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.55);
+      position: relative; z-index: 2;
+      transition: background var(--ease-state), box-shadow var(--ease-state);
+    }
+    .r-ping {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(var(--accent-rgb), 0.6);
+      animation: r-ping 2.4s ease-out infinite;
+    }
+    @keyframes r-ping {
+      0%   { transform: translate(-50%,-50%) scale(1);   opacity: 0.7; }
+      100% { transform: translate(-50%,-50%) scale(4.5); opacity: 0; }
+    }
+
+    /* Leaflet controls — dark theme */
+    .leaflet-control-zoom a {
+      background: var(--surface-1) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--border) !important;
+    }
+    .leaflet-control-zoom a:hover {
+      background: var(--surface-2) !important;
+      color: var(--accent) !important;
+    }
+    .leaflet-control-attribution {
+      background: rgba(6,9,5,0.82) !important;
+      color: var(--text-dim) !important;
+      font-size: 9px !important;
+    }
+    .leaflet-control-attribution a { color: var(--text-muted) !important; }
   </style>
 </head>
 <body>
-<header>
-  <h1>Mähroboter V2</h1>
-  <span id="status-badge">IDLE</span>
-  <span id="ws-indicator" title="WebSocket">&#9898;</span>
-</header>
-<main>
-  <div id="map"></div>
-  <aside>
-    <div>
-      <p class="section-title">Mission</p>
-      <button class="btn btn-green" id="btn-start">&#9654; Start</button>
-      <button class="btn btn-red"   id="btn-stop" style="margin-top:.4rem">&#9209; Stop</button>
+<div class="shell">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="logo">MV2 <em>/ FELDKOMMANDO</em></div>
+    <div class="hdiv"></div>
+    <div class="header-state" id="header-state">IDLE</div>
+    <div class="header-right">
+      <span class="header-coords" id="header-coords">—</span>
+      <div class="ws-pip" id="ws-pip" title="WebSocket"></div>
     </div>
-    <div>
-      <p class="section-title">Teach-In</p>
-      <button class="btn btn-blue" id="btn-teach-start">&#128205; Aufzeichnen</button>
-      <button class="btn btn-orange" id="btn-teach-stop" style="margin-top:.4rem">&#10003; Beenden</button>
+  </header>
+
+  <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+
+    <!-- State hero -->
+    <div class="state-hero">
+      <div class="state-eyebrow">Systemstatus</div>
+      <div class="state-name" id="state-name">IDLE</div>
+      <div class="state-track"><div class="state-fill"></div></div>
     </div>
-    <div>
-      <p class="section-title">Fehler</p>
-      <button class="btn btn-orange" id="btn-reset">&#8635; Reset</button>
-      <div id="error-log" style="margin-top:.4rem"></div>
+
+    <!-- Controls -->
+    <div class="controls">
+
+      <div class="sect">Mission</div>
+      <div class="btn-row">
+        <button class="btn btn-go"   id="btn-start">▶ Start</button>
+        <button class="btn btn-stop" id="btn-stop">⏹ Stop</button>
+      </div>
+
+      <div class="sect">Teach-In</div>
+      <div class="btn-row">
+        <button class="btn btn-go"   id="btn-teach-start">⬤ Aufz.</button>
+        <button class="btn btn-warn" id="btn-teach-stop">✓ Ende</button>
+      </div>
+
+      <div class="sect">System</div>
+      <div class="btn-row full">
+        <button class="btn btn-warn" id="btn-reset">↺ Fehler zurücksetzen</button>
+      </div>
+
+      <div class="sect">Telemetrie</div>
+      <div class="tel-grid">
+        <div class="tel-cell">
+          <div class="tel-label">Akku</div>
+          <div class="tel-val live" id="tel-soc">—</div>
+          <div class="tel-unit">Prozent</div>
+          <div class="bat-track"><div class="bat-fill" id="bat-fill"></div></div>
+        </div>
+        <div class="tel-cell">
+          <div class="tel-label">Speed</div>
+          <div class="tel-val" id="tel-speed">—</div>
+          <div class="tel-unit">km/h</div>
+        </div>
+        <div class="tel-cell">
+          <div class="tel-label">GPS</div>
+          <div class="tel-val" id="tel-gps" style="font-size:12px;padding-top:3px">—</div>
+          <div class="tel-unit">Fix-Typ</div>
+        </div>
+        <div class="tel-cell">
+          <div class="tel-label">Heading</div>
+          <div class="tel-val" id="tel-heading">—</div>
+          <div class="tel-unit">Grad</div>
+        </div>
+      </div>
+
+    </div><!-- /controls -->
+
+    <!-- Error log -->
+    <div class="err-wrap">
+      <div class="err-log" id="err-log"></div>
     </div>
-    <div>
-      <p class="section-title">Telemetrie</p>
-      <div class="telemetry-row"><span>Akku</span><span id="tel-soc">&#8212;</span></div>
-      <div class="telemetry-row"><span>GPS</span><span id="tel-gps">&#8212;</span></div>
-      <div class="telemetry-row"><span>Speed</span><span id="tel-speed">&#8212;</span></div>
-    </div>
+
   </aside>
-</main>
+
+  <!-- ── Map ──────────────────────────────────────────────────────────────── -->
+  <div id="map"></div>
+
+</div><!-- /shell -->
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/static/app.js"></script>
 </body>
