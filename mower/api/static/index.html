@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mähroboter V2</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; height: 100vh; }
+    header { background: #16213e; padding: .75rem 1rem; display: flex; align-items: center; gap: 1rem; }
+    header h1 { font-size: 1.1rem; }
+    #status-badge { padding: .3rem .7rem; border-radius: 1rem; font-size: .85rem; font-weight: bold; background: #444; }
+    #status-badge.IDLE      { background: #2d6a4f; }
+    #status-badge.MOWING    { background: #1b7f2e; }
+    #status-badge.ERROR     { background: #c0392b; }
+    #status-badge.RETURNING { background: #e67e22; }
+    main { display: flex; flex: 1; overflow: hidden; }
+    #map { flex: 1; }
+    aside { width: 260px; background: #16213e; padding: 1rem; display: flex; flex-direction: column; gap: .75rem; overflow-y: auto; }
+    .btn { padding: .6rem 1rem; border: none; border-radius: .4rem; cursor: pointer; font-size: .9rem; font-weight: bold; width: 100%; }
+    .btn-green  { background: #27ae60; color: #fff; }
+    .btn-red    { background: #c0392b; color: #fff; }
+    .btn-orange { background: #e67e22; color: #fff; }
+    .btn-blue   { background: #2980b9; color: #fff; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .section-title { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: #aaa; margin-bottom: .25rem; }
+    .telemetry-row { display: flex; justify-content: space-between; font-size: .85rem; padding: .2rem 0; border-bottom: 1px solid #2a2a4a; }
+    #error-log { font-size: .8rem; color: #f39c12; white-space: pre-wrap; max-height: 100px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Mähroboter V2</h1>
+  <span id="status-badge">IDLE</span>
+  <span id="ws-indicator" title="WebSocket">&#9898;</span>
+</header>
+<main>
+  <div id="map"></div>
+  <aside>
+    <div>
+      <p class="section-title">Mission</p>
+      <button class="btn btn-green" id="btn-start">&#9654; Start</button>
+      <button class="btn btn-red"   id="btn-stop" style="margin-top:.4rem">&#9209; Stop</button>
+    </div>
+    <div>
+      <p class="section-title">Teach-In</p>
+      <button class="btn btn-blue" id="btn-teach-start">&#128205; Aufzeichnen</button>
+      <button class="btn btn-orange" id="btn-teach-stop" style="margin-top:.4rem">&#10003; Beenden</button>
+    </div>
+    <div>
+      <p class="section-title">Fehler</p>
+      <button class="btn btn-orange" id="btn-reset">&#8635; Reset</button>
+      <div id="error-log" style="margin-top:.4rem"></div>
+    </div>
+    <div>
+      <p class="section-title">Telemetrie</p>
+      <div class="telemetry-row"><span>Akku</span><span id="tel-soc">&#8212;</span></div>
+      <div class="telemetry-row"><span>GPS</span><span id="tel-gps">&#8212;</span></div>
+      <div class="telemetry-row"><span>Speed</span><span id="tel-speed">&#8212;</span></div>
+    </div>
+  </aside>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
