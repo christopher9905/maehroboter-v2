@@ -9,20 +9,20 @@ logger = logging.getLogger(__name__)
 
 
 class ConnectionManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self._connections: list[WebSocket] = []
 
-    async def connect(self, ws: WebSocket):
+    async def connect(self, ws: WebSocket) -> None:
         await ws.accept()
         self._connections.append(ws)
         logger.info("WebSocket connected (%d total)", len(self._connections))
 
-    def disconnect(self, ws: WebSocket):
+    def disconnect(self, ws: WebSocket) -> None:
         if ws in self._connections:
             self._connections.remove(ws)
-        logger.info("WebSocket disconnected (%d remaining)", len(self._connections))
+            logger.info("WebSocket disconnected (%d remaining)", len(self._connections))
 
-    async def broadcast(self, payload: dict[str, Any]):
+    async def broadcast(self, payload: dict[str, Any]) -> None:
         """Send JSON payload to all connected clients; remove broken connections."""
         message = json.dumps(payload)
         dead: list[WebSocket] = []

@@ -16,7 +16,6 @@ def app(executive):
     return create_app(executive)
 
 
-@pytest.mark.asyncio
 async def test_get_state_returns_idle(app):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.get("/api/state")
@@ -24,7 +23,6 @@ async def test_get_state_returns_idle(app):
     assert resp.json()["state"] == "IDLE"
 
 
-@pytest.mark.asyncio
 async def test_mission_start(app, executive):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/mission/start")
@@ -33,7 +31,6 @@ async def test_mission_start(app, executive):
     assert executive.state == MowerState.MOWING
 
 
-@pytest.mark.asyncio
 async def test_mission_stop(app, executive):
     executive.start_mission()
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
@@ -42,7 +39,6 @@ async def test_mission_stop(app, executive):
     assert executive.state == MowerState.RETURNING
 
 
-@pytest.mark.asyncio
 async def test_mission_start_from_non_idle_returns_409(app, executive):
     executive.start_mission()  # already MOWING
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
@@ -50,7 +46,6 @@ async def test_mission_start_from_non_idle_returns_409(app, executive):
     assert resp.status_code == 409
 
 
-@pytest.mark.asyncio
 async def test_teach_in_start(app, executive):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/teach-in/start")
@@ -58,7 +53,6 @@ async def test_teach_in_start(app, executive):
     assert executive.state == MowerState.TEACH_IN
 
 
-@pytest.mark.asyncio
 async def test_teach_in_stop(app, executive):
     executive.start_teach_in()
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
@@ -67,7 +61,6 @@ async def test_teach_in_stop(app, executive):
     assert executive.state == MowerState.IDLE
 
 
-@pytest.mark.asyncio
 async def test_reset_from_error(app, executive):
     executive.start_mission()
     executive.on_lift()
@@ -78,7 +71,6 @@ async def test_reset_from_error(app, executive):
     assert executive.state == MowerState.IDLE
 
 
-@pytest.mark.asyncio
 async def test_reset_from_non_error_is_noop(app, executive):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/reset")
@@ -86,7 +78,6 @@ async def test_reset_from_non_error_is_noop(app, executive):
     assert executive.state == MowerState.IDLE
 
 
-@pytest.mark.asyncio
 async def test_root_returns_html(app):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.get("/")
@@ -94,7 +85,6 @@ async def test_root_returns_html(app):
     assert "text/html" in resp.headers["content-type"]
 
 
-@pytest.mark.asyncio
 async def test_status_endpoint(app, executive):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.get("/api/status")
