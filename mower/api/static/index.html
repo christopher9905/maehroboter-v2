@@ -1,1146 +1,1532 @@
 <!DOCTYPE html>
-<html lang="de" data-state="IDLE">
+<html lang="de">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Mähroboter V2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <style>
-  /* ═══════════════════════════════════════════════════════════════════════
-     TOKENS
-  ═══════════════════════════════════════════════════════════════════════ */
-  :root {
-    --bg:           #0e1117;
-    --surface:      #161b26;
-    --surface-2:    #1e2535;
-    --glass:        rgba(22, 27, 38, 0.82);
-    --glass-light:  rgba(255,255,255,0.06);
-    --border:       rgba(255,255,255,0.08);
-    --accent:       #22c55e;
-    --accent-2:     #16a34a;
-    --accent-glow:  rgba(34,197,94,0.22);
-    --danger:       #ef4444;
-    --warning:      #f59e0b;
-    --info:         #3b82f6;
-    --purple:       #a855f7;
-    --text:         #f1f5f9;
-    --text-2:       #94a3b8;
-    --text-3:       #475569;
-    --nav-h:        76px;
-    --top-h:        60px;
-    --card-r:       20px;
-    --btn-r:        14px;
-    --ease:         cubic-bezier(0.4,0,0.2,1);
-  }
-  [data-state="MOWING"]             { --accent: #22c55e; --accent-glow: rgba(34,197,94,0.22); }
-  [data-state="OBSTACLE_AVOIDANCE"] { --accent: #f59e0b; --accent-glow: rgba(245,158,11,0.22); }
-  [data-state="RETURNING"]          { --accent: #3b82f6; --accent-glow: rgba(59,130,246,0.22); }
-  [data-state="DOCKING"]            { --accent: #06b6d4; --accent-glow: rgba(6,182,212,0.22); }
-  [data-state="CHARGING"]           { --accent: #f59e0b; --accent-glow: rgba(245,158,11,0.22); }
-  [data-state="TEACH_IN"]           { --accent: #a855f7; --accent-glow: rgba(168,85,247,0.22); }
-  [data-state="ERROR"]              { --accent: #ef4444; --accent-glow: rgba(239,68,68,0.22); }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     RESET + BASE
-  ═══════════════════════════════════════════════════════════════════════ */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 14px;
-    background: var(--bg);
-    color: var(--text);
-  }
-  button { font: inherit; cursor: pointer; border: none; background: none; }
-  input, select { font: inherit; }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     LAYOUT
-  ═══════════════════════════════════════════════════════════════════════ */
-  #map {
-    position: fixed; inset: 0;
-    bottom: var(--nav-h);
-    z-index: 0;
-  }
-
-  /* Views layer on top of map */
-  .view {
-    position: fixed;
-    inset: 0; bottom: var(--nav-h);
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.28s var(--ease);
-  }
-  .view.active { opacity: 1; pointer-events: all; }
-
-  /* Dashboard is transparent (shows map) */
-  #v-home { background: transparent; }
-
-  /* Solid views */
-  #v-schedule, #v-history, #v-settings {
-    background: var(--bg);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  #v-schedule::-webkit-scrollbar,
-  #v-history::-webkit-scrollbar,
-  #v-settings::-webkit-scrollbar { display: none; }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     BOTTOM NAVIGATION
-  ═══════════════════════════════════════════════════════════════════════ */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    height: var(--nav-h);
-    background: var(--glass);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 8px;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-    z-index: 100;
-  }
-
-  .nav-btn {
-    display: flex; flex-direction: column;
-    align-items: center; gap: 4px;
-    padding: 8px 16px;
-    border-radius: 12px;
-    color: var(--text-3);
-    transition: color 0.2s ease, background 0.2s ease;
-    min-width: 64px;
-  }
-  .nav-btn.active { color: var(--accent); }
-  .nav-btn:hover  { background: var(--glass-light); }
-
-  .nav-icon {
-    width: 24px; height: 24px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .nav-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-
-  .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
-
-  /* Active indicator dot */
-  .nav-btn.active .nav-icon::after {
-    content: ''; display: block;
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: var(--accent);
-    position: absolute;
-    bottom: -8px;
-    left: 50%; transform: translateX(-50%);
-    box-shadow: 0 0 6px var(--accent);
-  }
-  .nav-btn { position: relative; }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     DASHBOARD — floating panels
-  ═══════════════════════════════════════════════════════════════════════ */
-
-  /* Top bar */
-  .dash-top {
-    position: absolute; top: 0; left: 0; right: 0;
-    height: var(--top-h);
-    display: flex; align-items: center;
-    padding: 0 16px; gap: 12px;
-    background: linear-gradient(to bottom, rgba(14,17,23,0.85) 0%, transparent 100%);
-  }
-
-  .dash-logo {
-    font-size: 15px; font-weight: 800;
-    letter-spacing: -0.01em;
-    color: var(--text);
-  }
-  .dash-logo span { color: var(--accent); transition: color 0.4s ease; }
-
-  .dash-top-right {
-    margin-left: auto;
-    display: flex; align-items: center; gap: 10px;
-  }
-
-  .top-pill {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 12px;
-    font-size: 12px; font-weight: 600;
-    color: var(--text-2);
-  }
-  .top-pill svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
-  .top-pill.live { color: var(--accent); border-color: rgba(34,197,94,0.25); transition: color 0.4s ease, border-color 0.4s ease; }
-
-  .ws-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--text-3);
-    transition: background 0.3s ease, box-shadow 0.3s ease;
-  }
-  .ws-dot.on  { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); transition: background 0.4s ease, box-shadow 0.4s ease; }
-  .ws-dot.err { background: var(--danger); }
-
-  /* State card (left floating) */
-  .state-card {
-    position: absolute;
-    top: 80px; left: 16px;
-    width: 220px;
-    background: var(--glass);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid var(--border);
-    border-radius: var(--card-r);
-    padding: 18px;
-    transition: border-color 0.4s ease;
-  }
-  .state-card:hover { border-color: rgba(255,255,255,0.14); }
-
-  .sc-eyebrow {
-    font-size: 10px; font-weight: 600;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--text-3); margin-bottom: 6px;
-  }
-
-  .sc-state {
-    font-size: 22px; font-weight: 800;
-    line-height: 1.1; letter-spacing: -0.02em;
-    color: var(--accent);
-    transition: color 0.4s ease;
-    margin-bottom: 14px;
-  }
-  .sc-state.pop {
-    animation: sc-pop 0.35s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes sc-pop {
-    from { opacity: 0; transform: scale(0.9) translateY(4px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  [data-state="ERROR"] .sc-state { animation: sc-pop 0.35s cubic-bezier(0.34,1.56,0.64,1), err-shake 0.4s ease 0.1s; }
-  @keyframes err-shake {
-    0%,100% { transform: translateX(0); }
-    20%     { transform: translateX(-5px); }
-    40%     { transform: translateX(5px); }
-    60%     { transform: translateX(-3px); }
-    80%     { transform: translateX(3px); }
-  }
-
-  /* Progress bar in state card */
-  .sc-prog {
-    height: 3px; background: var(--glass-light);
-    border-radius: 3px; overflow: hidden; margin-bottom: 14px;
-  }
-  .sc-prog-fill {
-    height: 100%; border-radius: 3px;
-    background: var(--accent); width: 0%;
-    transition: width 0.6s var(--ease), background 0.4s ease;
-  }
-  [data-state="MOWING"] .sc-prog-fill             { width:100%; animation: prog-scan 2s linear infinite; }
-  [data-state="OBSTACLE_AVOIDANCE"] .sc-prog-fill { width:65%;  animation: prog-pulse 0.7s ease-in-out infinite; }
-  [data-state="RETURNING"] .sc-prog-fill           { width:82%; }
-  [data-state="DOCKING"] .sc-prog-fill             { width:94%; }
-  [data-state="CHARGING"] .sc-prog-fill            { width:100%; animation: prog-charge 2.5s ease-in-out infinite; }
-  [data-state="TEACH_IN"] .sc-prog-fill            { width:50%;  animation: prog-scan 1.4s linear infinite; }
-  [data-state="ERROR"] .sc-prog-fill               { width:100%; background: var(--danger); }
-  @keyframes prog-scan {
-    0%   { transform: translateX(-110%); }
-    100% { transform: translateX(110%); }
-  }
-  @keyframes prog-pulse  { 0%,100%{opacity:1}50%{opacity:0.2} }
-  @keyframes prog-charge { 0%,100%{width:55%}50%{width:100%} }
-
-  /* Action buttons in state card */
-  .sc-actions { display: flex; flex-direction: column; gap: 8px; }
-
-  .sc-btn {
-    width: 100%; padding: 11px;
-    border-radius: var(--btn-r);
-    font-size: 13px; font-weight: 700;
-    letter-spacing: 0.01em;
-    transition: opacity 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-  }
-  .sc-btn:active:not(:disabled) { transform: scale(0.96); }
-  .sc-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-  .sc-btn-primary {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 4px 16px var(--accent-glow);
-    transition: background 0.4s ease, box-shadow 0.4s ease, opacity 0.2s ease, transform 0.1s ease;
-  }
-  .sc-btn-primary:not(:disabled):hover { filter: brightness(1.1); }
-
-  .sc-btn-ghost {
-    background: var(--glass-light);
-    border: 1px solid var(--border);
-    color: var(--text-2);
-  }
-  .sc-btn-ghost:not(:disabled):hover { background: rgba(255,255,255,0.1); }
-
-  .sc-btn-danger {
-    background: rgba(239,68,68,0.15);
-    border: 1px solid rgba(239,68,68,0.3);
-    color: var(--danger);
-  }
-  .sc-btn-danger:not(:disabled):hover { background: rgba(239,68,68,0.25); }
-
-  /* Teach-in shortcut button */
-  .teach-fab {
-    position: absolute;
-    bottom: 20px; right: 16px;
-    display: flex; align-items: center; gap: 8px;
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 10px 16px;
-    font-size: 13px; font-weight: 600;
-    color: var(--text-2);
-    transition: all 0.2s ease;
-  }
-  .teach-fab:hover { background: var(--glass-light); color: var(--text); }
-  .teach-fab svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; }
-
-  /* Bottom telem tray */
-  .dash-telem {
-    position: absolute;
-    bottom: 16px; left: 16px; right: 16px;
-    background: var(--glass);
-    backdrop-filter: blur(24px);
-    border: 1px solid var(--border);
-    border-radius: var(--card-r);
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    overflow: hidden;
-  }
-
-  .tel-item {
-    padding: 12px 10px;
-    display: flex; flex-direction: column; gap: 3px;
-    border-right: 1px solid var(--border);
-  }
-  .tel-item:last-child { border-right: none; }
-
-  .tel-lbl {
-    font-size: 9px; font-weight: 600;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--text-3);
-  }
-  .tel-val {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 16px; font-weight: 500;
-    color: var(--text); line-height: 1;
-  }
-  .tel-val.accent { color: var(--accent); transition: color 0.4s ease; }
-  .tel-unit { font-size: 9px; color: var(--text-3); }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     VIEW HEADER (reusable for solid views)
-  ═══════════════════════════════════════════════════════════════════════ */
-  .view-header {
-    padding: 20px 20px 0;
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 20px;
-    position: sticky; top: 0;
-    background: var(--bg);
-    z-index: 5;
-    padding-top: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .view-title {
-    font-size: 20px; font-weight: 800;
-    letter-spacing: -0.02em;
-  }
-  .view-header-action {
-    margin-left: auto;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-size: 13px; font-weight: 600;
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 2px 12px var(--accent-glow);
-    transition: filter 0.2s ease, box-shadow 0.4s ease;
-  }
-  .view-header-action:hover { filter: brightness(1.1); }
-
-  .view-content { padding: 0 20px 24px; }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     CARDS & SECTIONS
-  ═══════════════════════════════════════════════════════════════════════ */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--card-r);
-    overflow: hidden;
-    margin-bottom: 12px;
-  }
-
-  .card-row {
-    display: flex; align-items: center;
-    padding: 14px 16px; gap: 12px;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s ease;
-  }
-  .card-row:last-child { border-bottom: none; }
-  .card-row.tappable:hover { background: rgba(255,255,255,0.03); cursor: pointer; }
-  .card-row.tappable:active { background: rgba(255,255,255,0.06); }
-
-  .row-icon {
-    width: 36px; height: 36px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .row-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-  .row-icon.green  { background: rgba(34,197,94,0.15);  color: var(--accent); }
-  .row-icon.blue   { background: rgba(59,130,246,0.15); color: var(--info); }
-  .row-icon.orange { background: rgba(245,158,11,0.15); color: var(--warning); }
-  .row-icon.red    { background: rgba(239,68,68,0.15);  color: var(--danger); }
-  .row-icon.purple { background: rgba(168,85,247,0.15); color: var(--purple); }
-  .row-icon.slate  { background: rgba(100,116,139,0.15); color: var(--text-2); }
-
-  .row-info { flex: 1; min-width: 0; }
-  .row-title { font-size: 14px; font-weight: 600; color: var(--text); }
-  .row-sub   { font-size: 12px; color: var(--text-3); margin-top: 1px; }
-
-  .row-end { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-  .row-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-2); }
-
-  .chevron { width: 16px; height: 16px; color: var(--text-3); flex-shrink: 0; }
-  .chevron svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; }
-
-  .sect-label {
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--text-3); padding: 0 4px;
-    margin: 20px 0 8px;
-  }
-  .sect-label:first-child { margin-top: 0; }
-
-  /* Toggle switch */
-  .toggle { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-track {
-    position: absolute; inset: 0;
-    background: var(--text-3); border-radius: 13px;
-    transition: background 0.2s ease;
-    cursor: pointer;
-  }
-  .toggle input:checked ~ .toggle-track { background: var(--accent); }
-  .toggle-thumb {
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 20px; height: 20px;
-    background: #fff; border-radius: 50%;
-    transition: transform 0.2s ease;
-    pointer-events: none;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-  }
-  .toggle input:checked ~ .toggle-track .toggle-thumb { transform: translateX(18px); }
-
-  /* Text input */
-  .field-input {
-    width: 100%;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 14px; color: var(--text);
-    outline: none;
-    transition: border-color 0.2s ease;
-  }
-  .field-input:focus { border-color: var(--accent); }
-  .field-input::placeholder { color: var(--text-3); }
-
-  /* Slider */
-  .field-slider {
-    -webkit-appearance: none; width: 100%; height: 4px;
-    background: var(--surface-2); border-radius: 2px; outline: none;
-    cursor: pointer;
-  }
-  .field-slider::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 20px; height: 20px;
-    background: var(--accent); border-radius: 50%;
-    box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
-    transition: box-shadow 0.2s;
-  }
-  .field-slider::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(34,197,94,0.2); }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     SCHEDULE VIEW
-  ═══════════════════════════════════════════════════════════════════════ */
-  .schedule-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .schedule-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--card-r);
-    padding: 16px;
-    display: flex; flex-direction: column; gap: 12px;
-    position: relative;
-  }
-
-  .sched-top { display: flex; align-items: flex-start; gap: 12px; }
-
-  .sched-time {
-    font-size: 28px; font-weight: 800;
-    letter-spacing: -0.03em; line-height: 1;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .sched-info { flex: 1; }
-  .sched-days {
-    display: flex; gap: 6px; flex-wrap: wrap;
-    margin-top: 4px;
-  }
-  .day-chip {
-    width: 28px; height: 28px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700;
-    background: var(--surface-2); color: var(--text-3);
-    border: 1px solid var(--border);
-    cursor: pointer; transition: all 0.15s ease;
-    user-select: none;
-  }
-  .day-chip.on { background: rgba(34,197,94,0.15); color: var(--accent); border-color: rgba(34,197,94,0.3); }
-
-  .sched-delete {
-    padding: 6px; border-radius: 8px; color: var(--text-3);
-    transition: all 0.15s ease;
-  }
-  .sched-delete:hover { background: rgba(239,68,68,0.1); color: var(--danger); }
-  .sched-delete svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; display: block; }
-
-  .sched-footer {
-    display: flex; gap: 8px; align-items: center;
-    padding-top: 10px; border-top: 1px solid var(--border);
-  }
-  .sched-badge {
-    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
-    padding: 4px 10px; border-radius: 8px;
-    background: rgba(34,197,94,0.1); color: var(--accent);
-  }
-  .sched-footer-label { font-size: 12px; color: var(--text-3); }
-
-  .add-schedule-btn {
-    width: 100%; padding: 14px;
-    border: 1.5px dashed var(--border);
-    border-radius: var(--card-r);
-    color: var(--text-3); font-size: 14px; font-weight: 600;
-    transition: all 0.2s ease; margin-top: 4px;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .add-schedule-btn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; }
-  .add-schedule-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(34,197,94,0.05); }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     HISTORY VIEW
-  ═══════════════════════════════════════════════════════════════════════ */
-  .stats-row {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px; margin-bottom: 20px;
-  }
-  .stat-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 14px;
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  .stat-val { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
-  .stat-lbl { font-size: 11px; color: var(--text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
-
-  .session-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 16px;
-    display: flex; align-items: center; gap: 14px;
-    margin-bottom: 10px;
-  }
-  .session-icon {
-    width: 42px; height: 42px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  .session-icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
-  .session-icon.ok   { background: rgba(34,197,94,0.15); color: var(--accent); }
-  .session-icon.warn { background: rgba(245,158,11,0.15); color: var(--warning); }
-  .session-icon.err  { background: rgba(239,68,68,0.15);  color: var(--danger); }
-
-  .session-info { flex: 1; }
-  .session-date { font-size: 14px; font-weight: 700; }
-  .session-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-  .session-right { text-align: right; }
-  .session-area { font-size: 17px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text); }
-  .session-dur  { font-size: 12px; color: var(--text-3); margin-top: 1px; }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     SETTINGS VIEW
-  ═══════════════════════════════════════════════════════════════════════ */
-  .settings-field { padding: 12px 16px; }
-  .settings-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 8px; }
-  .settings-field .field-hint { font-size: 11px; color: var(--text-3); margin-top: 6px; }
-
-  .slider-row { display: flex; align-items: center; gap: 12px; }
-  .slider-row .field-slider { flex: 1; }
-  .slider-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); min-width: 44px; text-align: right; }
-
-  .about-hero {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--card-r); padding: 24px 20px;
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    margin-bottom: 12px; text-align: center;
-  }
-  .about-logo-circle {
-    width: 64px; height: 64px; border-radius: 18px;
-    background: rgba(34,197,94,0.12); border: 1.5px solid rgba(34,197,94,0.25);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px; margin-bottom: 4px;
-  }
-  .about-name  { font-size: 17px; font-weight: 800; }
-  .about-ver   { font-size: 12px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     TEACH-IN WIZARD
-  ═══════════════════════════════════════════════════════════════════════ */
-  #teach-wizard {
-    position: fixed; inset: 0;
-    z-index: 200;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(8px);
-    display: none; align-items: flex-end; justify-content: center;
-    padding-bottom: calc(var(--nav-h) + 8px);
-  }
-  #teach-wizard.open { display: flex; animation: wiz-in 0.35s var(--ease); }
-  @keyframes wiz-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-
-  .wiz-sheet {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 28px 28px 20px 20px;
-    width: 100%; max-width: 480px;
-    overflow: hidden;
-    animation: sheet-up 0.35s cubic-bezier(0.34,1.2,0.64,1);
-  }
-  @keyframes sheet-up {
-    from { transform: translateY(40px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-  }
-
-  /* Step indicator */
-  .wiz-steps {
-    display: flex; align-items: center; justify-content: center;
-    gap: 6px; padding: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .wiz-step-dot {
-    height: 4px; border-radius: 2px;
-    background: var(--border); transition: all 0.3s ease;
-  }
-  .wiz-step-dot.done { background: var(--accent); width: 24px !important; }
-  .wiz-step-dot.curr { background: var(--accent); opacity: 0.6; width: 16px !important; }
-
-  /* Step panels */
-  .wiz-steps-wrap { overflow: hidden; }
-  .wiz-step { display: none; padding: 24px; }
-  .wiz-step.active { display: block; }
-
-  .wiz-step-icon {
-    width: 56px; height: 56px; border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; margin-bottom: 14px;
-  }
-  .wiz-step-icon.green  { background: rgba(34,197,94,0.15); }
-  .wiz-step-icon.purple { background: rgba(168,85,247,0.15); }
-  .wiz-step-icon.blue   { background: rgba(59,130,246,0.15); }
-  .wiz-step-icon.green2 { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); }
-
-  .wiz-title { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
-  .wiz-body  { font-size: 14px; color: var(--text-2); line-height: 1.6; margin-bottom: 20px; }
-
-  .wiz-actions { display: flex; flex-direction: column; gap: 8px; }
-
-  .wiz-btn {
-    width: 100%; padding: 14px; border-radius: var(--btn-r);
-    font-size: 15px; font-weight: 700;
-    transition: filter 0.15s ease, transform 0.1s ease;
-  }
-  .wiz-btn:active { transform: scale(0.97); }
-  .wiz-btn.primary { background: var(--accent); color: #fff; box-shadow: 0 4px 16px var(--accent-glow); }
-  .wiz-btn.primary:hover { filter: brightness(1.1); }
-  .wiz-btn.secondary { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); }
-  .wiz-btn.danger { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); color: var(--danger); }
-
-  /* Recording animation */
-  .wiz-rec {
-    display: flex; align-items: center; gap: 10px;
-    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
-    border-radius: 12px; padding: 12px 14px; margin-bottom: 16px;
-  }
-  .wiz-rec-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--danger);
-    animation: rec-blink 1s ease-in-out infinite;
-  }
-  @keyframes rec-blink { 0%,100%{opacity:1}50%{opacity:0.2} }
-  .wiz-rec-label { font-size: 13px; font-weight: 600; color: var(--danger); }
-
-  /* Zone name input step */
-  .zone-preview {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 14px; padding: 14px;
-    margin-bottom: 16px;
-  }
-  .zone-icon { font-size: 24px; }
-  .zone-icon-label { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-
-  /* Success step */
-  .wiz-success-ring {
-    width: 72px; height: 72px; border-radius: 50%;
-    background: rgba(34,197,94,0.12);
-    border: 2px solid rgba(34,197,94,0.3);
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px; font-size: 32px;
-    animation: success-pop 0.5s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes success-pop {
-    from { transform: scale(0.5); opacity: 0; }
-    to   { transform: scale(1);   opacity: 1; }
-  }
-  .wiz-success-title { text-align: center; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-  .wiz-success-body  { text-align: center; font-size: 14px; color: var(--text-2); margin-bottom: 20px; }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     MODAL (generic — schedule edit, etc.)
-  ═══════════════════════════════════════════════════════════════════════ */
-  .modal-backdrop {
-    position: fixed; inset: 0; z-index: 300;
-    background: rgba(0,0,0,0.65);
-    backdrop-filter: blur(6px);
-    display: none; align-items: center; justify-content: center;
-    padding: 20px;
-  }
-  .modal-backdrop.open { display: flex; animation: fade-in 0.2s ease; }
-  @keyframes fade-in { from{opacity:0}to{opacity:1} }
-
-  .modal {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 24px; width: 100%; max-width: 400px;
-    overflow: hidden;
-    animation: modal-up 0.3s cubic-bezier(0.34,1.2,0.64,1);
-  }
-  @keyframes modal-up { from{transform:scale(0.92);opacity:0}to{transform:scale(1);opacity:1} }
-
-  .modal-header {
-    padding: 20px 20px 0;
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .modal-title { font-size: 17px; font-weight: 800; }
-  .modal-close { padding: 6px; border-radius: 8px; color: var(--text-3); font-size: 20px; line-height: 1; }
-  .modal-close:hover { background: var(--glass-light); color: var(--text); }
-  .modal-body { padding: 0 20px; }
-  .modal-footer { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 8px; }
-
-  .modal-btn {
-    width: 100%; padding: 13px; border-radius: var(--btn-r);
-    font-size: 15px; font-weight: 700;
-    transition: filter 0.15s ease;
-  }
-  .modal-btn.primary { background: var(--accent); color: #fff; box-shadow: 0 4px 14px var(--accent-glow); }
-  .modal-btn.primary:hover { filter: brightness(1.1); }
-  .modal-btn.ghost  { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); }
-
-  /* Time picker group */
-  .time-row { display: flex; gap: 8px; margin-bottom: 14px; }
-  .time-sel {
-    flex: 1; padding: 12px; border-radius: 12px;
-    background: var(--surface-2); border: 1px solid var(--border);
-    color: var(--text); font-size: 22px; font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
-    text-align: center; outline: none;
-    -webkit-appearance: none; appearance: none;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-  .time-sel:focus { border-color: var(--accent); }
-
-  .time-sep { display: flex; align-items: center; font-size: 22px; font-weight: 800; color: var(--text-3); }
-
-  /* Day picker in modal */
-  .day-row { display: flex; gap: 6px; margin-bottom: 14px; }
-  .day-row .day-chip { flex: 1; }
-
-  /* Duration option pills */
-  .dur-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-  .dur-opt {
-    padding: 7px 14px; border-radius: 10px;
-    font-size: 13px; font-weight: 600;
-    background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2);
-    cursor: pointer; transition: all 0.15s ease;
-  }
-  .dur-opt.on { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); color: var(--accent); }
-
-  .modal-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 8px; display: block; }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     LEAFLET OVERRIDES
-  ═══════════════════════════════════════════════════════════════════════ */
-  .leaflet-container { background: #1a1f2e !important; }
-  .leaflet-control-zoom a {
-    background: var(--glass) !important; color: var(--text-2) !important;
-    border-color: var(--border) !important; backdrop-filter: blur(16px);
-  }
-  .leaflet-control-zoom a:hover { color: var(--accent) !important; }
-  .leaflet-control-attribution {
-    background: rgba(14,17,23,0.75) !important; color: var(--text-3) !important;
-    font-size: 9px !important; backdrop-filter: blur(8px);
-  }
-  .leaflet-control-attribution a { color: var(--text-3) !important; }
-
-  /* Robot marker */
-  .r-wrap { position: relative; width: 16px; height: 16px; }
-  .r-dot  {
-    width: 16px; height: 16px; border-radius: 50%;
-    background: var(--accent); border: 2.5px solid var(--bg);
-    box-shadow: 0 0 12px var(--accent-glow);
-    position: relative; z-index: 2;
-    transition: background 0.4s ease, box-shadow 0.4s ease;
-  }
-  .r-ring {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    width: 16px; height: 16px; border-radius: 50%;
-    border: 1.5px solid var(--accent); opacity: 0;
-    animation: r-ping 2.5s ease-out infinite;
-  }
-  .r-ring2 { animation-delay: 1.2s; }
-  @keyframes r-ping {
-    0%   { transform: translate(-50%,-50%) scale(1);   opacity: 0.6; }
-    100% { transform: translate(-50%,-50%) scale(5);   opacity: 0; }
-  }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     UTILITIES
-  ═══════════════════════════════════════════════════════════════════════ */
-  .hidden { display: none !important; }
-  .empty-state {
-    padding: 40px 20px; text-align: center;
-    color: var(--text-3); font-size: 14px; font-weight: 500;
-  }
-  .empty-state-icon { font-size: 36px; margin-bottom: 10px; }
-  </style>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:      #F2F5F2;
+  --sf:      #FFFFFF;
+  --sf2:     #F7FAF7;
+  --sf3:     #EDF2ED;
+  --border:  rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.13);
+
+  --green:    #16A34A;
+  --green-dk: #14532D;
+  --green-lt: #DCFCE7;
+  --green-md: #86EFAC;
+
+  --amber:  #B45309;
+  --amber-lt:#FEF3C7;
+  --red:    #DC2626;
+  --red-lt: #FEE2E2;
+  --blue:   #1D4ED8;
+  --blue-lt:#DBEAFE;
+  --violet: #6D28D9;
+  --violet-lt:#EDE9FE;
+
+  --text:   #0F1F12;
+  --text2:  #4B5E50;
+  --text3:  #9AAB9E;
+
+  --sidebar: 390px;
+  --r:    14px;
+  --r-sm: 9px;
+  --r-lg: 20px;
+  --sh:   0 1px 3px rgba(0,0,0,0.06), 0 3px 10px rgba(0,0,0,0.05);
+  --sh-md:0 4px 20px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.06);
+  --ease: cubic-bezier(.4,0,.2,1);
+  --spring: cubic-bezier(.34,1.56,.64,1);
+
+  /* state theming */
+  --sc:    #16A34A;
+  --sc-lt: #DCFCE7;
+  --sc-gl: rgba(22,163,74,.12);
+}
+[data-state="IDLE"]               { --sc:#16A34A; --sc-lt:#DCFCE7; --sc-gl:rgba(22,163,74,.12); }
+[data-state="MOWING"]             { --sc:#15803D; --sc-lt:#D1FAE5; --sc-gl:rgba(21,128,61,.14); }
+[data-state="OBSTACLE_AVOIDANCE"] { --sc:#B45309; --sc-lt:#FEF3C7; --sc-gl:rgba(180,83,9,.12);  }
+[data-state="RETURNING"]          { --sc:#1D4ED8; --sc-lt:#DBEAFE; --sc-gl:rgba(29,78,216,.12); }
+[data-state="DOCKING"]            { --sc:#0369A1; --sc-lt:#E0F2FE; --sc-gl:rgba(3,105,161,.12); }
+[data-state="CHARGING"]           { --sc:#B45309; --sc-lt:#FEF3C7; --sc-gl:rgba(180,83,9,.12);  }
+[data-state="TEACH_IN"]           { --sc:#6D28D9; --sc-lt:#EDE9FE; --sc-gl:rgba(109,40,217,.12);}
+[data-state="ERROR"]              { --sc:#DC2626; --sc-lt:#FEE2E2; --sc-gl:rgba(220,38,38,.14); }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════════════════ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; overflow:hidden; }
+body { font-family:'Figtree',sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
+button { font:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+input,select { font:inherit; }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SHELL + MAP
+═══════════════════════════════════════════════════════════════ */
+.shell { display:flex; height:100vh; overflow:hidden; }
+#map {
+  position:fixed;
+  left:var(--sidebar); top:0; right:0; bottom:0;
+  z-index:0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════════════════ */
+.sidebar {
+  width:var(--sidebar);
+  flex-shrink:0;
+  background:var(--sf);
+  display:flex;
+  flex-direction:column;
+  position:relative; z-index:20;
+  box-shadow:1px 0 0 var(--border), 4px 0 24px rgba(0,0,0,0.05);
+  overflow:hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════════════════════════════ */
+.topbar {
+  display:flex; align-items:center; gap:10px;
+  padding:16px 20px 14px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.brand {
+  display:flex; align-items:center; gap:9px;
+  flex:1;
+}
+.brand-icon {
+  width:34px; height:34px;
+  background:var(--sc-lt);
+  border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .5s var(--ease);
+  flex-shrink:0;
+}
+.brand-icon svg { width:20px; height:20px; }
+.brand-name {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:15px; font-weight:800;
+  letter-spacing:-.01em;
+  color:var(--text);
+}
+.brand-model {
+  font-size:11px; font-weight:500;
+  color:var(--text3);
+  letter-spacing:.02em;
+}
+.topbar-right { display:flex; align-items:center; gap:8px; }
+
+.conn-pill {
+  display:flex; align-items:center; gap:5px;
+  background:var(--sf3);
+  border-radius:20px;
+  padding:5px 10px 5px 7px;
+  font-size:11px; font-weight:600;
+  color:var(--text2);
+  transition:background .3s;
+}
+.ws-dot {
+  width:7px; height:7px; border-radius:50%;
+  background:var(--border2);
+  transition:background .3s, box-shadow .3s;
+  flex-shrink:0;
+}
+.ws-dot.on  { background:#22C55E; box-shadow:0 0 0 3px rgba(34,197,94,.2); }
+.ws-dot.err { background:var(--red); }
+
+.soc-pill {
+  display:flex; align-items:center; gap:5px;
+  background:var(--sf3);
+  border-radius:20px;
+  padding:5px 10px 5px 8px;
+  font-size:11px; font-weight:600;
+  color:var(--text2);
+}
+.soc-pill svg { color:var(--sc); transition:color .5s; flex-shrink:0; }
+
+/* ═══════════════════════════════════════════════════════════════
+   VIEWS
+═══════════════════════════════════════════════════════════════ */
+.views { flex:1; overflow:hidden; position:relative; }
+.view {
+  position:absolute; inset:0;
+  overflow-y:auto; overflow-x:hidden;
+  display:none;
+  padding-bottom:12px;
+}
+.view.active { display:block; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION
+═══════════════════════════════════════════════════════════════ */
+.section { padding:0 16px; margin-top:16px; }
+.section-head {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:10px;
+}
+.section-label {
+  font-size:11px; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase;
+  color:var(--text3);
+}
+.section-action {
+  font-size:12px; font-weight:600;
+  color:var(--sc);
+  padding:4px 10px;
+  background:var(--sc-lt);
+  border-radius:20px;
+  transition:background .2s, color .2s;
+}
+.section-action:hover { background:var(--sc); color:#fff; }
+
+/* ═══════════════════════════════════════════════════════════════
+   HOME: HERO CARD
+═══════════════════════════════════════════════════════════════ */
+.hero-card {
+  margin:16px 16px 0;
+  background:var(--sc-lt);
+  border-radius:var(--r-lg);
+  padding:22px;
+  position:relative; overflow:hidden;
+  transition:background .5s var(--ease);
+}
+.hero-card::before {
+  content:'';
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at 80% 0%, rgba(255,255,255,0.5) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-top {
+  display:flex; align-items:flex-start; gap:16px;
+  margin-bottom:18px;
+}
+.robot-wrap {
+  flex-shrink:0;
+  position:relative;
+  animation:robot-float 3.5s ease-in-out infinite;
+}
+.robot-aura {
+  position:absolute;
+  inset:-8px;
+  border-radius:50%;
+  background:var(--sc-gl);
+  animation:aura-pulse 3s ease-in-out infinite;
+  transition:background .5s;
+}
+@keyframes aura-pulse { 0%,100%{transform:scale(1);opacity:.8;} 50%{transform:scale(1.12);opacity:.3;} }
+@keyframes robot-float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
+[data-state="MOWING"] .robot-wrap { animation:robot-mow .5s ease-in-out infinite alternate; }
+@keyframes robot-mow { from{transform:translateY(0) rotate(-1.5deg);} to{transform:translateY(-3px) rotate(1.5deg);} }
+[data-state="ERROR"] .robot-wrap { animation:robot-err .3s ease-in-out 4; }
+@keyframes robot-err { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+
+/* Robot SVG */
+.robot-svg { width:80px; height:80px; }
+.robot-blade { transform-origin:40px 43px; }
+[data-state="MOWING"] .robot-blade { animation:blade-spin 1s linear infinite; }
+[data-state="TEACH_IN"] .robot-blade { animation:blade-spin 2s linear infinite; }
+@keyframes blade-spin { to{transform:rotate(360deg);} }
+
+/* Battery ring */
+.hero-battery {
+  position:relative;
+  width:66px; height:66px;
+  flex-shrink:0;
+  margin-left:auto;
+}
+.hero-battery svg {
+  width:100%; height:100%;
+  transform:rotate(-90deg);
+}
+.ring-bg {
+  fill:none;
+  stroke:rgba(0,0,0,0.1);
+  stroke-width:5;
+}
+.ring-fill {
+  fill:none;
+  stroke:var(--sc);
+  stroke-width:5;
+  stroke-linecap:round;
+  stroke-dasharray:163.4;
+  stroke-dashoffset:163.4;
+  transition:stroke-dashoffset 1s var(--ease), stroke .5s;
+}
+.battery-text {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:0;
+}
+.battery-pct {
+  font-family:'JetBrains Mono',monospace;
+  font-size:17px; font-weight:600;
+  color:var(--text);
+  line-height:1;
+}
+.battery-unit {
+  font-size:9px; font-weight:600;
+  color:var(--text3);
+}
+
+/* Hero state info */
+.hero-state { margin-bottom:14px; }
+.state-chip {
+  display:inline-flex; align-items:center; gap:7px;
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(8px);
+  border-radius:20px;
+  padding:5px 12px 5px 8px;
+}
+.state-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--sc);
+  transition:background .5s;
+  animation:dot-pulse 2.5s ease-in-out infinite;
+}
+[data-state="IDLE"] .state-dot { animation:none; }
+[data-state="ERROR"] .state-dot { animation:dot-pulse .6s ease-in-out infinite; }
+@keyframes dot-pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+.state-chip-label {
+  font-size:13px; font-weight:700;
+  color:var(--sc);
+  transition:color .5s;
+}
+.state-chip-label.pop { animation:pop-in .35s var(--spring); }
+@keyframes pop-in { from{opacity:0;transform:scale(.85);} to{opacity:1;transform:scale(1);} }
+.state-sub-label {
+  margin-top:6px;
+  font-size:13px; font-weight:500;
+  color:var(--text2);
+  padding-left:2px;
+}
+
+/* Hero action buttons */
+.hero-actions { display:flex; flex-direction:column; gap:8px; }
+.ha-btn {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px;
+  border-radius:var(--r-sm);
+  font-size:14px; font-weight:600;
+  transition:all .15s var(--ease);
+  position:relative; overflow:hidden;
+}
+.ha-btn:active { transform:scale(.97); }
+.ha-btn-icon {
+  width:30px; height:30px; border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.ha-primary {
+  background:var(--sc);
+  color:#fff;
+}
+.ha-primary .ha-btn-icon { background:rgba(255,255,255,0.2); }
+.ha-primary:hover { filter:brightness(1.08); }
+.ha-ghost {
+  background:rgba(255,255,255,0.6);
+  color:var(--sc);
+  border:1px solid rgba(255,255,255,0.8);
+}
+.ha-ghost .ha-btn-icon { background:var(--sc-lt); }
+.ha-ghost:hover { background:rgba(255,255,255,0.9); }
+.ha-danger {
+  background:#FEE2E2;
+  color:#DC2626;
+}
+.ha-danger .ha-btn-icon { background:rgba(220,38,38,0.15); }
+.ha-danger:hover { background:#FECACA; }
+.ha-info {
+  background:rgba(255,255,255,0.5);
+  color:var(--text2);
+  font-size:12px; font-weight:500;
+  justify-content:center;
+  padding:8px;
+  border-radius:var(--r-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HOME: TELEMETRY
+═══════════════════════════════════════════════════════════════ */
+.tel-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.tel-cell {
+  background:var(--sf);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:14px;
+  transition:border-color .3s;
+}
+.tel-cell:hover { border-color:var(--sc); }
+.tel-icon {
+  width:30px; height:30px;
+  border-radius:8px;
+  background:var(--sf3);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:10px;
+  color:var(--text3);
+}
+.tel-icon svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.tel-val-row { display:flex; align-items:baseline; gap:3px; }
+.tel-num {
+  font-family:'JetBrains Mono',monospace;
+  font-size:24px; font-weight:600;
+  color:var(--text);
+  line-height:1;
+}
+.tel-unit-label {
+  font-size:11px; font-weight:500;
+  color:var(--text3);
+}
+.tel-name {
+  font-size:11px; font-weight:600;
+  letter-spacing:.04em; text-transform:uppercase;
+  color:var(--text3);
+  margin-top:6px;
+}
+/* GPS special: no mono number */
+.tel-gps-str {
+  font-size:13px; font-weight:700;
+  color:var(--text);
+  line-height:1.2;
+  margin-top:2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HOME: ZONES
+═══════════════════════════════════════════════════════════════ */
+.zone-list { display:flex; flex-direction:column; gap:6px; }
+.zone-item {
+  display:flex; align-items:center; gap:12px;
+  background:var(--sf);
+  border:1px solid var(--border);
+  border-radius:var(--r-sm);
+  padding:12px 14px;
+  transition:all .2s;
+}
+.zone-item:hover { border-color:var(--sc); box-shadow:var(--sh); }
+.zone-swatch {
+  width:10px; height:32px;
+  border-radius:5px;
+  flex-shrink:0;
+}
+.zone-info { flex:1; min-width:0; }
+.zone-name { font-size:14px; font-weight:600; color:var(--text); }
+.zone-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+.zone-play {
+  width:32px; height:32px; border-radius:8px;
+  background:var(--sc-lt);
+  color:var(--sc);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; font-size:12px;
+  transition:all .2s;
+}
+.zone-play:hover { background:var(--sc); color:#fff; transform:scale(1.05); }
+.zone-empty {
+  padding:24px 16px;
+  text-align:center;
+  background:var(--sf2);
+  border:1.5px dashed var(--border2);
+  border-radius:var(--r);
+}
+.zone-empty-icon { font-size:28px; margin-bottom:8px; }
+.zone-empty p { font-size:13px; color:var(--text3); line-height:1.5; }
+
+/* ═══════════════════════════════════════════════════════════════
+   HOME: LAST SESSION
+═══════════════════════════════════════════════════════════════ */
+.last-sess-card {
+  background:var(--sf);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:14px 16px;
+  display:flex; align-items:center; gap:12px;
+}
+.last-sess-icon {
+  width:40px; height:40px; border-radius:10px;
+  background:var(--green-lt);
+  color:var(--green);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.last-sess-info { flex:1; }
+.last-sess-date { font-size:13px; font-weight:600; color:var(--text); }
+.last-sess-meta { font-size:12px; color:var(--text3); margin-top:2px; }
+.last-sess-area { font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:600; color:var(--sc); }
+.last-sess-unit { font-size:10px; color:var(--text3); }
+
+/* ═══════════════════════════════════════════════════════════════
+   SCHEDULE VIEW
+═══════════════════════════════════════════════════════════════ */
+.next-mow-card {
+  margin:16px 16px 0;
+  background:linear-gradient(135deg, var(--green) 0%, var(--green-dk) 100%);
+  border-radius:var(--r-lg);
+  padding:22px;
+  color:#fff;
+  position:relative; overflow:hidden;
+}
+.next-mow-card::after {
+  content:'';
+  position:absolute; right:-20px; top:-20px;
+  width:120px; height:120px;
+  background:rgba(255,255,255,0.08);
+  border-radius:50%;
+}
+.next-mow-label {
+  font-size:11px; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase;
+  opacity:.7; margin-bottom:6px;
+}
+.next-mow-time {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:34px; font-weight:800;
+  line-height:1; letter-spacing:-.02em;
+}
+.next-mow-sub { font-size:13px; opacity:.75; margin-top:6px; font-weight:500; }
+
+.week-grid {
+  display:flex; gap:4px;
+  background:var(--sf);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:14px 12px;
+}
+.day-col {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.day-name {
+  font-size:10px; font-weight:700;
+  letter-spacing:.04em; text-transform:uppercase;
+  color:var(--text3);
+}
+.day-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--border2);
+  transition:background .3s;
+}
+.day-col.has-sched .day-dot { background:var(--sc); }
+.day-col.today .day-name { color:var(--sc); }
+.day-time {
+  font-size:9px; font-family:'JetBrains Mono',monospace;
+  background:var(--sc-lt);
+  color:var(--sc);
+  padding:2px 4px;
+  border-radius:4px;
+  width:100%; text-align:center;
+  transition:background .3s, color .3s;
+}
+
+.schedule-card {
+  background:var(--sf);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:14px 16px;
+  transition:all .2s;
+}
+.schedule-card:hover { border-color:var(--sc); }
+.sched-top { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.sched-time-badge {
+  background:var(--sf3);
+  border-radius:var(--r-sm);
+  padding:8px 12px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:20px; font-weight:600;
+  color:var(--text);
+  flex-shrink:0;
+}
+.sched-days { display:flex; flex-wrap:wrap; gap:4px; flex:1; }
+.day-chip {
+  padding:3px 8px;
+  border-radius:6px;
+  font-size:11px; font-weight:600;
+  background:var(--sf3);
+  color:var(--text3);
+  cursor:pointer;
+  transition:all .15s;
+  user-select:none;
+}
+.day-chip.on { background:var(--sc); color:#fff; }
+.sched-delete {
+  width:30px; height:30px;
+  border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text3);
+  transition:all .2s;
+  flex-shrink:0;
+}
+.sched-delete:hover { background:var(--red-lt); color:var(--red); }
+.sched-delete svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.sched-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding-top:10px;
+  border-top:1px solid var(--border);
+}
+.sched-badge {
+  font-size:11px; font-weight:700;
+  color:var(--sc); background:var(--sc-lt);
+  padding:3px 10px; border-radius:20px;
+}
+.sched-dur { font-size:12px; color:var(--text3); font-weight:500; }
+
+.add-btn {
+  width:100%;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:12px;
+  border:1.5px dashed var(--border2);
+  border-radius:var(--r);
+  font-size:13px; font-weight:600;
+  color:var(--text3);
+  transition:all .2s;
+  margin-top:8px;
+}
+.add-btn:hover { border-color:var(--sc); color:var(--sc); background:var(--sc-lt); }
+.add-btn svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+
+/* ═══════════════════════════════════════════════════════════════
+   HISTORY VIEW
+═══════════════════════════════════════════════════════════════ */
+.stat-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  padding:16px 16px 0;
+}
+.stat-card {
+  background:var(--sf);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:14px;
+  text-align:center;
+}
+.stat-val {
+  font-family:'JetBrains Mono',monospace;
+  font-size:22px; font-weight:600;
+  color:var(--text);
+}
+.stat-lbl {
+  font-size:10px; font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase;
+  color:var(--text3);
+  margin-top:4px;
+}
+
+.chart-wrap {
+  background:var(--sf);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:16px 12px 12px;
+}
+.chart-bars {
+  display:flex; gap:6px; align-items:flex-end;
+  height:90px;
+}
+.chart-col {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:5px;
+  height:100%;
+}
+.chart-bar-wrap {
+  flex:1; width:100%; display:flex; align-items:flex-end;
+}
+.chart-bar {
+  width:100%; border-radius:5px 5px 0 0;
+  background:var(--green-md);
+  min-height:5px;
+  position:relative; overflow:hidden;
+  transition:height .6s var(--ease);
+}
+.chart-bar::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,0.3) 0%,transparent 50%);
+}
+.chart-bar.bar-ok { background:#4ADE80; }
+.chart-bar.bar-warn { background:#FCD34D; }
+.chart-bar.bar-err { background:#FCA5A5; }
+.chart-lbl {
+  font-size:9px; font-family:'JetBrains Mono',monospace;
+  color:var(--text3); white-space:nowrap;
+}
+
+.session-card {
+  display:flex; align-items:center; gap:12px;
+  background:var(--sf);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:13px 16px;
+  transition:all .2s;
+}
+.session-card+.session-card { margin-top:6px; }
+.session-card:hover { border-color:var(--sc); }
+.sess-icon {
+  width:38px; height:38px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.sess-icon.ok { background:#DCFCE7; color:#16A34A; }
+.sess-icon.warn { background:#FEF3C7; color:#B45309; }
+.sess-icon.err { background:#FEE2E2; color:#DC2626; }
+.sess-icon svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.sess-info { flex:1; min-width:0; }
+.sess-date { font-size:13px; font-weight:600; color:var(--text); }
+.sess-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+.sess-right { text-align:right; flex-shrink:0; }
+.sess-area { font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:600; color:var(--sc); }
+.sess-unit { font-size:10px; color:var(--text3); }
+
+.empty-state {
+  padding:40px 20px; text-align:center;
+  background:var(--sf2);
+  border:1.5px dashed var(--border2);
+  border-radius:var(--r);
+}
+.empty-icon { font-size:32px; margin-bottom:10px; }
+.empty-state p { font-size:13px; color:var(--text3); line-height:1.6; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS VIEW
+═══════════════════════════════════════════════════════════════ */
+.settings-section { padding:16px 16px 0; }
+.settings-section-title {
+  font-size:11px; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:8px;
+}
+.settings-card {
+  background:var(--sf);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+.settings-row {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px;
+  transition:background .2s;
+  cursor:pointer;
+}
+.settings-row:hover { background:var(--sf2); }
+.settings-row-icon {
+  width:34px; height:34px; border-radius:9px;
+  background:var(--sf3);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; color:var(--text2);
+}
+.settings-row-icon svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.settings-row-text { flex:1; }
+.settings-row-label { font-size:14px; font-weight:500; color:var(--text); }
+.settings-row-val { font-size:12px; color:var(--text3); margin-top:1px; }
+.settings-arrow { color:var(--text3); font-size:18px; }
+.settings-divider { height:1px; background:var(--border); margin:0 16px; }
+
+/* Slider rows */
+.slider-row { padding:14px 16px; }
+.slider-head {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:8px;
+}
+.slider-label { font-size:14px; font-weight:500; color:var(--text); }
+.slider-val {
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px; font-weight:600;
+  color:var(--sc); background:var(--sc-lt);
+  padding:2px 8px; border-radius:6px;
+  transition:background .3s, color .3s;
+}
+input[type="range"] {
+  width:100%; height:4px; border-radius:2px;
+  appearance:none; -webkit-appearance:none;
+  background:var(--sf3);
+  outline:none; cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--sc);
+  box-shadow:0 1px 4px rgba(0,0,0,0.2);
+  transition:transform .15s, background .3s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
+
+/* Toggle rows */
+.toggle-row {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:14px 16px;
+}
+.toggle-text { flex:1; }
+.toggle-label { font-size:14px; font-weight:500; color:var(--text); }
+.toggle-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+.toggle-switch { position:relative; display:block; width:44px; height:26px; flex-shrink:0; cursor:pointer; }
+.toggle-switch input { opacity:0; width:0; height:0; }
+.toggle-track {
+  position:absolute; inset:0;
+  background:var(--border2);
+  border-radius:13px;
+  transition:background .3s;
+}
+.toggle-track::before {
+  content:'';
+  position:absolute; left:3px; top:3px;
+  width:20px; height:20px; border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,0.2);
+  transition:transform .3s var(--spring);
+}
+.toggle-switch input:checked + .toggle-track { background:var(--sc); }
+.toggle-switch input:checked + .toggle-track::before { transform:translateX(18px); }
+
+.danger-row {
+  width:100%; padding:14px 16px;
+  display:flex; align-items:center; gap:10px;
+  font-size:14px; font-weight:600;
+  color:var(--red);
+  transition:background .2s;
+  text-align:left;
+}
+.danger-row:hover { background:#FFF1F2; }
+.danger-row svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; flex-shrink:0; }
+
+/* ═══════════════════════════════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════════════════════════════ */
+.bottom-nav {
+  display:flex;
+  border-top:1px solid var(--border);
+  background:var(--sf);
+  flex-shrink:0;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+.nav-btn {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:4px; padding:10px 4px 11px;
+  font-size:10px; font-weight:600;
+  letter-spacing:.03em; text-transform:uppercase;
+  color:var(--text3);
+  transition:all .2s;
+  position:relative;
+}
+.nav-btn::before {
+  content:''; position:absolute; top:0; left:25%; right:25%; height:2px;
+  background:var(--sc); border-radius:0 0 2px 2px;
+  transform:scaleX(0); transition:transform .2s var(--spring);
+}
+.nav-btn.active::before { transform:scaleX(1); }
+.nav-btn svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:all .2s; }
+.nav-btn.active { color:var(--sc); }
+.nav-btn.active svg { stroke:var(--sc); }
+.nav-btn:hover:not(.active) { color:var(--text2); }
+
+/* ═══════════════════════════════════════════════════════════════
+   MAP FLOATING CONTROLS
+═══════════════════════════════════════════════════════════════ */
+.map-float {
+  position:fixed;
+  right:16px; top:16px;
+  z-index:10;
+  display:flex; flex-direction:column; gap:6px;
+}
+.map-fab {
+  width:40px; height:40px;
+  background:var(--sf);
+  border-radius:10px;
+  box-shadow:var(--sh-md);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text2);
+  transition:all .2s;
+}
+.map-fab:hover { background:var(--sc); color:#fff; box-shadow:0 4px 12px var(--sc-gl); }
+.map-fab svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+
+/* Robot map marker */
+.robot-marker { position:relative; width:28px; height:28px; }
+.robot-marker-ring {
+  position:absolute; inset:0; border-radius:50%;
+  background:var(--sc,#16A34A); opacity:.2;
+  animation:marker-ring 2s ease-out infinite;
+}
+.robot-marker-body {
+  position:absolute; inset:6px;
+  background:var(--sc,#16A34A);
+  border:2.5px solid #fff;
+  border-radius:50%;
+  box-shadow:0 2px 8px rgba(0,0,0,0.25);
+}
+@keyframes marker-ring { 0%{transform:scale(.8);opacity:.4;} 100%{transform:scale(2.2);opacity:0;} }
+
+/* ═══════════════════════════════════════════════════════════════
+   OVERLAYS (modals, wizard)
+═══════════════════════════════════════════════════════════════ */
+.overlay {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  z-index:100;
+  display:flex; align-items:flex-end; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition:opacity .3s var(--ease);
+}
+.overlay.open { opacity:1; pointer-events:auto; }
+.modal-sheet {
+  background:var(--sf);
+  border-radius:24px 24px 0 0;
+  width:100%; max-width:640px;
+  padding-bottom:env(safe-area-inset-bottom,16px);
+  transform:translateY(100%);
+  transition:transform .4s var(--spring);
+  overflow:hidden;
+}
+.overlay.open .modal-sheet { transform:translateY(0); }
+.modal-handle {
+  width:40px; height:4px; border-radius:2px;
+  background:var(--border2);
+  margin:12px auto 0;
+}
+.modal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 24px 0;
+}
+.modal-title {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:20px; font-weight:700;
+  color:var(--text);
+}
+.modal-close {
+  width:32px; height:32px; border-radius:8px;
+  background:var(--sf3);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text3); font-size:18px;
+  transition:all .2s;
+}
+.modal-close:hover { background:var(--red-lt); color:var(--red); }
+.modal-body { padding:20px 24px 24px; }
+
+/* Wizard steps */
+.wiz-dots { display:flex; gap:6px; align-items:center; padding:0 24px 16px; }
+.wiz-dot {
+  height:6px; border-radius:3px;
+  background:var(--border2);
+  transition:all .3s var(--spring);
+}
+.wiz-dot.curr { width:24px; background:var(--sc); }
+.wiz-dot.done { width:10px; background:var(--green-md); }
+.wiz-dot.next { width:8px; }
+
+.wiz-step { display:none; }
+.wiz-step.active { display:block; }
+.wiz-step-title {
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:22px; font-weight:700;
+  color:var(--text); margin-bottom:8px;
+}
+.wiz-step-body {
+  font-size:14px; color:var(--text2); line-height:1.6;
+  margin-bottom:20px;
+}
+.wiz-btn-row { display:flex; flex-direction:column; gap:8px; }
+.wiz-btn {
+  padding:14px; border-radius:var(--r);
+  font-size:14px; font-weight:600;
+  transition:all .2s;
+}
+.wiz-btn-primary { background:var(--sc); color:#fff; }
+.wiz-btn-primary:hover { filter:brightness(1.08); }
+.wiz-btn-ghost {
+  background:var(--sf3);
+  color:var(--text2);
+}
+.wiz-btn-ghost:hover { background:var(--sf2); }
+.wiz-btn-danger { background:var(--red-lt); color:var(--red); }
+.wiz-btn-danger:hover { background:#FECACA; }
+
+.rec-indicator {
+  display:flex; align-items:center; gap:10px;
+  padding:14px 16px;
+  background:#FEF2F2; border-radius:var(--r);
+  margin-bottom:14px;
+}
+.rec-dot {
+  width:10px; height:10px; border-radius:50%;
+  background:#EF4444; flex-shrink:0;
+  animation:rec-blink .8s ease-in-out infinite;
+}
+@keyframes rec-blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+.rec-label { font-size:13px; font-weight:600; color:#DC2626; flex:1; }
+.rec-time {
+  font-family:'JetBrains Mono',monospace;
+  font-size:15px; font-weight:600; color:#DC2626;
+}
+
+/* Schedule modal specific */
+.modal-field { margin-bottom:16px; }
+.modal-field-label {
+  font-size:12px; font-weight:600;
+  letter-spacing:.04em; text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:8px; display:block;
+}
+.modal-select {
+  width:100%; padding:11px 14px;
+  border:1.5px solid var(--border2);
+  border-radius:var(--r-sm);
+  background:var(--sf);
+  color:var(--text);
+  font-size:15px; font-weight:500;
+  outline:none; cursor:pointer;
+  transition:border-color .2s;
+}
+.modal-select:focus { border-color:var(--sc); }
+.dur-opts { display:flex; gap:6px; flex-wrap:wrap; }
+.dur-opt {
+  padding:7px 14px;
+  border:1.5px solid var(--border2);
+  border-radius:var(--r-sm);
+  font-size:13px; font-weight:600;
+  color:var(--text2);
+  transition:all .2s; cursor:pointer;
+}
+.dur-opt.on { border-color:var(--sc); background:var(--sc-lt); color:var(--sc); }
+
+/* Name modal */
+.modal-input {
+  width:100%; padding:12px 14px;
+  border:1.5px solid var(--border2);
+  border-radius:var(--r-sm);
+  background:var(--sf);
+  color:var(--text);
+  font-size:16px; font-weight:500;
+  outline:none;
+  transition:border-color .2s;
+}
+.modal-input:focus { border-color:var(--sc); }
+
+/* ═══════════════════════════════════════════════════════════════
+   TOASTS
+═══════════════════════════════════════════════════════════════ */
+.toast-stack {
+  position:fixed;
+  top:16px; right:16px;
+  z-index:200;
+  display:flex; flex-direction:column; gap:8px;
+  pointer-events:none;
+}
+.toast {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px;
+  background:var(--text);
+  color:#fff;
+  border-radius:12px;
+  font-size:13px; font-weight:500;
+  box-shadow:var(--sh-md);
+  transform:translateX(120%);
+  transition:transform .35s var(--spring);
+  pointer-events:auto;
+  min-width:200px; max-width:280px;
+}
+.toast.show { transform:translateX(0); }
+.toast.success { background:#14532D; }
+.toast.warning { background:#78350F; }
+.toast.error   { background:#991B1B; }
+.toast-dot { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.5); flex-shrink:0; }
+.toast.success .toast-dot { background:#4ADE80; }
+.toast.warning .toast-dot { background:#FCD34D; }
+.toast.error   .toast-dot { background:#FC8181; }
+
+/* ═══════════════════════════════════════════════════════════════
+   MISC ANIMATIONS
+═══════════════════════════════════════════════════════════════ */
+@keyframes fade-in { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+.view.active > * { animation:fade-in .3s var(--ease); }
+
+/* Charging battery animation */
+[data-state="CHARGING"] .ring-fill { animation:charge-fill 2s ease-in-out infinite; }
+@keyframes charge-fill {
+  0%,100%{stroke-dashoffset:120;}
+  50%{stroke-dashoffset:40;}
+}
+</style>
 </head>
 <body>
+<div class="shell">
 
-<!-- ═══════════ MAP (always visible beneath) ═══════════ -->
-<div id="map"></div>
+  <!-- ══════════════════════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════════════════════ -->
+  <aside class="sidebar">
 
-<!-- ═══════════════════════════════════════════════════
-     HOME / DASHBOARD VIEW
-═══════════════════════════════════════════════════ -->
-<section class="view active" id="v-home">
-
-  <!-- Top bar -->
-  <div class="dash-top">
-    <div class="dash-logo">MV<span>2</span></div>
-    <div class="dash-top-right">
-      <div class="top-pill live" id="top-soc">
-        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v3"/></svg>
-        <span id="top-soc-val">—</span>
-      </div>
-      <div class="top-pill" id="top-conn">
-        <div class="ws-dot" id="ws-dot"></div>
-        <span id="top-conn-label">Verbinden…</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- State card -->
-  <div class="state-card">
-    <div class="sc-eyebrow">Status</div>
-    <div class="sc-state" id="sc-state">IDLE</div>
-    <div class="sc-prog"><div class="sc-prog-fill"></div></div>
-    <div class="sc-actions" id="sc-actions">
-      <!-- filled by JS -->
-    </div>
-  </div>
-
-  <!-- Teach-in FAB -->
-  <button class="teach-fab" id="teach-fab-btn">
-    <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-    Teach-In
-  </button>
-
-  <!-- Telemetry tray -->
-  <div class="dash-telem">
-    <div class="tel-item">
-      <div class="tel-lbl">Speed</div>
-      <div class="tel-val" id="tel-speed">—</div>
-      <div class="tel-unit">km/h</div>
-    </div>
-    <div class="tel-item">
-      <div class="tel-lbl">GPS</div>
-      <div class="tel-val" id="tel-gps" style="font-size:13px;padding-top:2px">—</div>
-      <div class="tel-unit">Fix-Typ</div>
-    </div>
-    <div class="tel-item">
-      <div class="tel-lbl">Heading</div>
-      <div class="tel-val" id="tel-heading">—</div>
-      <div class="tel-unit">Grad</div>
-    </div>
-    <div class="tel-item">
-      <div class="tel-lbl">Akku</div>
-      <div class="tel-val accent" id="tel-soc">—</div>
-      <div class="tel-unit">%</div>
-    </div>
-  </div>
-
-</section>
-
-<!-- ═══════════════════════════════════════════════════
-     SCHEDULE VIEW
-═══════════════════════════════════════════════════ -->
-<section class="view" id="v-schedule">
-  <div class="view-header">
-    <div class="view-title">Zeitplan</div>
-    <button class="view-header-action" id="add-sched-btn">+ Hinzufügen</button>
-  </div>
-  <div class="view-content">
-    <div class="schedule-list" id="schedule-list">
-      <!-- rendered by JS -->
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════
-     HISTORY VIEW
-═══════════════════════════════════════════════════ -->
-<section class="view" id="v-history">
-  <div class="view-header">
-    <div class="view-title">Verlauf</div>
-  </div>
-  <div class="view-content">
-    <div class="stats-row" id="stats-row"><!-- js --></div>
-    <div class="sect-label">Sitzungen</div>
-    <div id="session-list"><!-- js --></div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════
-     SETTINGS VIEW
-═══════════════════════════════════════════════════ -->
-<section class="view" id="v-settings">
-  <div class="view-header">
-    <div class="view-title">Einstellungen</div>
-  </div>
-  <div class="view-content">
-
-    <div class="about-hero">
-      <div class="about-logo-circle">🌿</div>
-      <div class="about-name">Mähroboter V2</div>
-      <div class="about-ver" id="about-ver">v0.5.0 · Phase 5</div>
-    </div>
-
-    <div class="sect-label">Mähwerk</div>
-    <div class="card">
-      <div class="card-row">
-        <div class="row-icon green">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" fill="var(--sc)"/>
+            <circle cx="10" cy="10" r="4" fill="rgba(0,0,0,0.2)"/>
+            <circle cx="7"  cy="7"  r="2" fill="white" opacity=".95"/>
+            <circle cx="13" cy="7"  r="2" fill="white" opacity=".95"/>
+          </svg>
         </div>
-        <div class="row-info"><div class="row-title">Spurabstand</div></div>
-        <div class="row-end">
-          <div class="settings-field" style="margin:0;padding:0">
-            <div class="slider-row">
-              <input type="range" class="field-slider" id="s-lane" min="20" max="60" value="38" style="width:90px">
-              <span class="slider-val" id="s-lane-val">38 cm</span>
+        <div>
+          <div class="brand-name">Mähroboter V2</div>
+          <div class="brand-model">MV2-Alpha</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="conn-pill">
+          <span class="ws-dot" id="ws-dot"></span>
+          <span id="top-conn-label">Verbinden…</span>
+        </div>
+        <div class="soc-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 18H3a2 2 0 01-2-2V8a2 2 0 012-2h3.19M15 6h2a2 2 0 012 2v8a2 2 0 01-2 2h-3.19"/>
+            <line x1="23" y1="13" x2="23" y2="11"/>
+            <polyline points="11 6 7 12 13 12 9 18"/>
+          </svg>
+          <span id="top-soc-val">—</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ─── VIEWS ──────────────────────────────────────── -->
+    <div class="views">
+
+      <!-- ▸ HOME VIEW -->
+      <div id="v-home" class="view active">
+
+        <!-- Hero Card -->
+        <div class="hero-card">
+          <div class="hero-top">
+            <!-- Robot SVG -->
+            <div class="robot-wrap">
+              <div class="robot-aura"></div>
+              <svg class="robot-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="40" cy="73" rx="20" ry="5" fill="rgba(0,0,0,0.10)"/>
+                <circle cx="40" cy="40" r="33" fill="var(--sc)" class="robot-body"/>
+                <path d="M11 34 Q40 14 69 34" stroke="rgba(0,0,0,0.20)" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="40" cy="43" r="13" fill="rgba(0,0,0,0.18)"/>
+                <g class="robot-blade">
+                  <rect x="38.5" y="31" width="3" height="12" rx="1.5" fill="rgba(255,255,255,0.9)"/>
+                  <rect x="38.5" y="31" width="3" height="12" rx="1.5" fill="rgba(255,255,255,0.9)" transform="rotate(120 40 43)"/>
+                  <rect x="38.5" y="31" width="3" height="12" rx="1.5" fill="rgba(255,255,255,0.9)" transform="rotate(240 40 43)"/>
+                </g>
+                <circle cx="40" cy="43" r="3.5" fill="rgba(255,255,255,0.7)"/>
+                <circle cx="28" cy="27" r="5.5" fill="rgba(255,255,255,0.95)"/>
+                <circle cx="52" cy="27" r="5.5" fill="rgba(255,255,255,0.95)"/>
+                <circle cx="28.5" cy="27.5" r="2.5" fill="rgba(0,0,0,0.4)"/>
+                <circle cx="52.5" cy="27.5" r="2.5" fill="rgba(0,0,0,0.4)"/>
+                <ellipse cx="33" cy="32" rx="11" ry="6" fill="rgba(255,255,255,0.12)" transform="rotate(-25 33 32)"/>
+                <circle cx="40" cy="12" r="3" fill="rgba(255,255,255,0.65)" class="status-led"/>
+              </svg>
+            </div>
+
+            <!-- Battery Ring -->
+            <div class="hero-battery">
+              <svg viewBox="0 0 66 66" fill="none">
+                <circle class="ring-bg" cx="33" cy="33" r="26"/>
+                <circle class="ring-fill" id="soc-ring" cx="33" cy="33" r="26"/>
+              </svg>
+              <div class="battery-text">
+                <div class="battery-pct" id="tel-soc">—</div>
+                <div class="battery-unit">%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-state">
+            <div class="state-chip">
+              <div class="state-dot"></div>
+              <span class="state-chip-label" id="sc-state">Bereit</span>
+            </div>
+            <div class="state-sub-label" id="state-sub">Bereit zum Starten</div>
+          </div>
+
+          <div class="hero-actions" id="sc-actions"></div>
+        </div>
+
+        <!-- Telemetry -->
+        <div class="section">
+          <div class="section-head"><span class="section-label">Telemetrie</span></div>
+          <div class="tel-grid">
+            <div class="tel-cell">
+              <div class="tel-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="tel-val-row">
+                <span class="tel-num" id="tel-speed">—</span>
+                <span class="tel-unit-label">km/h</span>
+              </div>
+              <div class="tel-name">Geschwindigkeit</div>
+            </div>
+            <div class="tel-cell">
+              <div class="tel-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              </div>
+              <div class="tel-val-row">
+                <span class="tel-num" id="tel-heading">—</span>
+                <span class="tel-unit-label">°</span>
+              </div>
+              <div class="tel-name">Kurs</div>
+            </div>
+            <div class="tel-cell">
+              <div class="tel-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              </div>
+              <div class="tel-gps-str" id="tel-gps">—</div>
+              <div class="tel-name">GPS</div>
+            </div>
+            <div class="tel-cell">
+              <div class="tel-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
+              <div class="tel-val-row">
+                <span class="tel-num" id="tel-area">—</span>
+                <span class="tel-unit-label">m²</span>
+              </div>
+              <div class="tel-name">Heute gemäht</div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="card-row">
-        <div class="row-icon green">
-          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </div>
-        <div class="row-info"><div class="row-title">Fahrgeschwindigkeit</div></div>
-        <div class="row-end">
-          <div class="slider-row">
-            <input type="range" class="field-slider" id="s-speed" min="1" max="10" value="5" style="width:90px">
-            <span class="slider-val" id="s-speed-val">5</span>
+
+        <!-- Zones -->
+        <div class="section">
+          <div class="section-head">
+            <span class="section-label">Mähbereiche</span>
+            <button class="section-action" id="teach-fab-btn">+ Teach-In</button>
+          </div>
+          <div id="zone-list" class="zone-list">
+            <div class="zone-empty">
+              <div class="zone-empty-icon">🌿</div>
+              <p>Noch keine Bereiche gespeichert.<br>Starte ein Teach-In, um den Mähbereich abzugrenzen.</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card-row">
-        <div class="row-icon green">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-        </div>
-        <div class="row-info">
-          <div class="row-title">Roboter-Name</div>
-          <div class="row-sub" id="robot-name-preview">MV2-Alpha</div>
-        </div>
-        <div class="row-end chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
-      </div>
-    </div>
 
-    <div class="sect-label">Sicherheit</div>
-    <div class="card">
-      <div class="card-row">
-        <div class="row-icon orange">
-          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <!-- Last session (hidden until data) -->
+        <div class="section" id="last-session-section" style="display:none">
+          <div class="section-head"><span class="section-label">Letzte Sitzung</span></div>
+          <div class="last-sess-card" id="last-session-card"></div>
         </div>
-        <div class="row-info"><div class="row-title">Regensensor</div><div class="row-sub">Stopp bei Regen</div></div>
-        <div class="row-end">
-          <label class="toggle"><input type="checkbox" id="s-rain" checked><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+
+        <div style="height:8px"></div>
+      </div><!-- /v-home -->
+
+      <!-- ▸ SCHEDULE VIEW -->
+      <div id="v-schedule" class="view">
+
+        <!-- Next mow card -->
+        <div class="next-mow-card">
+          <div class="next-mow-label">Nächste Mähung</div>
+          <div class="next-mow-time" id="next-mow-time">—</div>
+          <div class="next-mow-sub" id="next-mow-sub">Kein Zeitplan konfiguriert</div>
         </div>
-      </div>
-      <div class="card-row">
-        <div class="row-icon orange">
-          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+
+        <!-- Week overview -->
+        <div class="section">
+          <div class="section-head">
+            <span class="section-label">Wochenübersicht</span>
+            <button class="section-action" id="teach-nav-btn">Bereich aufnehmen</button>
+          </div>
+          <div class="week-grid" id="week-grid"></div>
         </div>
-        <div class="row-info"><div class="row-title">Neigungsschutz</div><div class="row-sub">Max. Neigung</div></div>
-        <div class="row-end">
-          <div class="slider-row">
-            <input type="range" class="field-slider" id="s-tilt" min="15" max="45" value="30" style="width:80px">
-            <span class="slider-val" id="s-tilt-val">30°</span>
+
+        <!-- Schedules list -->
+        <div class="section">
+          <div class="section-head"><span class="section-label">Zeitpläne</span></div>
+          <div id="schedule-list"></div>
+          <button class="add-btn" id="add-sched-btn">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Zeitplan hinzufügen
+          </button>
+        </div>
+
+        <div style="height:8px"></div>
+      </div><!-- /v-schedule -->
+
+      <!-- ▸ HISTORY VIEW -->
+      <div id="v-history" class="view">
+
+        <div id="stats-row" class="stat-grid"></div>
+
+        <div class="section">
+          <div class="section-head"><span class="section-label">Sitzungsübersicht</span></div>
+          <div class="chart-wrap">
+            <div class="chart-bars" id="session-chart">
+              <!-- JS fills -->
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card-row">
-        <div class="row-icon orange">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+
+        <div class="section">
+          <div class="section-head"><span class="section-label">Verlauf</span></div>
+          <div id="session-list"></div>
         </div>
-        <div class="row-info"><div class="row-title">Regenpause</div><div class="row-sub">Wartezeit nach Regen</div></div>
-        <div class="row-end">
-          <div class="slider-row">
-            <input type="range" class="field-slider" id="s-rainwait" min="15" max="120" value="30" style="width:80px">
-            <span class="slider-val" id="s-rainwait-val">30 min</span>
+
+        <div style="height:8px"></div>
+      </div><!-- /v-history -->
+
+      <!-- ▸ SETTINGS VIEW -->
+      <div id="v-settings" class="view">
+
+        <!-- Robot -->
+        <div class="settings-section">
+          <div class="settings-section-title">Roboter</div>
+          <div class="settings-card">
+            <div class="settings-row" id="card-robot-name">
+              <div class="settings-row-icon">
+                <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+              </div>
+              <div class="settings-row-text">
+                <div class="settings-row-label">Name</div>
+                <div class="settings-row-val" id="robot-name-preview">MV2-Alpha</div>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="settings-row" style="cursor:default">
+              <div class="settings-row-icon">
+                <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </div>
+              <div class="settings-row-text">
+                <div class="settings-row-label">Firmware</div>
+                <div class="settings-row-val">v0.5.0</div>
+              </div>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="settings-row" style="cursor:default">
+              <div class="settings-row-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="settings-row-text">
+                <div class="settings-row-label">Seriennummer</div>
+                <div class="settings-row-val">MV2-2026-0001</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="sect-label">Geofencing</div>
-    <div class="card">
-      <div class="card-row">
-        <div class="row-icon blue">
-          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <!-- Mowing -->
+        <div class="settings-section">
+          <div class="settings-section-title">Mähparameter</div>
+          <div class="settings-card">
+            <div class="slider-row">
+              <div class="slider-head">
+                <span class="slider-label">Spurabstand</span>
+                <span class="slider-val" id="s-lane-val">38 cm</span>
+              </div>
+              <input type="range" id="s-lane" min="20" max="60" step="2" class="slider"/>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row">
+              <div class="slider-head">
+                <span class="slider-label">Fahrgeschwindigkeit</span>
+                <span class="slider-val" id="s-speed-val">5</span>
+              </div>
+              <input type="range" id="s-speed" min="1" max="10" step="1" class="slider"/>
+            </div>
+          </div>
         </div>
-        <div class="row-info"><div class="row-title">Geofencing aktiv</div><div class="row-sub">Außerhalb Grenze → Stopp</div></div>
-        <div class="row-end">
-          <label class="toggle"><input type="checkbox" id="s-geo" checked><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
-        </div>
-      </div>
-      <div class="card-row tappable" id="teach-nav-btn">
-        <div class="row-icon purple">
-          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        </div>
-        <div class="row-info"><div class="row-title">Bereich einlernen</div><div class="row-sub">Teach-In starten</div></div>
-        <div class="row-end chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
-      </div>
-    </div>
 
-    <div class="sect-label">System</div>
-    <div class="card">
-      <div class="card-row">
-        <div class="row-icon slate">
-          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <!-- Safety -->
+        <div class="settings-section">
+          <div class="settings-section-title">Sicherheit</div>
+          <div class="settings-card">
+            <div class="slider-row">
+              <div class="slider-head">
+                <span class="slider-label">Maximale Neigung</span>
+                <span class="slider-val" id="s-tilt-val">30°</span>
+              </div>
+              <input type="range" id="s-tilt" min="15" max="45" step="5" class="slider"/>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="toggle-row">
+              <div class="toggle-text">
+                <div class="toggle-label">Regenabschaltung</div>
+                <div class="toggle-sub">Pause bei Regensensor-Alarm</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-rain">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row">
+              <div class="slider-head">
+                <span class="slider-label">Wartezeit nach Regen</span>
+                <span class="slider-val" id="s-rainwait-val">30 min</span>
+              </div>
+              <input type="range" id="s-rainwait" min="0" max="120" step="10" class="slider"/>
+            </div>
+          </div>
         </div>
-        <div class="row-info"><div class="row-title">API Port</div></div>
-        <div class="row-end"><span class="row-value">8080</span></div>
-      </div>
-      <div class="card-row">
-        <div class="row-icon slate">
-          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-        </div>
-        <div class="row-info"><div class="row-title">Firmware</div><div class="row-sub" id="fw-ver">Teensy 4.1 · v1.0.0</div></div>
-      </div>
-      <div class="card-row tappable" id="reset-btn-settings">
-        <div class="row-icon red">
-          <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
-        </div>
-        <div class="row-info"><div class="row-title">Fehler zurücksetzen</div></div>
-        <div class="row-end chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
-      </div>
-    </div>
 
-    <div style="height: 8px;"></div>
+        <!-- Navigation -->
+        <div class="settings-section">
+          <div class="settings-section-title">Navigation</div>
+          <div class="settings-card">
+            <div class="toggle-row">
+              <div class="toggle-text">
+                <div class="toggle-label">GPS-Tracking</div>
+                <div class="toggle-sub">Verbesserte Kartierung und Statistiken</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-geo">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="settings-row" style="cursor:default">
+              <div class="settings-row-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+              </div>
+              <div class="settings-row-text">
+                <div class="settings-row-label">GPS-Genauigkeit</div>
+                <div class="settings-row-val" id="gps-accuracy-display">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <div class="settings-section">
+          <div class="settings-section-title">Erweitert</div>
+          <div class="settings-card">
+            <button class="danger-row" id="reset-btn-settings">
+              <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+              Fehler zurücksetzen
+            </button>
+          </div>
+        </div>
+
+        <div style="height:8px"></div>
+      </div><!-- /v-settings -->
+
+    </div><!-- /views -->
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-view="v-home">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Karte</span>
+      </button>
+      <button class="nav-btn" data-view="v-schedule">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Zeitplan</span>
+      </button>
+      <button class="nav-btn" data-view="v-history">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Verlauf</span>
+      </button>
+      <button class="nav-btn" data-view="v-settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>Einstellungen</span>
+      </button>
+    </nav>
+
+  </aside><!-- /sidebar -->
+
+  <!-- MAP -->
+  <div id="map"></div>
+
+  <!-- Map floating controls -->
+  <div class="map-float">
+    <button class="map-fab" id="map-center-btn" title="Zum Roboter zentrieren">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+    </button>
+    <button class="map-fab" id="map-layer-btn" title="Karten-Stil wechseln">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+    </button>
   </div>
-</section>
 
-<!-- ═══════════════════════════════════════════════════
-     TEACH-IN WIZARD
-═══════════════════════════════════════════════════ -->
-<div id="teach-wizard">
-  <div class="wiz-sheet">
+</div><!-- /shell -->
+
+<!-- ══════════════════════════════════════════════════════
+     TEACH-IN WIZARD (bottom sheet)
+══════════════════════════════════════════════════════ -->
+<div class="overlay" id="teach-wizard">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Teach-In</span>
+      <button class="modal-close" onclick="wizClose()">✕</button>
+    </div>
 
     <!-- Step dots -->
-    <div class="wiz-steps" id="wiz-dots"></div>
+    <div class="wiz-dots" id="wiz-dots"></div>
 
-    <div class="wiz-steps-wrap">
+    <div class="modal-body">
 
-      <!-- Step 1: Einführung -->
+      <!-- Step 1: Intro -->
       <div class="wiz-step active" id="wiz-s1">
-        <div class="wiz-step-icon green">🌿</div>
-        <div class="wiz-title">Bereich einlernen</div>
-        <div class="wiz-body">Fahre mit dem Roboter entlang der Außengrenze deines Mähbereichs. Die Route wird aufgezeichnet und als Geofence gespeichert.<br><br>Stelle sicher, dass der Roboter bereit ist und GPS-Empfang hat (RTK Fix empfohlen).</div>
-        <div class="wiz-actions">
-          <button class="wiz-btn primary" onclick="wizNext()">Weiter</button>
-          <button class="wiz-btn secondary" onclick="wizClose()">Abbrechen</button>
+        <div class="wiz-step-title">Mähbereich aufzeichnen</div>
+        <div class="wiz-step-body">
+          Fahre den Roboter manuell entlang der Grenzen des Mähbereichs. Die Strecke wird als neuer Bereich gespeichert. Stelle sicher, dass du genug Platz für den Wendepunkt hast.
+        </div>
+        <div class="wiz-btn-row">
+          <button class="wiz-btn wiz-btn-primary" onclick="wizNext()">Weiter →</button>
+          <button class="wiz-btn wiz-btn-ghost" onclick="wizClose()">Abbrechen</button>
         </div>
       </div>
 
-      <!-- Step 2: Aufzeichnen -->
+      <!-- Step 2: Record -->
       <div class="wiz-step" id="wiz-s2">
-        <div class="wiz-step-icon purple">📍</div>
-        <div class="wiz-title">Grenze aufzeichnen</div>
-        <div class="wiz-body">Starte die Aufzeichnung und fahre den Roboter langsam entlang der Mähbereichsgrenze. Kehre am Ende zum Startpunkt zurück.</div>
-        <div id="wiz-rec-indicator" class="wiz-rec hidden">
-          <div class="wiz-rec-dot"></div>
-          <span class="wiz-rec-label">Aufzeichnung läuft…</span>
-          <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-3)" id="wiz-rec-time">00:00</span>
+        <div class="wiz-step-title">Grenze abfahren</div>
+        <div class="wiz-step-body">
+          Klicke auf „Aufnahme starten", dann fahre entlang der Bereichsgrenzen. Beende die Aufnahme, wenn du wieder am Startpunkt bist.
         </div>
-        <div class="wiz-actions" id="wiz-s2-actions">
-          <button class="wiz-btn primary" id="wiz-rec-start-btn" onclick="wizStartRecording()">⬤ Aufzeichnung starten</button>
-          <button class="wiz-btn secondary" onclick="wizClose()">Abbrechen</button>
+        <div class="rec-indicator hidden" id="wiz-rec-indicator">
+          <div class="rec-dot"></div>
+          <span class="rec-label">Aufnahme läuft…</span>
+          <span class="rec-time" id="wiz-rec-time">00:00</span>
         </div>
-        <div class="wiz-actions hidden" id="wiz-s2-stop">
-          <button class="wiz-btn danger" onclick="wizStopRecording()">⏹ Aufzeichnung beenden</button>
+        <div class="wiz-btn-row" id="wiz-s2-actions">
+          <button class="wiz-btn wiz-btn-primary" onclick="wizStartRecording()">⏺ Aufnahme starten</button>
+          <button class="wiz-btn wiz-btn-ghost" onclick="wizClose()">Abbrechen</button>
+        </div>
+        <div class="wiz-btn-row hidden" id="wiz-s2-stop">
+          <button class="wiz-btn wiz-btn-danger" onclick="wizStopRecording()">⏹ Aufnahme beenden</button>
         </div>
       </div>
 
-      <!-- Step 3: Benennen -->
+      <!-- Step 3: Name -->
       <div class="wiz-step" id="wiz-s3">
-        <div class="wiz-step-icon blue">✏️</div>
-        <div class="wiz-title">Bereich benennen</div>
-        <div class="wiz-body">Gib dem aufgezeichneten Bereich einen Namen.</div>
-        <div class="zone-preview">
-          <div class="zone-icon">🌿</div>
-          <div>
-            <div style="font-weight:700" id="zone-name-preview">Hauptgarten</div>
-            <div class="zone-icon-label">Neuer Mähbereich</div>
-          </div>
+        <div class="wiz-step-title">Bereich benennen</div>
+        <div class="wiz-step-body">Gib dem Bereich einen Namen, damit du ihn später leicht findest.</div>
+        <div class="modal-field">
+          <label class="modal-field-label" for="zone-name-input">Bereichsname</label>
+          <input type="text" id="zone-name-input" class="modal-input" placeholder="z. B. Vordergarten" maxlength="40"/>
         </div>
-        <input class="field-input" id="zone-name-input" type="text" placeholder="z.B. Hauptgarten, Vorgarten…" value="Hauptgarten" oninput="document.getElementById('zone-name-preview').textContent=this.value||'…'">
-        <div style="height:14px"></div>
-        <div class="wiz-actions">
-          <button class="wiz-btn primary" onclick="wizNext()">Speichern</button>
-          <button class="wiz-btn secondary" onclick="wizClose()">Verwerfen</button>
+        <div class="wiz-btn-row">
+          <button class="wiz-btn wiz-btn-primary" onclick="wizNext()">Speichern ✓</button>
+          <button class="wiz-btn wiz-btn-ghost" onclick="wizClose()">Überspringen</button>
         </div>
       </div>
 
-      <!-- Step 4: Fertig -->
+      <!-- Step 4: Success -->
       <div class="wiz-step" id="wiz-s4">
-        <div class="wiz-success-ring">✓</div>
-        <div class="wiz-success-title">Einlernen abgeschlossen!</div>
-        <div class="wiz-success-body" id="wiz-success-body">Der Bereich „Hauptgarten" wurde erfolgreich gespeichert. Du kannst jetzt eine Mission starten.</div>
-        <div class="wiz-actions">
-          <button class="wiz-btn primary" onclick="wizClose()">Fertig</button>
+        <div style="text-align:center;padding:8px 0 16px">
+          <div style="font-size:48px;margin-bottom:12px">✅</div>
+          <div class="wiz-step-title" style="text-align:center">Gespeichert!</div>
+        </div>
+        <div class="wiz-step-body" id="wiz-success-body" style="text-align:center"></div>
+        <div class="wiz-btn-row">
+          <button class="wiz-btn wiz-btn-primary" onclick="wizClose()">Fertig</button>
         </div>
       </div>
 
@@ -1148,106 +1534,86 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     SCHEDULE ADD MODAL
-═══════════════════════════════════════════════════ -->
-<div class="modal-backdrop" id="sched-modal">
-  <div class="modal">
+<!-- ══════════════════════════════════════════════════════
+     SCHEDULE MODAL
+══════════════════════════════════════════════════════ -->
+<div class="overlay" id="sched-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
     <div class="modal-header">
-      <div class="modal-title">Zeitplan hinzufügen</div>
-      <button class="modal-close" onclick="closeSchedModal()">×</button>
+      <span class="modal-title">Zeitplan hinzufügen</span>
+      <button class="modal-close" onclick="closeSchedModal()">✕</button>
     </div>
     <div class="modal-body">
-      <label class="modal-label">Startzeit</label>
-      <div class="time-row">
-        <select class="time-sel" id="m-hour">
-          <!-- filled by JS -->
-        </select>
-        <div class="time-sep">:</div>
-        <select class="time-sel" id="m-min">
-          <option value="00">00</option>
-          <option value="15">15</option>
-          <option value="30">30</option>
-          <option value="45">45</option>
-        </select>
+
+      <div class="modal-field">
+        <label class="modal-field-label">Uhrzeit</label>
+        <div style="display:flex;gap:8px">
+          <select id="m-hour" class="modal-select" style="flex:1"></select>
+          <select id="m-min" class="modal-select" style="width:90px">
+            <option value="00">:00</option>
+            <option value="15">:15</option>
+            <option value="30">:30</option>
+            <option value="45">:45</option>
+          </select>
+        </div>
       </div>
-      <label class="modal-label">Wochentage</label>
-      <div class="day-row" id="m-days">
-        <div class="day-chip on" data-day="Mo">Mo</div>
-        <div class="day-chip on" data-day="Di">Di</div>
-        <div class="day-chip on" data-day="Mi">Mi</div>
-        <div class="day-chip on" data-day="Do">Do</div>
-        <div class="day-chip on" data-day="Fr">Fr</div>
-        <div class="day-chip" data-day="Sa">Sa</div>
-        <div class="day-chip" data-day="So">So</div>
+
+      <div class="modal-field">
+        <label class="modal-field-label">Wochentage</label>
+        <div id="m-days" style="display:flex;flex-wrap:wrap;gap:6px">
+          <div class="day-chip on" data-day="Mo">Mo</div>
+          <div class="day-chip on" data-day="Di">Di</div>
+          <div class="day-chip on" data-day="Mi">Mi</div>
+          <div class="day-chip on" data-day="Do">Do</div>
+          <div class="day-chip on" data-day="Fr">Fr</div>
+          <div class="day-chip" data-day="Sa">Sa</div>
+          <div class="day-chip" data-day="So">So</div>
+        </div>
       </div>
-      <label class="modal-label">Dauer</label>
-      <div class="dur-row" id="m-dur">
-        <div class="dur-opt" data-val="60">1 h</div>
-        <div class="dur-opt on" data-val="90">1.5 h</div>
-        <div class="dur-opt" data-val="120">2 h</div>
-        <div class="dur-opt" data-val="180">3 h</div>
-        <div class="dur-opt" data-val="240">4 h</div>
+
+      <div class="modal-field">
+        <label class="modal-field-label">Dauer</label>
+        <div id="m-dur" class="dur-opts">
+          <div class="dur-opt" data-val="30">30 min</div>
+          <div class="dur-opt" data-val="60">1 h</div>
+          <div class="dur-opt on" data-val="90">1,5 h</div>
+          <div class="dur-opt" data-val="120">2 h</div>
+          <div class="dur-opt" data-val="180">3 h</div>
+          <div class="dur-opt" data-val="240">4 h</div>
+        </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button class="modal-btn primary" onclick="saveSchedule()">Speichern</button>
-      <button class="modal-btn ghost"   onclick="closeSchedModal()">Abbrechen</button>
+
+      <button class="wiz-btn wiz-btn-primary" onclick="saveSchedule()" style="width:100%;margin-top:8px">Zeitplan speichern</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     ROBOT NAME MODAL
-═══════════════════════════════════════════════════ -->
-<div class="modal-backdrop" id="name-modal">
-  <div class="modal">
+<!-- ══════════════════════════════════════════════════════
+     NAME MODAL
+══════════════════════════════════════════════════════ -->
+<div class="overlay" id="name-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
     <div class="modal-header">
-      <div class="modal-title">Roboter-Name</div>
-      <button class="modal-close" onclick="closeNameModal()">×</button>
+      <span class="modal-title">Roboter umbenennen</span>
+      <button class="modal-close" onclick="closeNameModal()">✕</button>
     </div>
     <div class="modal-body">
-      <label class="modal-label">Name</label>
-      <input class="field-input" id="robot-name-input" type="text" placeholder="MV2-Alpha" maxlength="24">
-    </div>
-    <div class="modal-footer">
-      <button class="modal-btn primary" onclick="saveRobotName()">Speichern</button>
-      <button class="modal-btn ghost"   onclick="closeNameModal()">Abbrechen</button>
+      <div class="modal-field">
+        <label class="modal-field-label" for="robot-name-input">Name</label>
+        <input type="text" id="robot-name-input" class="modal-input" maxlength="30" placeholder="MV2-Alpha"/>
+      </div>
+      <button class="wiz-btn wiz-btn-primary" onclick="saveRobotName()" style="width:100%">Speichern</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     BOTTOM NAVIGATION
-═══════════════════════════════════════════════════ -->
-<nav class="bottom-nav">
-  <button class="nav-btn active" data-view="v-home">
-    <div class="nav-icon">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </div>
-    <span class="nav-label">Karte</span>
-  </button>
-  <button class="nav-btn" data-view="v-schedule">
-    <div class="nav-icon">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    </div>
-    <span class="nav-label">Zeitplan</span>
-  </button>
-  <button class="nav-btn" data-view="v-history">
-    <div class="nav-icon">
-      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    </div>
-    <span class="nav-label">Verlauf</span>
-  </button>
-  <button class="nav-btn" data-view="v-settings">
-    <div class="nav-icon">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    </div>
-    <span class="nav-label">Einstellungen</span>
-  </button>
-</nav>
+<!-- TOAST STACK -->
+<div class="toast-stack" id="toast-stack"></div>
 
+<!-- SCRIPTS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/app.js"></script>
+<script src="/static/app.js?v=2"></script>
 </body>
 </html>
