@@ -780,7 +780,7 @@ git commit -m "feat(executive): docking manager with RTK->visual handoff"
 
 After all tasks are complete:
 
-- [ ] `python3 -m pytest tests/ -q` → **191 passed, 0 failed** (171 existing + 20 new)
+- [ ] `python3 -m pytest tests/ -q` → **199 passed, 0 failed** (171 existing + 28 new; the plan's 20 core tests plus 8 added during code review — yaw/left-offset, controller edge/gain cases, and the safety-race guard)
 - [ ] `mower/cv/aruco_detector.py` — `ArucoDetector.detect(frame)` returns the closest target-id `MarkerPose` (distance, lateral offset, bearing, yaw) or `None`; pose math validated against synthetic `projectPoints` corners
 - [ ] `mower/control/docking_controller.py` — `DockingController.compute(marker, charge_detected)` implements SEARCHING/ALIGNING/APPROACHING/DOCKED with correct steering sign (+ = LEFT), distance-tapered speed, and clamped steering
 - [ ] `mower/executive/docking_manager.py` — `_tick()` performs the RTK→visual handoff at ≤1.2 m, drives the controller during DOCKING, cuts the blade and enters CHARGING on contact, and returns to IDLE at full SOC; background loop mirrors `ObstacleDetector`
@@ -795,6 +795,12 @@ After all tasks are complete:
 - [ ] Wire `DockingManager` into the app runtime: SOC/charging from HAL status callbacks, `frame_source` from the camera, `start()` alongside the executive
 - [ ] Field-tune `CONTACT_DISTANCE_M`, approach speeds, and `handoff_distance_m` against the physical dock
 - [ ] Commission the blade for real mowing runs ("Mähwerk in Betrieb nehmen")
+
+### Deferred robustness items (surfaced in code review — resolve before live wiring)
+
+- [ ] **Actuation ordering vs. safety estop.** `DockingManager._tick` re-checks `executive.state == DOCKING` immediately before the nonzero `drive()` (implemented), which narrows but does not fully close the race between a docking drive command and a concurrent tilt/lift/geofence estop — both just enqueue serial frames with no ordering guarantee. Before wiring `DockingManager` into the live runtime, give the ESTOP/blade-off command serial-layer priority (or route all actuation through a shared lock with `_hw_estop`) so a safety fault always wins.
+- [ ] **CHARGING stuck-detection.** `cmd.docked` can trigger purely on `distance ≤ CONTACT_DISTANCE_M` without real electrical contact. If the mower parks close but makes no contact, it enters CHARGING and waits forever for `soc ≥ FULL_SOC`. Add a CHARGING timeout → ERROR/retry fallback (mirror the `OBSTACLE_TIMEOUT_S` pattern in `MissionExecutive`).
+- [ ] **Cut the blade on DOCKING/RETURNING entry, not only at contact.** Today `DockingManager` calls `set_blade(False)` only at the DOCKED instant; nothing cuts it on entering RETURNING or DOCKING. This is latent while the blade is never commanded on, but the moment the blade is commissioned the mower would make its final ~1.2 m approach with a live blade. Cut the blade on the DOCKING (or RETURNING) transition — land this in the same change as blade commissioning + live wiring.
 
 ---
 
