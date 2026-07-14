@@ -18,6 +18,15 @@ LOOP_HZ: float = 10.0
 
 
 class DockingManager:
+    """Orchestrates the RTK→visual docking handoff and the DOCKING/CHARGING phases.
+
+    Keyed on the MissionExecutive state: watches for the ArUco marker while
+    RETURNING (handing off to visual docking once close enough), runs the
+    visual-servo DockingController while DOCKING, and holds still while CHARGING
+    until the battery is full. Mirrors ObstacleDetector: a synchronous _tick()
+    unit (tested directly) plus a background thread loop for the real system.
+    """
+
     def __init__(
         self,
         detector,
@@ -39,6 +48,7 @@ class DockingManager:
         self._thread: Optional[threading.Thread] = None
 
     def _tick(self, frame, soc: int, charging: bool) -> None:
+        """Run one orchestration step, keyed off the executive's current state."""
         state = self._executive.state
 
         if state == MowerState.RETURNING:
@@ -57,7 +67,16 @@ class DockingManager:
                     self._hw.drive(0.0, 0.0)
                     self._hw.set_blade(False)
                 self._executive.on_charge_started()  # → CHARGING
-            elif self._hw:
+            elif self._hw and self._executive.state == MowerState.DOCKING:
+                # Re-check state immediately before actuating: a tilt/lift/geofence
+                # fault on another thread can transition the executive to ERROR and
+                # issue an estop during the detect/compute window above. drive() only
+                # enqueues a frame with no cross-thread ordering guarantee, so a stale
+                # nonzero drive could otherwise land AFTER the estop and re-drive the
+                # motor. Skip driving if we already left DOCKING. This narrows but
+                # cannot fully close the window without serial-layer command priority
+                # (out of scope here). The docked/stop paths above are stops, so they
+                # stay unconditional.
                 self._hw.drive(cmd.speed, cmd.steering_deg)
             return
 
@@ -74,6 +93,7 @@ class DockingManager:
     # --- Background loop (real system) ---
 
     def start(self, soc_source: Callable[[], int], charging_source: Callable[[], bool]):
+        """Start the background docking loop (idempotent while already running)."""
         if self._thread is not None and self._thread.is_alive():
             return
         self._stop_event.clear()
@@ -82,11 +102,13 @@ class DockingManager:
         self._thread.start()
 
     def stop(self):
+        """Stop the background docking loop and join the worker thread."""
         self._stop_event.set()
         if self._thread:
             self._thread.join(timeout=2.0)
 
     def _run_loop(self, soc_source, charging_source):
+        """Background worker: poll frame + sensors and _tick at LOOP_HZ until stopped."""
         interval = 1.0 / LOOP_HZ
         while not self._stop_event.is_set():
             try:

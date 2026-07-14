@@ -1,8 +1,8 @@
 # tests/executive/test_docking_manager.py
-import pytest
-
 from mower.cv.aruco_detector import MarkerPose
-from mower.control.docking_controller import DockingController
+from mower.control.docking_controller import (
+    DockingController, DockingCommand, DockPhase,
+)
 from mower.executive.mission_executive import MissionExecutive, MowerState
 from mower.executive.docking_manager import DockingManager
 
@@ -76,6 +76,9 @@ def test_docking_drives_toward_marker():
     mgr._tick(frame=object(), soc=50, charging=False)   # servo
     assert ex.state == MowerState.DOCKING
     assert len(hw.drives) == 1                          # a drive command was issued
+    # Dead-ahead marker (bearing 0): drive forward with no steering.
+    assert hw.drives[0][0] > 0                           # positive forward speed
+    assert hw.drives[0][1] == 0                          # no steering
 
 
 def test_charge_contact_starts_charging_and_stops_blade():
@@ -106,4 +109,38 @@ def test_tick_is_noop_when_idle():
     mgr = _mgr(_StubDetector(_marker(0.5)), ex, hw)
     mgr._tick(frame=object(), soc=50, charging=False)
     assert ex.state == MowerState.IDLE
+    assert hw.drives == []
+
+
+class _ExitDockingController:
+    """Stub controller that forces the executive out of DOCKING during compute(),
+    simulating a concurrent safety-estop fault landing mid-tick. Returns a
+    non-docked forward command so the manager would drive were it not re-checking.
+    """
+    def __init__(self, executive):
+        self._executive = executive
+
+    def compute(self, marker, charge_detected):
+        self._executive.on_lift()   # DOCKING → ERROR (concurrent safety fault + estop)
+        return DockingCommand(speed=0.2, steering_deg=0.0,
+                              phase=DockPhase.APPROACHING, docked=False)
+
+
+def test_no_drive_if_executive_left_docking_mid_tick():
+    ex = _returning_executive()
+    ex.on_dock_success()                                # RETURNING → DOCKING
+    assert ex.state == MowerState.DOCKING
+    hw = _FakeHW()
+    mgr = DockingManager(
+        detector=_StubDetector(_marker(1.0)),
+        controller=_ExitDockingController(ex),
+        executive=ex,
+        hardware=hw,
+        frame_source=lambda: object(),
+        handoff_distance_m=1.2,
+    )
+    mgr._tick(frame=object(), soc=50, charging=False)
+    # The safety fault fired during compute(); the stale nonzero drive must NOT
+    # have been issued after the estop transition.
+    assert ex.state == MowerState.ERROR
     assert hw.drives == []
