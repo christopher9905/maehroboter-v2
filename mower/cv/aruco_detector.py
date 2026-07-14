@@ -6,15 +6,12 @@ synthetic corners (no camera, no image files).
 
 Camera frame convention (OpenCV): x right, y down, z forward (into scene).
 """
-import logging
 import math
 from dataclasses import dataclass
 from typing import Optional
 
 import cv2
 import numpy as np
-
-logger = logging.getLogger(__name__)
 
 MARKER_LENGTH_M: float = 0.15
 TARGET_MARKER_ID: int = 0
@@ -50,7 +47,7 @@ class ArucoDetector:
         self._target_id = target_id
         self._detector = detector if detector is not None else _default_detector()
 
-        half = marker_length_m / 2
+        half = self._marker_length / 2
         # Object points in the marker's own frame, matching the corner order
         # returned by detectMarkers (top-left, top-right, bottom-right, bottom-left).
         self._obj_points = np.array([

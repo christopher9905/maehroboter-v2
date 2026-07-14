@@ -1,9 +1,11 @@
 # tests/cv/test_aruco_detector.py
+import math
+
 import numpy as np
 import cv2
 import pytest
 
-from mower.cv.aruco_detector import ArucoDetector, MarkerPose
+from mower.cv.aruco_detector import ArucoDetector
 
 # Simple 640x480 pinhole intrinsics for tests
 CAMERA_MATRIX = np.array([[600.0, 0.0, 320.0],
@@ -66,6 +68,27 @@ def test_marker_to_the_right_has_positive_offset():
     pose = det.detect(np.zeros((480, 640, 3), np.uint8))
     assert pose.lateral_offset_m == pytest.approx(0.3, abs=0.03)
     assert pose.bearing_deg > 0
+
+
+def test_marker_to_the_left_has_negative_offset():
+    corners = _project_marker(tvec=(-0.3, 0.0, 1.2))
+    det = _make([corners], [0])
+    pose = det.detect(np.zeros((480, 640, 3), np.uint8))
+    assert pose.lateral_offset_m < 0
+    assert pose.lateral_offset_m == pytest.approx(-0.3, abs=0.03)
+    assert pose.bearing_deg < 0
+
+
+def test_yaw_recovered_for_rotated_marker():
+    # Marker rotated +20 deg about the camera's vertical (y) axis, facing straight ahead.
+    corners = _project_marker(tvec=(0.0, 0.0, 1.0),
+                              rvec=(0.0, math.radians(20.0), 0.0))
+    det = _make([corners], [0])
+    pose = det.detect(np.zeros((480, 640, 3), np.uint8))
+    assert pose is not None
+    # A positive rotation about the vertical axis yields a positive yaw_deg.
+    assert pose.yaw_deg == pytest.approx(20.0, abs=1.0)
+    assert pose.yaw_deg > 0
 
 
 def test_ignores_non_target_ids():
