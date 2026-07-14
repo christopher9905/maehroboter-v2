@@ -800,6 +800,7 @@ After all tasks are complete:
 
 - [ ] **Actuation ordering vs. safety estop.** `DockingManager._tick` re-checks `executive.state == DOCKING` immediately before the nonzero `drive()` (implemented), which narrows but does not fully close the race between a docking drive command and a concurrent tilt/lift/geofence estop — both just enqueue serial frames with no ordering guarantee. Before wiring `DockingManager` into the live runtime, give the ESTOP/blade-off command serial-layer priority (or route all actuation through a shared lock with `_hw_estop`) so a safety fault always wins.
 - [ ] **CHARGING stuck-detection.** `cmd.docked` can trigger purely on `distance ≤ CONTACT_DISTANCE_M` without real electrical contact. If the mower parks close but makes no contact, it enters CHARGING and waits forever for `soc ≥ FULL_SOC`. Add a CHARGING timeout → ERROR/retry fallback (mirror the `OBSTACLE_TIMEOUT_S` pattern in `MissionExecutive`).
+- [ ] **Cut the blade on DOCKING/RETURNING entry, not only at contact.** Today `DockingManager` calls `set_blade(False)` only at the DOCKED instant; nothing cuts it on entering RETURNING or DOCKING. This is latent while the blade is never commanded on, but the moment the blade is commissioned the mower would make its final ~1.2 m approach with a live blade. Cut the blade on the DOCKING (or RETURNING) transition — land this in the same change as blade commissioning + live wiring.
 
 ---
 
