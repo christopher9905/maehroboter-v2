@@ -42,6 +42,23 @@ def _clamp(v, lo, hi):
 
 
 class DockingController:
+    """Four-phase visual-servoing state machine for ArUco docking.
+
+    Each ``compute`` call maps the latest MarkerPose (or its absence) to a
+    single DockingCommand; the controller holds no state between calls.
+
+    Phases, in the order a nominal dock progresses through them:
+      - SEARCHING:   no marker visible → rotate in place to sweep for it.
+      - ALIGNING:    marker off-boresight (|bearing| > tolerance) → steer to
+                     centre it with zero forward speed.
+      - APPROACHING: marker centred → creep forward, speed tapered by distance.
+      - DOCKED:      marker within contact distance, or charge detected →
+                     stop (``docked=True``).
+
+    Charge detection and contact distance short-circuit to DOCKED regardless
+    of bearing, so a slightly off-centre marker at the pins still docks.
+    """
+
     def __init__(
         self,
         bearing_tol_deg: float = BEARING_TOL_DEG,
@@ -51,6 +68,7 @@ class DockingController:
         max_speed: float = MAX_APPROACH_SPEED,
         min_speed: float = MIN_APPROACH_SPEED,
         taper_distance_m: float = TAPER_DISTANCE_M,
+        search_steering_deg: float = SEARCH_STEERING_DEG,
     ):
         self._bearing_tol = bearing_tol_deg
         self._contact = contact_distance_m
@@ -59,6 +77,7 @@ class DockingController:
         self._max_speed = max_speed
         self._min_speed = min_speed
         self._taper = taper_distance_m
+        self._search_steer = search_steering_deg
 
     def compute(self, marker: Optional[MarkerPose], charge_detected: bool) -> DockingCommand:
         if charge_detected:
@@ -66,14 +85,15 @@ class DockingController:
 
         if marker is None:
             # Rotate in place to sweep for the marker.
-            return DockingCommand(0.0, SEARCH_STEERING_DEG, DockPhase.SEARCHING, False)
+            return DockingCommand(0.0, self._search_steer, DockPhase.SEARCHING, False)
 
         if marker.distance_m <= self._contact:
             return DockingCommand(0.0, 0.0, DockPhase.DOCKED, True)
 
         # Marker to the right (bearing +) → steer right (negative).
-        steering = _clamp(-self._gain * marker.bearing_deg,
-                          -self._max_steer, self._max_steer)
+        steering = _clamp(
+            -self._gain * marker.bearing_deg, -self._max_steer, self._max_steer
+        )
 
         if abs(marker.bearing_deg) > self._bearing_tol:
             return DockingCommand(0.0, steering, DockPhase.ALIGNING, False)
