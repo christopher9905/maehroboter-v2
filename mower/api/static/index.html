@@ -13,53 +13,54 @@
    TOKENS
 ═══════════════════════════════════════════════════════════════ */
 :root {
-  --bg:      #F2F5F2;
-  --sf:      #FFFFFF;
-  --sf2:     #F7FAF7;
-  --sf3:     #EDF2ED;
-  --border:  rgba(0,0,0,0.07);
-  --border2: rgba(0,0,0,0.13);
+  --bg:      #181C25;   /* app background            (rgba 24,28,37)  */
+  --sf:      #242B35;   /* floating cards / tiles     (rgba 36,43,53)  */
+  --sf2:     #1E242E;   /* darker inset surface       */
+  --sf3:     #2F3846;   /* input tracks / icon chips  */
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.14);
 
-  --green:    #16A34A;
-  --green-dk: #14532D;
-  --green-lt: #DCFCE7;
-  --green-md: #86EFAC;
+  --green:    #3FC66B;
+  --green-dk: #1C6B3A;
+  --green-lt: rgba(63,198,107,.16);
+  --green-md: #57D07E;
 
-  --amber:  #B45309;
-  --amber-lt:#FEF3C7;
-  --red:    #DC2626;
-  --red-lt: #FEE2E2;
-  --blue:   #1D4ED8;
-  --blue-lt:#DBEAFE;
-  --violet: #6D28D9;
-  --violet-lt:#EDE9FE;
+  --amber:    #FFAA01;  /* brand highlight            (rgba 255,170,1) */
+  --amber-soft:#FFC658; /* washed-out orange accent   */
+  --amber-lt: rgba(255,170,1,.16);
+  --red:    #F2565B;
+  --red-lt: rgba(242,86,91,.16);
+  --blue:   #5B8DF6;
+  --blue-lt:rgba(91,141,246,.16);
+  --violet: #A784F2;
+  --violet-lt:rgba(167,132,242,.16);
 
-  --text:   #0F1F12;
-  --text2:  #4B5E50;
-  --text3:  #9AAB9E;
+  --text:   #EEF2F7;
+  --text2:  #A7B2BF;
+  --text3:  #6C7686;
 
-  --sidebar: 390px;
-  --r:    14px;
-  --r-sm: 9px;
-  --r-lg: 20px;
-  --sh:   0 1px 3px rgba(0,0,0,0.06), 0 3px 10px rgba(0,0,0,0.05);
-  --sh-md:0 4px 20px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.06);
+  --sidebar: 400px;
+  --r:    16px;
+  --r-sm: 11px;
+  --r-lg: 22px;
+  --sh:   0 6px 20px rgba(0,0,0,0.35);
+  --sh-md:0 12px 34px rgba(0,0,0,0.48), 0 2px 8px rgba(0,0,0,0.32);
   --ease: cubic-bezier(.4,0,.2,1);
   --spring: cubic-bezier(.34,1.56,.64,1);
 
-  /* state theming */
-  --sc:    #16A34A;
-  --sc-lt: #DCFCE7;
-  --sc-gl: rgba(22,163,74,.12);
+  /* state theming — orange brand + semantic accents where sensible */
+  --sc:    #FFAA01;
+  --sc-lt: rgba(255,170,1,.16);
+  --sc-gl: rgba(255,170,1,.18);
 }
-[data-state="IDLE"]               { --sc:#16A34A; --sc-lt:#DCFCE7; --sc-gl:rgba(22,163,74,.12); }
-[data-state="MOWING"]             { --sc:#15803D; --sc-lt:#D1FAE5; --sc-gl:rgba(21,128,61,.14); }
-[data-state="OBSTACLE_AVOIDANCE"] { --sc:#B45309; --sc-lt:#FEF3C7; --sc-gl:rgba(180,83,9,.12);  }
-[data-state="RETURNING"]          { --sc:#1D4ED8; --sc-lt:#DBEAFE; --sc-gl:rgba(29,78,216,.12); }
-[data-state="DOCKING"]            { --sc:#0369A1; --sc-lt:#E0F2FE; --sc-gl:rgba(3,105,161,.12); }
-[data-state="CHARGING"]           { --sc:#B45309; --sc-lt:#FEF3C7; --sc-gl:rgba(180,83,9,.12);  }
-[data-state="TEACH_IN"]           { --sc:#6D28D9; --sc-lt:#EDE9FE; --sc-gl:rgba(109,40,217,.12);}
-[data-state="ERROR"]              { --sc:#DC2626; --sc-lt:#FEE2E2; --sc-gl:rgba(220,38,38,.14); }
+[data-state="IDLE"]               { --sc:#3FC66B; --sc-lt:rgba(63,198,107,.16); --sc-gl:rgba(63,198,107,.16); }
+[data-state="MOWING"]             { --sc:#FFAA01; --sc-lt:rgba(255,170,1,.16);  --sc-gl:rgba(255,170,1,.18);  }
+[data-state="OBSTACLE_AVOIDANCE"] { --sc:#FFB020; --sc-lt:rgba(255,176,32,.16); --sc-gl:rgba(255,176,32,.16); }
+[data-state="RETURNING"]          { --sc:#5B8DF6; --sc-lt:rgba(91,141,246,.16); --sc-gl:rgba(91,141,246,.16); }
+[data-state="DOCKING"]            { --sc:#3FB6E0; --sc-lt:rgba(63,182,224,.16); --sc-gl:rgba(63,182,224,.16); }
+[data-state="CHARGING"]           { --sc:#FFB020; --sc-lt:rgba(255,176,32,.16); --sc-gl:rgba(255,176,32,.16); }
+[data-state="TEACH_IN"]           { --sc:#A784F2; --sc-lt:rgba(167,132,242,.16); --sc-gl:rgba(167,132,242,.16);}
+[data-state="ERROR"]              { --sc:#F2565B; --sc-lt:rgba(242,86,91,.16);  --sc-gl:rgba(242,86,91,.16);  }
 
 /* ═══════════════════════════════════════════════════════════════
    RESET
@@ -1062,6 +1063,267 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
   0%,100%{stroke-dashoffset:120;}
   50%{stroke-dashoffset:40;}
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   DARK THEME · FLOATING PILL NAV · GRAPHIC CONTROLS  (overrides)
+═══════════════════════════════════════════════════════════════ */
+.visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+/* Sidebar = darkest layer so cards float above it */
+.sidebar{ background:var(--bg); box-shadow:1px 0 0 var(--border), 10px 0 50px rgba(0,0,0,.45); }
+
+/* ─ Floating pill topbar ─ */
+.topbar{
+  position:absolute; top:12px; left:12px; right:12px; z-index:40;
+  padding:8px 10px; gap:10px;
+  background:rgba(29,35,45,.82);
+  backdrop-filter:blur(18px) saturate(1.3); -webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border:1px solid var(--border2); border-radius:100px;
+  box-shadow:var(--sh-md);
+}
+.nav-toggle{
+  width:40px; height:40px; border-radius:50%; flex-shrink:0;
+  background:var(--sf3);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  transition:background .2s;
+}
+.nav-toggle span{ width:16px; height:2px; border-radius:2px; background:var(--text2); transition:.3s var(--spring); }
+.nav-toggle:hover{ background:var(--sc); }
+.nav-toggle:hover span{ background:#12161d; }
+.topbar.menu-open .nav-toggle span:nth-child(1){ transform:translateY(6px) rotate(45deg); }
+.topbar.menu-open .nav-toggle span:nth-child(2){ opacity:0; }
+.topbar.menu-open .nav-toggle span:nth-child(3){ transform:translateY(-6px) rotate(-45deg); }
+
+.tb-brand{ display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
+.brand-icon{ background:var(--sc-lt); }
+.tb-titles{ min-width:0; }
+.tb-titles .brand-name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.topbar-right{ gap:9px; }
+.ws-dot{ width:9px; height:9px; }
+.soc-pill{ background:var(--sf3); color:var(--text2); }
+
+/* ─ Dropdown nav ─ */
+.nav-menu{
+  position:absolute; top:calc(100% + 10px); left:2px; min-width:232px;
+  background:var(--sf); border:1px solid var(--border2); border-radius:18px;
+  box-shadow:var(--sh-md); padding:8px;
+  opacity:0; visibility:hidden; transform:translateY(-10px) scale(.96); transform-origin:top left;
+  transition:opacity .22s var(--ease), transform .26s var(--spring), visibility .22s;
+  z-index:50;
+}
+.topbar.menu-open .nav-menu{ opacity:1; visibility:visible; transform:none; }
+.nav-item{
+  display:flex; align-items:center; gap:12px; width:100%;
+  padding:11px 12px; border-radius:13px;
+  color:var(--text2); font-size:14.5px; font-weight:600; text-align:left;
+  transition:background .15s, color .15s;
+}
+.nav-item:hover{ background:var(--sf2); color:var(--text); }
+.nav-item.active{ background:var(--sc-lt); color:var(--sc); }
+.ni-ic{ width:32px; height:32px; border-radius:9px; background:var(--sf3); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.nav-item.active .ni-ic{ background:var(--sc); }
+.ni-ic svg{ width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.nav-item.active .ni-ic svg{ stroke:#12161d; }
+.nav-scrim{ position:absolute; inset:0; z-index:35; display:none; }
+
+/* Content scrolls UNDER the floating pill */
+.view{ padding-top:72px; }
+
+/* ─ Floating cards (shadow + lift) ─ */
+.hero-card, .tel-cell, .zone-item, .last-sess-card, .next-mow-card,
+.week-grid, .schedule-card, .stat-card, .chart-wrap, .session-card,
+.settings-card{ box-shadow:var(--sh); }
+.hero-card{ background:linear-gradient(165deg, var(--sf) 0%, var(--sf2) 100%); border:1px solid var(--border); box-shadow:var(--sh-md); }
+.hero-card::before{ background:radial-gradient(ellipse at 82% -10%, var(--sc-gl) 0%, transparent 62%); }
+
+/* Hero interior on dark */
+.state-chip{ background:rgba(255,255,255,.05); border:1px solid var(--border); }
+.ring-bg{ stroke:rgba(255,255,255,.09); }
+.battery-pct{ color:var(--text); }
+.ha-primary{ background:linear-gradient(135deg, var(--amber-soft), var(--amber)); color:#231600; box-shadow:0 10px 24px -10px rgba(255,170,1,.5); }
+.ha-primary .ha-btn-icon{ background:rgba(0,0,0,.16); }
+.ha-primary:hover{ filter:brightness(1.05); }
+.ha-ghost{ background:var(--sf3); color:var(--text); border:1px solid var(--border); }
+.ha-ghost .ha-btn-icon{ background:rgba(255,255,255,.06); color:var(--sc); }
+.ha-ghost:hover{ background:#374252; }
+.ha-danger{ background:var(--red-lt); color:#FF7C80; }
+.ha-danger .ha-btn-icon{ background:rgba(242,86,91,.22); }
+.ha-danger:hover{ background:rgba(242,86,91,.24); }
+.ha-info{ background:var(--sf2); color:var(--text2); }
+
+/* Telemetry / sections */
+.tel-icon{ background:var(--sf3); color:var(--text2); }
+.section-action{ background:var(--sc-lt); color:var(--sc); }
+.section-action:hover{ background:var(--sc); color:#12161d; }
+.zone-empty, .empty-state{ background:var(--sf2); border-color:var(--border2); }
+
+/* Schedule */
+.next-mow-card{ background:linear-gradient(135deg, var(--amber-soft) 0%, var(--amber) 100%); color:#241700; box-shadow:0 14px 34px -12px rgba(255,170,1,.45); }
+.next-mow-card::after{ background:rgba(0,0,0,.06); }
+.next-mow-label{ opacity:.62; }
+.next-mow-sub{ opacity:.72; }
+.day-chip{ background:var(--sf3); color:var(--text3); }
+.day-chip.on{ background:var(--sc); color:#12161d; }
+.sched-time-badge{ background:var(--sf3); color:var(--text); }
+.add-btn{ border-color:var(--border2); color:var(--text3); }
+.add-btn:hover{ border-color:var(--sc); color:var(--sc); background:var(--sc-lt); }
+
+/* Last session / history icons */
+.last-sess-icon{ background:var(--green-lt); color:var(--green); }
+.sess-icon.ok{ background:var(--green-lt); color:var(--green); }
+.sess-icon.warn{ background:var(--amber-lt); color:var(--amber-soft); }
+.sess-icon.err{ background:var(--red-lt); color:var(--red); }
+.chart-bar{ background:var(--green-md); }
+.chart-bar.bar-ok{ background:linear-gradient(180deg,#57D07E,#2E9E52); }
+.chart-bar.bar-warn{ background:linear-gradient(180deg,#FFC658,#F0A11F); }
+.chart-bar.bar-err{ background:linear-gradient(180deg,#F98488,#E5484D); }
+.chart-bar::after{ background:linear-gradient(180deg,rgba(255,255,255,.16) 0%,transparent 55%); }
+
+/* Settings rows / inputs */
+.settings-row:hover{ background:var(--sf2); }
+.settings-row-icon{ background:var(--sf3); color:var(--text2); }
+.settings-divider{ background:var(--border); }
+input[type="range"]{ background:var(--sf3); }
+input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0 2px 6px rgba(0,0,0,.5); }
+.slider-val{ background:var(--sc-lt); color:var(--sc); }
+.slider-label{ display:flex; align-items:center; gap:9px; }
+.toggle-track{ background:var(--border2); }
+.toggle-switch input:checked + .toggle-track{ background:var(--amber); }
+.danger-row{ color:#FF7C80; }
+.danger-row:hover{ background:rgba(242,86,91,.1); }
+
+/* Modals / toasts on dark */
+.modal-sheet{ box-shadow:0 -20px 60px rgba(0,0,0,.6); }
+.modal-close{ background:var(--sf3); color:var(--text3); }
+.modal-select, .modal-input{ background:var(--sf2); border-color:var(--border2); color:var(--text); }
+.dur-opt{ border-color:var(--border2); color:var(--text2); }
+.dur-opt.on{ border-color:var(--sc); background:var(--sc-lt); color:var(--sc); }
+.wiz-btn-primary{ background:linear-gradient(135deg, var(--amber-soft), var(--amber)); color:#231600; }
+.wiz-btn-ghost{ background:var(--sf3); color:var(--text2); }
+.wiz-btn-danger{ background:var(--red-lt); color:#FF7C80; }
+.rec-indicator{ background:rgba(242,86,91,.12); }
+.rec-label, .rec-time{ color:#FF7C80; }
+.map-fab{ background:var(--sf); color:var(--text2); border:1px solid var(--border); }
+.map-fab:hover{ background:var(--sc); color:#12161d; }
+.toast{ background:#2B3442; color:var(--text); border:1px solid var(--border); }
+.toast.success{ background:#1E3327; }
+.toast.warning{ background:#3A2E12; }
+.toast.error{ background:#3A1E22; }
+
+/* ─ Graphic control: label icon ─ */
+.sl-ic{ width:26px; height:26px; border-radius:8px; background:var(--sc-lt); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sl-ic svg{ width:15px; height:15px; fill:none; stroke:var(--sc); stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+
+/* ─ Graphic control: lane spacing ─ */
+.lane-viz{
+  --lane-gap:30px;
+  position:relative; height:150px; margin:6px 0 14px;
+  border-radius:14px; overflow:hidden;
+  background:linear-gradient(180deg,#1c3325,#152318);
+  border:1px solid var(--border);
+}
+/* Stripes are single solid elements (JS-generated) placed symmetrically at
+   50% ± gap/2, ± 3·gap/2 … — every stripe is exactly the same width, and they
+   grow outward evenly from the centre. */
+.lane-stripes{
+  position:absolute; inset:0; overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+}
+.lane-stripes i{
+  position:absolute; top:0; bottom:0; width:3px; margin-left:-1.5px;
+  background:#FFB300; border-radius:1px;
+}
+.lane-robot{ position:absolute; left:50%; top:68%; transform:translate(-50%,-50%); width:96px; height:96px; z-index:2; filter:drop-shadow(0 3px 6px rgba(0,0,0,.6)); }
+.lane-robot svg{ width:100%; height:100%; display:block; }
+/* Caliper measures ONE lane gap between the two central stripes — centred.
+   No width transition: it must snap in lock-step with the (instantly redrawn)
+   stripes, otherwise the measurement lags behind the spacing change. */
+.lane-caliper{
+  position:absolute; top:30px; left:50%; transform:translateX(-50%);
+  width:var(--lane-gap); border-top:2px solid rgba(255,255,255,.82);
+  z-index:3;
+}
+.lane-caliper::before, .lane-caliper::after{ content:''; position:absolute; top:-6px; width:2px; height:13px; background:rgba(255,255,255,.82); border-radius:1px; }
+.lane-caliper::before{ left:0; } .lane-caliper::after{ right:0; }
+.lc-val{ position:absolute; top:-23px; left:50%; transform:translateX(-50%); font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:600; color:#fff; white-space:nowrap; background:rgba(0,0,0,.6); padding:2px 7px; border-radius:6px; }
+
+/* ─ Graphic control: speed meter ─ */
+.speed-viz{ display:flex; align-items:flex-end; gap:6px; height:26px; margin:8px 0 12px; }
+.speed-viz span{ flex:1; height:9px; border-radius:4px; background:var(--sf3); transition:height .2s var(--spring), background .2s; }
+.speed-viz span.on{ background:var(--green); }
+.speed-viz span.on:nth-child(2){ height:13px; }
+.speed-viz span.on:nth-child(3){ height:17px; }
+.speed-viz span.on:nth-child(4){ height:21px; background:#FFC24D; }   /* warnt: schnell */
+.speed-viz span.on:nth-child(5){ height:26px; background:var(--red); } /* zu schnell */
+
+/* ─ Graphic control: max slope — tractor sits on a tilting ground line ─ */
+.tilt-viz{
+  --tilt-ang:30deg;
+  position:relative; height:128px; margin:6px 0 14px; overflow:hidden;
+  border-radius:14px; background:linear-gradient(180deg,#212a3d,#161c29); border:1px solid var(--border);
+}
+.tilt-scene{
+  position:absolute; inset:0;
+  transform-origin:50% 66%; transform:rotate(var(--tilt-ang));
+  transition:transform .35s var(--spring);
+}
+.tilt-line{
+  position:absolute; left:-15%; right:-15%; top:66%; height:3px; border-radius:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.5) 12%,rgba(255,255,255,.5) 88%,transparent);
+}
+.tilt-tractor{
+  position:absolute; left:50%; top:66%; width:66px;
+  transform:translate(-50%,-84%);   /* seat wheels on the line (image has bottom padding) */
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.5));
+}
+.tilt-angle-label{
+  position:absolute; left:14px; top:12px;
+  font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:var(--sc);
+  background:rgba(0,0,0,.32); padding:2px 8px; border-radius:6px;
+}
+.lane-robot img{ width:100%; height:100%; object-fit:contain; display:block; }
+
+/* ═══ Custom slider (value bubble merged onto the thumb) ═══ */
+.slider-head{ margin-bottom:2px; }
+.rng{ position:relative; height:48px; margin-top:2px; }
+.rng-track{ position:absolute; left:0; right:0; bottom:11px; height:8px; border-radius:6px; background:var(--sf3); overflow:hidden; }
+.rng-fill{ position:absolute; left:0; top:0; bottom:0; width:var(--pct,50%); background:linear-gradient(90deg,var(--amber-soft),var(--amber)); border-radius:6px; transition:width .12s var(--ease); }
+.rng input[type="range"]{
+  position:absolute; left:0; right:0; bottom:5px; width:100%; height:20px; margin:0;
+  -webkit-appearance:none; appearance:none; background:transparent; cursor:pointer;
+}
+.rng input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+  background:#fff; border:3px solid var(--amber); box-shadow:0 2px 8px rgba(0,0,0,.6); cursor:pointer;
+}
+.rng input[type="range"]::-moz-range-thumb{ width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--amber); box-shadow:0 2px 8px rgba(0,0,0,.6); cursor:pointer; }
+.rng-bubble{
+  position:absolute; top:-3px; left:clamp(34px, var(--pct,50%), calc(100% - 34px)); transform:translateX(-50%);
+  background:var(--amber); color:#231600;
+  font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700;
+  padding:3px 9px; border-radius:8px; white-space:nowrap; pointer-events:none;
+  box-shadow:0 3px 9px rgba(0,0,0,.4); transition:left .12s var(--ease);
+}
+.rng-bubble::after{ content:''; position:absolute; left:50%; bottom:-4px; transform:translateX(-50%); border:4px solid transparent; border-top-color:var(--amber); }
+
+/* ═══ Home speed control (actual + chosen + steppers) ═══ */
+.speed-ctrl{
+  display:flex; align-items:center; gap:14px;
+  background:var(--sf); border:1px solid var(--border); border-radius:var(--r);
+  padding:14px 16px; box-shadow:var(--sh);
+}
+.sc-icon{ width:44px; height:44px; border-radius:13px; background:var(--sc-lt); color:var(--sc); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sc-icon svg{ width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.sc-info{ flex:1; min-width:0; }
+.sc-name{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text3); }
+.sc-actual{ font-family:'JetBrains Mono',monospace; font-size:23px; font-weight:600; color:var(--text); line-height:1.15; }
+.sc-actual small{ font-size:12px; color:var(--text3); font-weight:500; margin-left:4px; }
+.sc-target{ font-size:12px; color:var(--text3); font-weight:600; margin-top:1px; }
+.sc-btns{ display:flex; gap:8px; flex-shrink:0; }
+.sc-btn{ width:42px; height:42px; border-radius:13px; background:var(--sf3); color:var(--text); font-size:24px; font-weight:500; line-height:1; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+.sc-btn:hover{ background:var(--sc); color:#12161d; }
+.sc-btn:active{ transform:scale(.9); }
 </style>
 </head>
 <body>
@@ -1072,27 +1334,30 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
   ══════════════════════════════════════════════════════ -->
   <aside class="sidebar">
 
-    <!-- TOPBAR -->
-    <header class="topbar">
-      <div class="brand">
+    <!-- TOPBAR — floating pill with hamburger dropdown -->
+    <header class="topbar" id="topbar">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menü öffnen">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="tb-brand">
         <div class="brand-icon">
           <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="10" cy="10" r="8" fill="var(--sc)"/>
-            <circle cx="10" cy="10" r="4" fill="rgba(0,0,0,0.2)"/>
+            <circle cx="10" cy="10" r="4" fill="rgba(0,0,0,0.28)"/>
             <circle cx="7"  cy="7"  r="2" fill="white" opacity=".95"/>
             <circle cx="13" cy="7"  r="2" fill="white" opacity=".95"/>
           </svg>
         </div>
-        <div>
-          <div class="brand-name">Mähroboter V2</div>
+        <div class="tb-titles">
+          <div class="brand-name" id="view-title">Karte</div>
           <div class="brand-model">MV2-Alpha</div>
         </div>
       </div>
+
       <div class="topbar-right">
-        <div class="conn-pill">
-          <span class="ws-dot" id="ws-dot"></span>
-          <span id="top-conn-label">Verbinden…</span>
-        </div>
+        <span class="ws-dot" id="ws-dot" title="Verbindung"></span>
+        <span id="top-conn-label" class="visually-hidden">Verbinden…</span>
         <div class="soc-pill">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 18H3a2 2 0 01-2-2V8a2 2 0 012-2h3.19M15 6h2a2 2 0 012 2v8a2 2 0 01-2 2h-3.19"/>
@@ -1102,7 +1367,28 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
           <span id="top-soc-val">—</span>
         </div>
       </div>
+
+      <!-- Dropdown nav -->
+      <div class="nav-menu" id="nav-menu">
+        <button class="nav-item active" data-view="v-home">
+          <span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          <span>Karte</span>
+        </button>
+        <button class="nav-item" data-view="v-schedule">
+          <span class="ni-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+          <span>Zeitplan</span>
+        </button>
+        <button class="nav-item" data-view="v-history">
+          <span class="ni-ic"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+          <span>Verlauf</span>
+        </button>
+        <button class="nav-item" data-view="v-settings">
+          <span class="ni-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
+          <span>Einstellungen</span>
+        </button>
+      </div>
     </header>
+    <div class="nav-scrim" id="nav-scrim"></div>
 
     <!-- ─── VIEWS ──────────────────────────────────────── -->
     <div class="views">
@@ -1160,20 +1446,28 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
           <div class="hero-actions" id="sc-actions"></div>
         </div>
 
+        <!-- Speed control -->
+        <div class="section">
+          <div class="speed-ctrl">
+            <div class="sc-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M12 4v2M4.9 7.2l1.4 1.4M2 15h2M20 15h2M17.7 8.6l1.4-1.4"/><path d="M12 15l4-3"/></svg>
+            </div>
+            <div class="sc-info">
+              <div class="sc-name">Fahrtempo</div>
+              <div class="sc-actual"><span id="tel-speed">—</span><small>km/h</small></div>
+              <div class="sc-target" id="tel-speed-target">Ziel —</div>
+            </div>
+            <div class="sc-btns">
+              <button class="sc-btn" id="speed-down" aria-label="Langsamer">−</button>
+              <button class="sc-btn" id="speed-up" aria-label="Schneller">+</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Telemetry -->
         <div class="section">
           <div class="section-head"><span class="section-label">Telemetrie</span></div>
           <div class="tel-grid">
-            <div class="tel-cell">
-              <div class="tel-icon">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <div class="tel-val-row">
-                <span class="tel-num" id="tel-speed">—</span>
-                <span class="tel-unit-label">km/h</span>
-              </div>
-              <div class="tel-name">Geschwindigkeit</div>
-            </div>
             <div class="tel-cell">
               <div class="tel-icon">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
@@ -1183,6 +1477,16 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
                 <span class="tel-unit-label">°</span>
               </div>
               <div class="tel-name">Kurs</div>
+            </div>
+            <div class="tel-cell">
+              <div class="tel-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 20h18M5 20L19 8"/><path d="M14 8h5v5"/></svg>
+              </div>
+              <div class="tel-val-row">
+                <span class="tel-num" id="tel-tilt">—</span>
+                <span class="tel-unit-label">°</span>
+              </div>
+              <div class="tel-name">Neigung</div>
             </div>
             <div class="tel-cell">
               <div class="tel-icon">
@@ -1327,18 +1631,38 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
           <div class="settings-card">
             <div class="slider-row">
               <div class="slider-head">
-                <span class="slider-label">Spurabstand</span>
-                <span class="slider-val" id="s-lane-val">38 cm</span>
+                <span class="slider-label">
+                  <span class="sl-ic"><svg viewBox="0 0 24 24"><path d="M4 4v16M9 4v16M15 4v16M20 4v16"/></svg></span>
+                  Spurabstand
+                </span>
               </div>
-              <input type="range" id="s-lane" min="20" max="60" step="2" class="slider"/>
+              <!-- graphic lane-spacing visualiser -->
+              <div class="lane-viz" id="lane-viz">
+                <div class="lane-stripes"></div>
+                <div class="lane-robot"><img src="/static/tractor.png" alt="Traktor"></div>
+                <div class="lane-caliper" id="lane-caliper"><span class="lc-val" id="lane-caliper-val">38 cm</span></div>
+              </div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-lane" min="20" max="60" step="2"/>
+                <div class="rng-bubble" id="s-lane-val">38 cm</div>
+              </div>
             </div>
             <div class="settings-divider"></div>
             <div class="slider-row">
               <div class="slider-head">
-                <span class="slider-label">Fahrgeschwindigkeit</span>
-                <span class="slider-val" id="s-speed-val">5</span>
+                <span class="slider-label">
+                  <span class="sl-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 12l4-2"/></svg></span>
+                  Fahrgeschwindigkeit
+                </span>
               </div>
-              <input type="range" id="s-speed" min="1" max="10" step="1" class="slider"/>
+              <!-- speed dashes visualiser -->
+              <div class="speed-viz" id="speed-viz"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-speed" min="0.3" max="1.8" step="0.1"/>
+                <div class="rng-bubble" id="s-speed-val">0,9 km/h</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1349,10 +1673,24 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
           <div class="settings-card">
             <div class="slider-row">
               <div class="slider-head">
-                <span class="slider-label">Maximale Neigung</span>
-                <span class="slider-val" id="s-tilt-val">30°</span>
+                <span class="slider-label">
+                  <span class="sl-ic"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20L19 8"/></svg></span>
+                  Maximale Neigung
+                </span>
               </div>
-              <input type="range" id="s-tilt" min="15" max="45" step="5" class="slider"/>
+              <!-- front-view tractor tilting to the chosen max angle -->
+              <div class="tilt-viz" id="tilt-viz">
+                <div class="tilt-scene">
+                  <div class="tilt-line"></div>
+                  <img class="tilt-tractor" src="/static/tractor-front.png" alt="Traktor">
+                </div>
+                <div class="tilt-angle-label" id="tilt-angle-label">30°</div>
+              </div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-tilt" min="15" max="45" step="5"/>
+                <div class="rng-bubble" id="s-tilt-val">30°</div>
+              </div>
             </div>
             <div class="settings-divider"></div>
             <div class="toggle-row">
@@ -1368,10 +1706,16 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
             <div class="settings-divider"></div>
             <div class="slider-row">
               <div class="slider-head">
-                <span class="slider-label">Wartezeit nach Regen</span>
-                <span class="slider-val" id="s-rainwait-val">30 min</span>
+                <span class="slider-label">
+                  <span class="sl-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                  Wartezeit nach Regen
+                </span>
               </div>
-              <input type="range" id="s-rainwait" min="0" max="120" step="10" class="slider"/>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-rainwait" min="0" max="120" step="10"/>
+                <div class="rng-bubble" id="s-rainwait-val">30 min</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1418,26 +1762,6 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
       </div><!-- /v-settings -->
 
     </div><!-- /views -->
-
-    <!-- BOTTOM NAV -->
-    <nav class="bottom-nav">
-      <button class="nav-btn active" data-view="v-home">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Karte</span>
-      </button>
-      <button class="nav-btn" data-view="v-schedule">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span>Zeitplan</span>
-      </button>
-      <button class="nav-btn" data-view="v-history">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        <span>Verlauf</span>
-      </button>
-      <button class="nav-btn" data-view="v-settings">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        <span>Einstellungen</span>
-      </button>
-    </nav>
 
   </aside><!-- /sidebar -->
 
@@ -1614,6 +1938,6 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
 
 <!-- SCRIPTS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/app.js?v=2"></script>
+<script src="/static/app.js?v=8"></script>
 </body>
 </html>

@@ -4,18 +4,22 @@
 // ═══════════════════════════════════════════════════════════════
 // MAP
 // ═══════════════════════════════════════════════════════════════
-const map = L.map('map', { zoomControl: false, attributionControl: true })
+const map = L.map('map', { zoomControl: false, attributionControl: true, maxZoom: 21 })
   .setView([48.5, 11.0], 17);
 
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
+// maxNativeZoom caps the highest zoom level actually requested from the tile
+// server; Leaflet upscales beyond it. Without this, zooming past the imagery's
+// available levels fetches non-existent tiles that render "Map data not yet
+// available". Esri World Imagery is globally available to ~z19.
 const satelliteLayer = L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  { attribution: 'Tiles © Esri', maxZoom: 22 }
+  { attribution: 'Tiles © Esri', maxZoom: 21, maxNativeZoom: 19 }
 );
 const streetLayer = L.tileLayer(
-  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-  { attribution: '© CARTO © OSM', subdomains: 'abcd', maxZoom: 22 }
+  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  { attribution: '© CARTO © OSM', subdomains: 'abcd', maxZoom: 21, maxNativeZoom: 20 }
 );
 
 satelliteLayer.addTo(map);
@@ -52,6 +56,10 @@ document.getElementById('map-layer-btn')?.addEventListener('click', () => {
 // VIEW ROUTER
 // ═══════════════════════════════════════════════════════════════
 const VIEWS = ['v-home', 'v-schedule', 'v-history', 'v-settings'];
+const VIEW_TITLES = {
+  'v-home': 'Karte', 'v-schedule': 'Zeitplan',
+  'v-history': 'Verlauf', 'v-settings': 'Einstellungen',
+};
 let currentView = 'v-home';
 
 function showView(id) {
@@ -59,16 +67,31 @@ function showView(id) {
   VIEWS.forEach(v => {
     document.getElementById(v).classList.toggle('active', v === id);
   });
-  document.querySelectorAll('.nav-btn').forEach(btn => {
+  document.querySelectorAll('.nav-item').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.view === id);
   });
+  const titleEl = document.getElementById('view-title');
+  if (titleEl) titleEl.textContent = VIEW_TITLES[id] || '';
+  closeNavMenu();
   if (id === 'v-schedule') { renderSchedule(); renderWeekGrid(); updateNextMow(); }
   if (id === 'v-history')  renderHistory();
 }
 
-document.querySelectorAll('.nav-btn[data-view]').forEach(btn => {
+document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
   btn.addEventListener('click', () => showView(btn.dataset.view));
 });
+
+// ─── Hamburger dropdown ───────────────────────────────────────────
+const _topbar   = document.getElementById('topbar');
+const _navScrim = document.getElementById('nav-scrim');
+function openNavMenu()  { _topbar?.classList.add('menu-open');  if (_navScrim) _navScrim.style.display = 'block'; }
+function closeNavMenu() { _topbar?.classList.remove('menu-open'); if (_navScrim) _navScrim.style.display = 'none';  }
+document.getElementById('nav-toggle')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  _topbar?.classList.contains('menu-open') ? closeNavMenu() : openNavMenu();
+});
+_navScrim?.addEventListener('click', closeNavMenu);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNavMenu(); });
 
 // ═══════════════════════════════════════════════════════════════
 // STATE MACHINE UI
@@ -355,8 +378,8 @@ function showLastSession(s) {
   const d = new Date(s.date);
   const dateStr = d.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'short' });
   const timeStr = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-  const iconColor = s.status === 'error' ? '#DC2626' : s.status === 'warn' ? '#D97706' : '#16A34A';
-  const iconBg    = s.status === 'error' ? '#FEE2E2' : s.status === 'warn' ? '#FEF3C7' : '#DCFCE7';
+  const iconColor = s.status === 'error' ? '#F2565B' : s.status === 'warn' ? '#FFC658' : '#3FC66B';
+  const iconBg    = s.status === 'error' ? 'rgba(242,86,91,.16)' : s.status === 'warn' ? 'rgba(255,170,1,.16)' : 'rgba(63,198,107,.16)';
   card.innerHTML = `
     <div class="last-sess-icon" style="background:${iconBg};color:${iconColor}">
       ${checkSVG()}
@@ -728,12 +751,73 @@ function errSVG()   { return '<svg viewBox="0 0 24 24" style="width:18px;height:
 // ═══════════════════════════════════════════════════════════════
 // SETTINGS (localStorage)
 // ═══════════════════════════════════════════════════════════════
+// Chosen driving speed is a real target in km/h (shared by settings + home).
+const SPEED_MIN = 0.3, SPEED_MAX = 1.8, SPEED_STEP = 0.1;
+const fmtSpeed = (v) => v.toFixed(1).replace('.', ',') + ' km/h';
+
 function getSettings() {
-  const def = { lane: 38, speed: 5, tilt: 30, rainwait: 30, rain: true, geo: true, robotName: 'MV2-Alpha' };
-  try { return Object.assign(def, JSON.parse(localStorage.getItem('mv2_settings') || '{}')); }
-  catch { return def; }
+  const def = { lane: 38, speed: 0.9, tilt: 30, rainwait: 30, rain: true, geo: true, robotName: 'MV2-Alpha' };
+  let s;
+  try { s = Object.assign(def, JSON.parse(localStorage.getItem('mv2_settings') || '{}')); }
+  catch { s = def; }
+  if (!(s.speed > 0.2 && s.speed <= 2.5)) s.speed = 0.9;   // migrate legacy 1–10 level
+  return s;
 }
 function saveSettings(s) { localStorage.setItem('mv2_settings', JSON.stringify(s)); }
+function saveKey(k, v) { saveSettings(Object.assign(getSettings(), { [k]: v })); }
+
+// Wire a custom slider: paints the amber fill + value bubble on the thumb.
+function initSlider(id, unit, decimals, onChange) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const wrap = input.closest('.rng');
+  const bubble = wrap ? wrap.querySelector('.rng-bubble') : null;
+  const fmt = decimals ? (v => v.toFixed(decimals).replace('.', ',')) : (v => String(v));
+  const paint = () => {
+    const v = +input.value, min = +input.min, max = +input.max;
+    if (wrap) wrap.style.setProperty('--pct', ((v - min) / (max - min)) * 100 + '%');
+    if (bubble) bubble.textContent = fmt(v) + unit;
+  };
+  input.addEventListener('input', () => { paint(); if (onChange) onChange(+input.value); });
+  paint();
+}
+
+// Speed "meter" bars (settings) reflect the chosen km/h.
+function renderSpeedViz(v) {
+  const el = document.getElementById('speed-viz');
+  if (!el) return;
+  const on = Math.round(((v - SPEED_MIN) / (SPEED_MAX - SPEED_MIN)) * 5);
+  [...el.children].forEach((seg, i) => seg.classList.toggle('on', i < on));
+}
+
+// Single source of truth for the chosen speed — syncs settings slider,
+// speed meter, the home stepper value and the home "Ziel" line.
+function applyChosenSpeed(v) {
+  v = Math.min(SPEED_MAX, Math.max(SPEED_MIN, Math.round(v / SPEED_STEP) * SPEED_STEP));
+  saveKey('speed', v);
+  const sp = document.getElementById('s-speed');
+  if (sp) {
+    sp.value = v;
+    const wrap = sp.closest('.rng');
+    if (wrap) {
+      wrap.style.setProperty('--pct', ((v - SPEED_MIN) / (SPEED_MAX - SPEED_MIN)) * 100 + '%');
+      const b = wrap.querySelector('.rng-bubble');
+      if (b) b.textContent = fmtSpeed(v);
+    }
+  }
+  renderSpeedViz(v);
+  const target = document.getElementById('tel-speed-target');
+  if (target) target.textContent = 'Ziel ' + fmtSpeed(v);
+  return v;
+}
+
+function initSpeedStepper() {
+  const down = document.getElementById('speed-down');
+  const up   = document.getElementById('speed-up');
+  if (down) down.addEventListener('click', () => applyChosenSpeed(getSettings().speed - SPEED_STEP));
+  if (up)   up.addEventListener('click',   () => applyChosenSpeed(getSettings().speed + SPEED_STEP));
+  applyChosenSpeed(getSettings().speed);   // initial paint of home + settings
+}
 
 function initSettings() {
   const s = getSettings();
@@ -742,34 +826,51 @@ function initSettings() {
   const modelEl = document.querySelector('.brand-model');
   if (modelEl) modelEl.textContent = s.robotName;
 
-  const bind = (id, valId, suffix, key, transform) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.value = s[key];
-    const valEl = document.getElementById(valId);
-    if (valEl) valEl.textContent = (transform ? transform(s[key]) : s[key]) + suffix;
-    el.addEventListener('input', () => {
-      const v = +el.value;
-      if (valEl) valEl.textContent = (transform ? transform(v) : v) + suffix;
-      saveSettings(Object.assign(getSettings(), { [key]: v }));
-    });
+  // ─── Graphic visualisers ──────────────────────────────────────
+  const laneViz = document.getElementById('lane-viz');
+  const laneStripes = laneViz ? laneViz.querySelector('.lane-stripes') : null;
+  const laneCalVal = document.getElementById('lane-caliper-val');
+  const renderLane = (v) => {
+    const gap = 24 + (v - 20) * 1.425;                      // px between lanes (scaled with tractor)
+    if (laneViz) laneViz.style.setProperty('--lane-gap', gap.toFixed(2) + 'px');
+    if (laneCalVal) laneCalVal.textContent = v + ' cm';
+    if (laneStripes) {
+      let html = '';
+      for (let off = gap / 2; off < 230; off += gap) {
+        html += `<i style="left:calc(50% + ${off.toFixed(1)}px)"></i>`
+              + `<i style="left:calc(50% - ${off.toFixed(1)}px)"></i>`;
+      }
+      laneStripes.innerHTML = html;
+    }
+  };
+  const tiltViz = document.getElementById('tilt-viz');
+  const tiltLbl = document.getElementById('tilt-angle-label');
+  const renderTilt = (v) => {
+    if (tiltViz) tiltViz.style.setProperty('--tilt-ang', v + 'deg');
+    if (tiltLbl) tiltLbl.textContent = v + '°';
   };
 
-  bind('s-lane',    's-lane-val',    ' cm', 'lane');
-  bind('s-speed',   's-speed-val',   '',    'speed');
-  bind('s-tilt',    's-tilt-val',    '°',   'tilt');
-  bind('s-rainwait','s-rainwait-val',' min','rainwait');
+  // Seed slider positions from stored settings, then wire the custom sliders.
+  const seed = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
+  seed('s-lane', s.lane); seed('s-speed', s.speed); seed('s-tilt', s.tilt); seed('s-rainwait', s.rainwait);
+
+  initSlider('s-lane', ' cm', 0, (v) => { saveKey('lane', v); renderLane(v); });
+  initSlider('s-tilt', '°', 0, (v) => { saveKey('tilt', v); renderTilt(v); });
+  initSlider('s-rainwait', ' min', 0, () => saveKey('rainwait', +document.getElementById('s-rainwait').value));
+  initSlider('s-speed', ' km/h', 1, (v) => applyChosenSpeed(v));
+
+  renderLane(s.lane);
+  renderTilt(s.tilt);
 
   const rainEl = document.getElementById('s-rain');
-  if (rainEl) { rainEl.checked = s.rain; rainEl.addEventListener('change', () => saveSettings(Object.assign(getSettings(), { rain: rainEl.checked }))); }
+  if (rainEl) { rainEl.checked = s.rain; rainEl.addEventListener('change', () => saveKey('rain', rainEl.checked)); }
 
   const geoEl = document.getElementById('s-geo');
-  if (geoEl) { geoEl.checked = s.geo; geoEl.addEventListener('change', () => saveSettings(Object.assign(getSettings(), { geo: geoEl.checked }))); }
+  if (geoEl) { geoEl.checked = s.geo; geoEl.addEventListener('change', () => saveKey('geo', geoEl.checked)); }
 
   const namePreview = document.getElementById('robot-name-preview');
   if (namePreview) namePreview.textContent = s.robotName;
 
-  // Robot name card click
   const nameCard = document.getElementById('card-robot-name');
   if (nameCard) nameCard.addEventListener('click', openNameModal);
 
@@ -802,6 +903,7 @@ function saveRobotName() {
 // ═══════════════════════════════════════════════════════════════
 updateUI('IDLE');
 initSettings();
+initSpeedStepper();
 renderWizDots();
 renderZones();
 
