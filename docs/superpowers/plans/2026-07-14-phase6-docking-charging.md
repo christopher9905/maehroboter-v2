@@ -791,10 +791,11 @@ After all tasks are complete:
 ### Manual / hardware bring-up (not automatable here — track separately)
 
 - [ ] Mount the DICT_4X4_50 15×15 cm marker at the charging-station entrance
-- [ ] Calibrate the RPi Camera Module 3 (`cv2.calibrateCamera`) → real `camera_matrix` / `dist_coeffs`, wired into `ArucoDetector`
-- [ ] Wire `DockingManager` into the app runtime: SOC/charging from HAL status callbacks, `frame_source` from the camera, `start()` alongside the executive
+- [ ] Calibrate the RPi Camera Module 3 (`cv2.calibrateCamera`) → real `camera_matrix` / `dist_coeffs` saved as `mower/config/camera_calibration.npz` (loaded via `mower.hal.camera.load_camera_calibration`)
+- [x] **Wire `DockingManager` into the app runtime** — done in software: `mower/main.py` is the new robot entrypoint. It builds `HardwareInterface` (real serial port) and, if a camera + calibration file are present, `DockingManager` via `mower.executive.docking_runtime.build_docking_manager` (real `Camera` frame source, `ArucoDetector`). SOC is tracked via `LatestSoc` fed from `HardwareInterface.on_soc`; `create_app(executive, docking_manager, soc_source, charging_source)` starts/stops the manager's background loop in the FastAPI lifespan. Everything degrades gracefully (logs a warning, runs API-only) when hardware/camera/calibration aren't present yet — safe to run on a partially-assembled robot. `charging_source` is still a `lambda: False` stub: no charge-contact sensor exists in the serial protocol yet, so `DockingManager` relies on its documented distance-only `DOCKED` trigger (`CONTACT_DISTANCE_M`) until a real signal is added to the firmware protocol (separate, firmware-side task). Tests: `tests/hal/test_camera.py`, `tests/executive/test_docking_runtime.py`, `tests/api/test_app.py::TestDockingManagerLifecycle`.
 - [ ] Field-tune `CONTACT_DISTANCE_M`, approach speeds, and `handoff_distance_m` against the physical dock
 - [ ] Commission the blade for real mowing runs ("Mähwerk in Betrieb nehmen")
+- [ ] Add a real charge-contact signal to the serial protocol (firmware + `decode_status`/`decode_soc`) so `charging_source` reflects true electrical contact instead of the distance-only approximation
 
 ### Deferred robustness items (surfaced in code review) — ✅ resolved
 

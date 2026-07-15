@@ -1,6 +1,7 @@
 # tests/api/test_app.py
 import pytest
 import pytest_asyncio
+from unittest.mock import MagicMock
 from httpx import AsyncClient, ASGITransport
 from mower.executive.mission_executive import MissionExecutive, MowerState
 from mower.api.app import create_app
@@ -92,3 +93,40 @@ async def test_status_endpoint(app, executive):
     data = resp.json()
     assert "state" in data
     assert "error_reason" in data
+
+
+class TestDockingManagerLifecycle:
+    """create_app optionally owns a DockingManager's start()/stop() lifecycle."""
+
+    async def test_docking_manager_started_on_lifespan_startup(self, executive):
+        docking_manager = MagicMock()
+        soc_source = lambda: 50
+        charging_source = lambda: False
+        app = create_app(
+            executive, docking_manager=docking_manager,
+            soc_source=soc_source, charging_source=charging_source,
+        )
+        async with app.router.lifespan_context(app):
+            docking_manager.start.assert_called_once_with(soc_source, charging_source)
+
+    async def test_docking_manager_stopped_on_lifespan_shutdown(self, executive):
+        docking_manager = MagicMock()
+        app = create_app(executive, docking_manager=docking_manager)
+        async with app.router.lifespan_context(app):
+            docking_manager.stop.assert_not_called()
+        docking_manager.stop.assert_called_once()
+
+    async def test_docking_manager_defaults_have_safe_sources(self, executive):
+        # No soc_source/charging_source given — must not raise at startup.
+        docking_manager = MagicMock()
+        app = create_app(executive, docking_manager=docking_manager)
+        async with app.router.lifespan_context(app):
+            args, _ = docking_manager.start.call_args
+            assert args[0]() == 0
+            assert args[1]() is False
+
+    async def test_app_works_without_docking_manager(self, app):
+        async with app.router.lifespan_context(app):
+            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+                resp = await client.get("/api/state")
+        assert resp.status_code == 200

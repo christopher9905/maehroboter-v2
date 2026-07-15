@@ -9,13 +9,14 @@ import asyncio
 import contextlib
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from mower.executive.mission_executive import MissionExecutive, MowerState
+from mower.executive.docking_manager import DockingManager
 from mower.api.ws_manager import ConnectionManager
 
 logger = logging.getLogger(__name__)
@@ -23,8 +24,18 @@ logger = logging.getLogger(__name__)
 _STATIC_DIR = Path(__file__).parent / "static"
 
 
-def create_app(executive: MissionExecutive) -> FastAPI:
-    """Create and return the configured FastAPI application."""
+def create_app(
+    executive: MissionExecutive,
+    docking_manager: Optional[DockingManager] = None,
+    soc_source: Optional[Callable[[], int]] = None,
+    charging_source: Optional[Callable[[], bool]] = None,
+) -> FastAPI:
+    """Create and return the configured FastAPI application.
+
+    If docking_manager is given, its background loop is started on lifespan
+    startup (soc_source/charging_source default to safe no-ops) and stopped
+    on shutdown.
+    """
     manager = ConnectionManager()
     _loop: Optional[asyncio.AbstractEventLoop] = None
 
@@ -32,7 +43,11 @@ def create_app(executive: MissionExecutive) -> FastAPI:
     async def lifespan(app: FastAPI):
         nonlocal _loop
         _loop = asyncio.get_running_loop()   # safe: called from async context
+        if docking_manager is not None:
+            docking_manager.start(soc_source or (lambda: 0), charging_source or (lambda: False))
         yield
+        if docking_manager is not None:
+            docking_manager.stop()
         _loop = None
 
     app = FastAPI(title="Mähroboter V2 Control", version="0.5.0", lifespan=lifespan)
