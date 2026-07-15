@@ -17,11 +17,7 @@ Dies ist Teil von Phase 7 (Tuning & Erweiterungen) laut [Design-Spec](2026-04-12
 - Eine serielle RTCM3-Quelle, die Bytes vom lokalen LC29H (im Base-Mode) abgreift und weiterreicht.
 - Verdrahtung + Konfiguration über Umgebungsvariablen (`base_station/main.py`).
 
-**Explizit außerhalb des Scopes (Hardware-Bring-up, separat zu tracken):**
-- Das LC29H-Modul der Basisstation in den Base-/Survey-in-Modus versetzen (modul-spezifische Konfiguration, einmalig, außerhalb dieses Codes — es existiert kein Datenblatt/keine Hardware in dieser Umgebung, um das zu verifizieren).
-- Physischer Aufbau/Standort der Basisstation, Antennenmontage.
-- Netzwerk zwischen Basisstation und Rover (WLAN/Ethernet) einrichten.
-- Feldtest der tatsächlichen Korrektur-Qualität/Fix-Zeit.
+**Explizit außerhalb des Scopes:** Hardware-Bring-up — siehe Abschnitt 7 für die vollständige Liste (dort statt hier dupliziert, um Drift zwischen zwei Listen zu vermeiden). Ebenfalls außerhalb des Scopes: Prozess-Supervision/Autostart von `base_station/main.py` (z. B. ein systemd-Unit) — die "fail loudly beim Start"-Philosophie in 3.3 hilft nur, wenn danach etwas den Prozess neu startet; das Einrichten dieses Supervisors ist Teil des physischen Aufbaus in Abschnitt 7, nicht dieses Codes.
 
 ## 3. Architektur
 
@@ -54,7 +50,9 @@ class RtcmSerialSource:
     def stop(self) -> None: ...
 ```
 
-Injizierbarer `serial_backend` (mirrort `SerialDriver`/`GpsReader`-Muster) — testbar ohne echte Hardware. `start()` öffnet den Port und startet einen Lese-Thread, der in einer Schleife `read()` aufruft und bei nicht-leeren Chunks `on_data` feuert. `stop()` beendet den Thread sauber (mirrort `SerialDriver.stop()`).
+Injizierbarer `serial_backend` (Konstruktor-Parameter, Default baut einen echten `serial.Serial(...)` — mirrort `Camera`s `capture=None`-Muster in `mower/hal/camera.py`, nicht `SerialDriver`/`GpsReader`, die den Port intern fest verdrahten) — testbar ohne echte Hardware über einen Fake-Backend wie `Camera`s Tests es tun. `start()` öffnet den Port und startet einen Lese-Thread, der in einer Schleife `read()` aufruft und bei nicht-leeren Chunks `on_data` feuert. `stop()` beendet den Thread sauber.
+
+**Laufzeit-Fehler im Lese-Thread:** Ein einzelner fehlschlagender `read()`-Aufruf (z. B. USB-Wackelkontakt) darf den Lese-Thread nicht crashen. Die Schleife fängt Exceptions pro Iteration ab, loggt sie auf ERROR-Level und versucht es weiter — exakt das bestehende Muster aus `SerialDriver._recv_loop()` (`mower/hal/serial_driver.py`). Das ist kein Widerspruch zum "kein Soft-Fallback beim Start" aus 3.3: dort geht es um einen initial nicht vorhandenen Port (harter Abbruch vor dem ersten Start), hier um eine transiente Störung *nach* erfolgreichem Start (log-and-retry, sichtbar in den Prozess-Logs, konsistent mit jedem anderen Treiber in diesem Projekt — `SerialDriver`, `GpsReader`, `NtripClient` verhalten sich alle so).
 
 ### 3.2 `base_station/ntrip_server.py` — `NtripServer`
 
@@ -81,9 +79,10 @@ class NtripServer:
 ```
 
 **Verhalten:**
-- `start()` bindet einen TCP-Listener und startet einen Accept-Loop-Thread. Jede eingehende Verbindung wird in einem eigenen Handler behandelt: Request-Zeile + Header parsen, Mountpoint gegen den konfigurierten Wert prüfen, `Authorization`-Header gegen `user`/`password` prüfen. Bei Erfolg: `ICY 200 OK\r\n\r\n` senden, Socket zur Liste aktiver Verbindungen hinzufügen. Bei Mountpoint- oder Auth-Fehler: Fehlerantwort senden, Socket schließen, nicht zur Liste hinzufügen.
-- `broadcast(data)` schreibt `data` an alle aktiven Sockets. Schlägt ein Schreibversuch fehl (Exception), wird der betroffene Socket aus der Liste entfernt — kein Crash, andere Verbindungen unberührt.
-- `stop()` schließt den Listener und alle aktiven Client-Sockets, beendet den Accept-Thread.
+- `start()` bindet einen TCP-Listener und startet einen Accept-Loop-Thread. Jede eingehende Verbindung wird in einem eigenen Handler-Thread behandelt: Request-Zeile + Header parsen, Mountpoint gegen den konfigurierten Wert prüfen, `Authorization`-Header parsen (Präfix `Basic ` entfernen, Base64 dekodieren, am ersten `:` in User/Passwort trennen) und gegen `user`/`password` prüfen. Bei Erfolg: `ICY 200 OK\r\n\r\n` senden, Socket unter Lock zur Liste aktiver Verbindungen hinzufügen. Bei Mountpoint- oder Auth-Fehler: Fehlerantwort senden, Socket schließen, nicht zur Liste hinzufügen. Der Handshake wird über einen einzelnen `recv()` gelesen (wie beim bestehenden `NtripClient`) — auf über mehrere TCP-Segmente verteilte Requests wird nicht gesondert eingegangen.
+- **Die Liste aktiver Verbindungen wird von mehreren Threads gleichzeitig verändert** (Accept-Thread fügt hinzu, `broadcast()` — aufgerufen aus dem `RtcmSerialSource`-Lese-Thread — entfernt tote Verbindungen, `stop()` iteriert und schließt alle). Der Zugriff wird durchgehend über einen `threading.Lock` serialisiert; `broadcast()` kopiert die Liste unter Lock, bevor es außerhalb des Locks sendet (damit ein langsamer/blockierender Socket-Write nicht den Accept-Thread blockiert).
+- `broadcast(data)` schreibt `data` an alle aktiven Sockets. Schlägt ein Schreibversuch fehl (Exception), wird der betroffene Socket unter Lock aus der Liste entfernt — kein Crash, andere Verbindungen unberührt.
+- `stop()` schließt den Listener und alle aktiven Client-Sockets (unter Lock), beendet den Accept-Thread.
 - Mehrere gleichzeitige Rover werden unterstützt (Liste statt Einzelverbindung) — kostet im Design praktisch nichts extra, kein YAGNI-Verstoß.
 - Kein GGA-Handling nötig: eine einzelne stationäre Basisstation sendet dieselben Korrekturen unabhängig von der Rover-Position (kein VRS-Modus). Vom Client evtl. gesendete GGA-Zeilen werden ignoriert.
 
@@ -109,20 +108,21 @@ Anders als `mower/main.py` gibt es **keinen** Soft-Fallback: fehlt der serielle 
 | Falsche Zugangsdaten | Verbindung abgelehnt, Socket geschlossen |
 | Rover trennt sich | Erkannt beim nächsten `broadcast()` (Schreibfehler), Socket aus Liste entfernt |
 | Kein Rover verbunden | `broadcast()` ist No-op |
-| Serieller Port zum LC29H nicht erreichbar | `main.py` bricht beim Start mit klarer Fehlermeldung ab |
+| Serieller Port zum LC29H nicht erreichbar **beim Start** | `main.py` bricht mit klarer Fehlermeldung ab (kein Soft-Fallback) |
+| Serieller Port fällt **zur Laufzeit** aus (z. B. USB-Wackelkontakt) | Lese-Thread fängt den Fehler pro Iteration ab, loggt auf ERROR-Level, versucht weiter zu lesen — Prozess läuft weiter, kein Crash (mirrort `SerialDriver._recv_loop()`) |
 
 ## 5. Testing
 
 Alles ohne echte Hardware testbar:
 
-- **`RtcmSerialSource`**: injizierbarer Fake-Serial-Backend (mirrort `_FakeCapture` bei `Camera`). Tests: `on_data` feuert mit gelesenen Bytes; sauberer Thread-Start/-Stop (mirrort `SerialDriver`s bestehende Tests).
+- **`RtcmSerialSource`**: injizierbarer Fake-Serial-Backend, Konstruktor-Injection nach `Camera`s Muster (`capture=None` → `serial_backend=None`), Fake mirrort `_FakeCapture` aus `tests/hal/test_camera.py`. Tests: `on_data` feuert mit gelesenen Bytes; sauberer Thread-Start/-Stop (assert-Stil wie `TestSerialDriver::test_stop_terminates_threads` in `tests/hal/test_hardware_interface.py`); ein Fake, dessen `read()` einmalig eine Exception wirft und danach normal weiterliest, beweist, dass der Lese-Thread eine transiente Störung übersteht statt zu sterben.
 - **`NtripServer`**: echte Loopback-Sockets (`127.0.0.1:0`, OS vergibt freien Port) statt Mocks — die Klasse *ist* Socket-Protokoll-Handling, ein echter Client-Socket ist hier der treffendere Test als ein gemocktes `socket`-Modul. Tests:
   - Korrekter Handshake → Client empfängt `ICY 200 OK`
   - Falscher Mountpoint → Verbindung abgelehnt
   - Falsche Zugangsdaten → Verbindung abgelehnt
   - `broadcast(data)` kommt beim verbundenen Client an (exakte Bytes)
   - Mehrere gleichzeitige Clients erhalten denselben Broadcast
-  - Ein getrennter Client lässt nachfolgende `broadcast()`-Aufrufe nicht crashen
+  - Ein getrennter Client lässt nachfolgende `broadcast()`-Aufrufe nicht crashen (kein Lock-Deadlock, keine Exception nach außen)
 - **`base_station/main.py`**: dünnes Verdrahtungsskript, keine dedizierten Tests (mirrort `mower/main.py`) — die Substanz steckt in den getesteten Modulen.
 
 ## 6. Kompatibilität mit dem Rover
@@ -131,7 +131,8 @@ Keine Code-Änderung am Rover nötig. `NtripClient(host, port, mountpoint, user,
 
 ## 7. Nicht automatisierbares Hardware-Bring-up (separat zu tracken)
 
-- Zweites LC29H in den Base-/Survey-in-Modus versetzen (modulspezifische Einmalkonfiguration).
+- Zweites LC29H in den Base-/Survey-in-Modus versetzen (modulspezifische Einmalkonfiguration, außerhalb dieses Codes — es existiert kein Datenblatt/keine Hardware in dieser Umgebung, um das zu verifizieren).
 - Antennenposition der Basisstation vermessen/fixieren (Survey-in-Genauigkeit hängt davon ab).
-- RPi Zero + LC29H physisch aufbauen, Stromversorgung, Netzwerkanbindung zum Rover.
+- RPi Zero + LC29H physisch aufbauen, Stromversorgung, Netzwerkanbindung zum Rover (WLAN/Ethernet).
+- Prozess-Supervision/Autostart für `base_station/main.py` einrichten (z. B. systemd-Unit), damit ein Neustart nach einem Startfehler tatsächlich erfolgt.
 - Feldtest: tatsächliche Fix-Zeit und Korrektur-Qualität gegenüber SAPOS/RTK2go vergleichen.
