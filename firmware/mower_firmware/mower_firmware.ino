@@ -14,11 +14,14 @@
 #define RAIN_ADC_PIN    A0
 #define LIFT_PIN        6
 #define ENCODER_PIN_A   7
+// Charge-contact detect: placeholder pin, no dock circuit built yet
+// (Phase 6 bring-up) — adjust once the charging-station contacts exist.
+#define CHARGE_DETECT_PIN 8
 
 MotorControl motor(MOTOR_DIR_PIN, MOTOR_PWM_PIN);
 ServoControl steering(SERVO_PIN);
 BladeControl blade(BLADE_ESC_PIN);
-SensorReader sensors(RAIN_ADC_PIN, LIFT_PIN, ENCODER_PIN_A);
+SensorReader sensors(RAIN_ADC_PIN, LIFT_PIN, ENCODER_PIN_A, CHARGE_DETECT_PIN);
 Watchdog watchdog(500);
 
 uint32_t last_sensors_tx = 0;
@@ -132,11 +135,12 @@ void loop() {
   // Send STATUS at 10 Hz
   if (now - last_status_tx >= 100) {
     last_status_tx = now;
-    uint8_t payload[3] = {
+    uint8_t payload[4] = {
       (uint8_t)(!watchdog.is_triggered()),
       (uint8_t)blade.is_running(),
-      0x00
+      0x00,
+      (uint8_t)sensors.read_charging(),
     };
-    send_frame(Serial, CMD_STATUS, payload, 3);
+    send_frame(Serial, CMD_STATUS, payload, 4);
   }
 }

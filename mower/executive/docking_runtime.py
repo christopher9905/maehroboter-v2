@@ -31,6 +31,26 @@ class LatestSoc:
             return self._value
 
 
+class LatestCharging:
+    """Thread-safe holder for the most recently reported charge-contact state.
+
+    Wire HardwareInterface.on_status to call update(data['charging']); pass
+    get() as the DockingManager charging_source.
+    """
+
+    def __init__(self):
+        self._value: bool = False
+        self._lock = threading.Lock()
+
+    def update(self, charging: bool) -> None:
+        with self._lock:
+            self._value = charging
+
+    def get(self) -> bool:
+        with self._lock:
+            return self._value
+
+
 def build_docking_manager(
     hardware,
     executive: MissionExecutive,

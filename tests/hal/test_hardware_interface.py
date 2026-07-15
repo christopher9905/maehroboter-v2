@@ -112,6 +112,19 @@ class TestHardwareInterface:
         assert received[0]['rain_adc'] == 300
         assert received[0]['encoder_ticks'] == 1000
 
+    def test_telemetry_callback_on_status_includes_charging(self, mock_driver):
+        import struct
+        from mower.hal.protocol import encode_frame, CmdType, decode_frame
+        hw = HardwareInterface(driver=mock_driver)
+        received = []
+        hw.on_status = lambda d: received.append(d)
+        payload = struct.pack('<BBBB', 1, 0, 0, 1)  # charging=True
+        frame = encode_frame(CmdType.STATUS, payload)
+        cmd, p = decode_frame(frame)
+        hw._on_frame(cmd, p)
+        assert len(received) == 1
+        assert received[0]['charging'] is True
+
     def test_lift_triggers_estop(self, mock_driver):
         import struct
         from mower.hal.protocol import encode_frame, CmdType, decode_frame

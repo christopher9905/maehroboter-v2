@@ -23,7 +23,7 @@ PING_SEQ_BYTES: int = 2
 # Telemetry payload size constants (Issue 2)
 _SENSORS_SIZE = struct.calcsize('<HBI')  # 7
 _SOC_SIZE = struct.calcsize('<BH')       # 3
-_STATUS_SIZE = struct.calcsize('<BBB')   # 3
+_STATUS_SIZE = struct.calcsize('<BBBB')  # 4 (watchdog_ok, blade_running, error_flags, charging)
 
 # CRC-8/MAXIM: poly=0x31, initCrc=0x00, rev=True, xorOut=0x00
 _crc8 = crcmod.predefined.mkCrcFun('crc-8-maxim')
@@ -112,9 +112,10 @@ def decode_status(payload: bytes) -> dict:
     # Issue 2: check payload length before unpacking
     if len(payload) != _STATUS_SIZE:
         raise FrameError(f"STATUS payload must be {_STATUS_SIZE} bytes, got {len(payload)}")
-    watchdog_ok, blade_running, error_flags = struct.unpack('<BBB', payload)
+    watchdog_ok, blade_running, error_flags, charging = struct.unpack('<BBBB', payload)
     return {
         'watchdog_ok': bool(watchdog_ok),
         'blade_running': bool(blade_running),
         'error_flags': error_flags,
+        'charging': bool(charging),
     }

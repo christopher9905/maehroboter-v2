@@ -4,7 +4,7 @@ import pytest
 
 from mower.executive.mission_executive import MissionExecutive, MowerState
 from mower.executive.docking_manager import DockingManager
-from mower.executive.docking_runtime import LatestSoc, build_docking_manager
+from mower.executive.docking_runtime import LatestSoc, LatestCharging, build_docking_manager
 
 
 class _FakeCamera:
@@ -41,6 +41,22 @@ class TestLatestSoc:
         soc.update(10)
         soc.update(77)
         assert soc.get() == 77
+
+
+class TestLatestCharging:
+    def test_defaults_to_false(self):
+        assert LatestCharging().get() is False
+
+    def test_update_then_get_returns_latest_value(self):
+        charging = LatestCharging()
+        charging.update(True)
+        assert charging.get() is True
+
+    def test_update_overwrites_previous_value(self):
+        charging = LatestCharging()
+        charging.update(True)
+        charging.update(False)
+        assert charging.get() is False
 
 
 class TestBuildDockingManager:

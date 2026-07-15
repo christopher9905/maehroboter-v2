@@ -18,7 +18,7 @@ import os
 import uvicorn
 
 from mower.executive.mission_executive import MissionExecutive
-from mower.executive.docking_runtime import LatestSoc, build_docking_manager
+from mower.executive.docking_runtime import LatestSoc, LatestCharging, build_docking_manager
 from mower.api.app import create_app
 
 logger = logging.getLogger(__name__)
@@ -69,21 +69,23 @@ def build_app():
     executive = MissionExecutive(hardware_interface=hardware)
 
     latest_soc = LatestSoc()
+    latest_charging = LatestCharging()
     if hardware is not None:
         hardware.on_soc = lambda data: latest_soc.update(data["soc_percent"])
+        # 'charging' reflects the STATUS frame's charge-detect byte — real
+        # signal, but the sensing pin is still a hardware bring-up item (see
+        # CHARGE_DETECT_PIN in firmware/mower_firmware/mower_firmware.ino).
+        hardware.on_status = lambda data: latest_charging.update(data["charging"])
 
     docking_manager, _camera = _try_build_docking_manager(
         hardware, executive, camera_device, calibration_path,
     )
 
-    # No real charge-contact sensor exists in the serial protocol yet (see
-    # Phase 6 plan bring-up checklist) — DockingManager falls back to its
-    # documented distance-only DOCKED trigger until that lands.
     return create_app(
         executive,
         docking_manager=docking_manager,
         soc_source=latest_soc.get,
-        charging_source=lambda: False,
+        charging_source=latest_charging.get,
     )
 
 

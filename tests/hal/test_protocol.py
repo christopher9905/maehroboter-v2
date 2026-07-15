@@ -119,8 +119,18 @@ class TestTelemetryDecoding:
         assert data['voltage_mv'] == 14800
 
     def test_decode_status(self):
-        payload = struct.pack('<BBB', 1, 0, 0)  # watchdog_ok, blade_running, error_flags
+        payload = struct.pack('<BBBB', 1, 0, 0, 0)  # watchdog_ok, blade_running, error_flags, charging
         data = decode_status(payload)
         assert data['watchdog_ok'] is True
         assert data['blade_running'] is False
         assert data['error_flags'] == 0
+        assert data['charging'] is False
+
+    def test_decode_status_charging_true(self):
+        payload = struct.pack('<BBBB', 1, 0, 0, 1)
+        data = decode_status(payload)
+        assert data['charging'] is True
+
+    def test_decode_status_wrong_length_raises(self):
+        with pytest.raises(FrameError, match="STATUS payload"):
+            decode_status(struct.pack('<BBB', 1, 0, 0))  # legacy 3-byte payload
