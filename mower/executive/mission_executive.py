@@ -14,6 +14,10 @@ logger = logging.getLogger(__name__)
 LOW_BATTERY_SOC: int = 20
 OBSTACLE_TIMEOUT_S: float = 60.0
 MAX_AVOIDANCE_ATTEMPTS: int = 3
+# Upper bound on a charge cycle. If SOC never reaches full (e.g. the robot
+# parked close enough to trigger DOCKED but never made real electrical contact)
+# the executive falls back to ERROR instead of waiting forever.
+CHARGE_TIMEOUT_S: float = 7200.0  # 2 h
 
 
 class MowerState(Enum):
@@ -44,6 +48,7 @@ class MissionExecutive:
         self._error_reason: str = ""
         self._avoidance_attempts: int = 0
         self._obstacle_timer: Optional[threading.Timer] = None
+        self._charge_timer: Optional[threading.Timer] = None
         self._lock = threading.Lock()
         self.on_state_change: Optional[Callable[[MowerState, MowerState], None]] = None
 
@@ -76,10 +81,25 @@ class MissionExecutive:
             self._hw.estop()
             self._hw.set_blade(False)
 
+    def _hw_blade_off(self):
+        """Cut the blade on non-mowing transitions. Call OUTSIDE the lock.
+        The blade must be off throughout return/dock, not only at contact."""
+        if self._hw:
+            self._hw.set_blade(False)
+
     def _cancel_obstacle_timer(self):
         if self._obstacle_timer:
             self._obstacle_timer.cancel()
             self._obstacle_timer = None
+
+    def _cancel_charge_timer(self):
+        if self._charge_timer:
+            self._charge_timer.cancel()
+            self._charge_timer = None
+
+    def _cancel_timers(self):
+        self._cancel_obstacle_timer()
+        self._cancel_charge_timer()
 
     def _notify(self, old: MowerState, new: MowerState):
         if old != new:
@@ -115,6 +135,7 @@ class MissionExecutive:
                 return
             self._cancel_obstacle_timer()
             old = self._set_state(MowerState.RETURNING)
+        self._hw_blade_off()
         self._notify(old, MowerState.RETURNING)
 
     def reset_error(self):
@@ -128,7 +149,7 @@ class MissionExecutive:
         with self._lock:
             if self._state not in _ACTIVE_STATES:
                 return
-            self._cancel_obstacle_timer()
+            self._cancel_timers()
             old = self._go_error("Deck lift detected")
         self._hw_estop()
         self._notify(old, MowerState.ERROR)
@@ -137,7 +158,7 @@ class MissionExecutive:
         with self._lock:
             if self._state not in _ACTIVE_STATES:
                 return
-            self._cancel_obstacle_timer()
+            self._cancel_timers()
             old = self._go_error(
                 f"Tilt limit exceeded: pitch={reading.pitch_deg:.1f}°, roll={reading.roll_deg:.1f}°"
             )
@@ -148,7 +169,7 @@ class MissionExecutive:
         with self._lock:
             if self._state not in _ACTIVE_STATES:
                 return
-            self._cancel_obstacle_timer()
+            self._cancel_timers()
             old = self._go_error(
                 f"Geofence violation at ({pose.utm_x:.2f}, {pose.utm_y:.2f})"
             )
@@ -204,6 +225,7 @@ class MissionExecutive:
                 return
             self._cancel_obstacle_timer()
             old = self._set_state(MowerState.RETURNING)
+        self._hw_blade_off()
         self._notify(old, MowerState.RETURNING)
 
     def on_dock_success(self):
@@ -211,6 +233,7 @@ class MissionExecutive:
             if self._state != MowerState.RETURNING:
                 return
             old = self._set_state(MowerState.DOCKING)
+        self._hw_blade_off()
         self._notify(old, MowerState.DOCKING)
 
     def on_charge_started(self):
@@ -218,11 +241,27 @@ class MissionExecutive:
             if self._state != MowerState.DOCKING:
                 return
             old = self._set_state(MowerState.CHARGING)
+            timer = threading.Timer(CHARGE_TIMEOUT_S, self._charge_timeout)
+            timer.daemon = True
+            timer.start()
+            self._charge_timer = timer
         self._notify(old, MowerState.CHARGING)
 
     def on_charge_complete(self):
         with self._lock:
             if self._state != MowerState.CHARGING:
                 return
+            self._cancel_charge_timer()
             old = self._set_state(MowerState.IDLE)
         self._notify(old, MowerState.IDLE)
+
+    def _charge_timeout(self):
+        with self._lock:
+            if self._state != MowerState.CHARGING:
+                return
+            self._charge_timer = None
+            old = self._go_error(
+                f"Charging did not complete within {CHARGE_TIMEOUT_S:.0f} s"
+            )
+        self._hw_estop()
+        self._notify(old, MowerState.ERROR)

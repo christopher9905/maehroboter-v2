@@ -131,3 +131,41 @@ class TestHardwareInterface:
 def mock_driver():
     d = MagicMock()
     return d
+
+
+class TestEstopPriority:
+    """ESTOP must win serial ordering over an in-flight drive command
+    (Phase 6 docking review — actuation-vs-estop race)."""
+
+    def test_estop_sent_with_priority(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        hw.estop()
+        assert mock_driver.send.call_args.kwargs.get('priority') is True
+
+    def test_drive_sent_without_priority(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        hw.drive(0.2, 0.0)
+        assert mock_driver.send.call_args.kwargs.get('priority', False) is False
+
+    def test_priority_send_drains_pending_normal_frames(self):
+        from mower.hal.protocol import encode_drive, encode_estop
+        d = SerialDriver(port='/dev/ttyACM0', baud=921600)
+        d.send(encode_drive(0.5, 0.0))                 # queued normal drive
+        assert d._send_queue.qsize() == 1
+        d.send(encode_estop(), priority=True)          # emergency
+        assert d._send_queue.qsize() == 0              # pending drive discarded
+        assert d._priority_queue.qsize() == 1
+
+    def test_priority_frame_written_before_normal(self, mock_serial):
+        from mower.hal.protocol import encode_drive, encode_estop, decode_frame, CmdType
+        d = SerialDriver(port='/dev/ttyACM0', baud=921600)
+        d._serial = mock_serial
+        d.send(encode_drive(0.5, 0.0))
+        d.send(encode_estop(), priority=True)
+        d.start()
+        time.sleep(0.06)
+        d.stop()
+        written = [c[0][0] for c in mock_serial.write.call_args_list]
+        cmds = [decode_frame(f)[0] for f in written]
+        assert CmdType.ESTOP in cmds
+        assert CmdType.DRIVE not in cmds               # drained, never sent

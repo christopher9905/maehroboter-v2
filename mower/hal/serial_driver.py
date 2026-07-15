@@ -16,6 +16,7 @@ class SerialDriver:
         self._baud = baud
         self._serial: Optional[serial.Serial] = None
         self._send_queue: queue.Queue = queue.Queue(maxsize=64)
+        self._priority_queue: queue.Queue = queue.Queue()  # ESTOP / emergency frames
         self._running = False
         self._send_thread: Optional[threading.Thread] = None
         self._recv_thread: Optional[threading.Thread] = None
@@ -43,14 +44,34 @@ class SerialDriver:
             self._serial.close()
         logger.info("SerialDriver stopped")
 
-    def send(self, frame: bytes):
+    def send(self, frame: bytes, priority: bool = False):
+        if priority:
+            # Emergency (ESTOP): discard any queued normal frames so an in-flight
+            # drive command can't be written after the stop, then jump the queue.
+            self._drain(self._send_queue)
+            self._priority_queue.put(frame)
+            return
         try:
             self._send_queue.put_nowait(frame)
         except queue.Full:
             logger.warning("Send queue full — dropping frame")
 
+    @staticmethod
+    def _drain(q: queue.Queue):
+        try:
+            while True:
+                q.get_nowait()
+        except queue.Empty:
+            pass
+
     def _send_loop(self):
         while self._running:
+            try:
+                frame = self._priority_queue.get_nowait()   # ESTOP always first
+                self._serial.write(frame)
+                continue
+            except queue.Empty:
+                pass
             try:
                 frame = self._send_queue.get(timeout=0.05)
                 self._serial.write(frame)

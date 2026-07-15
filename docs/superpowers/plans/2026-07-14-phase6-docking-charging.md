@@ -796,11 +796,11 @@ After all tasks are complete:
 - [ ] Field-tune `CONTACT_DISTANCE_M`, approach speeds, and `handoff_distance_m` against the physical dock
 - [ ] Commission the blade for real mowing runs ("Mähwerk in Betrieb nehmen")
 
-### Deferred robustness items (surfaced in code review — resolve before live wiring)
+### Deferred robustness items (surfaced in code review) — ✅ resolved
 
-- [ ] **Actuation ordering vs. safety estop.** `DockingManager._tick` re-checks `executive.state == DOCKING` immediately before the nonzero `drive()` (implemented), which narrows but does not fully close the race between a docking drive command and a concurrent tilt/lift/geofence estop — both just enqueue serial frames with no ordering guarantee. Before wiring `DockingManager` into the live runtime, give the ESTOP/blade-off command serial-layer priority (or route all actuation through a shared lock with `_hw_estop`) so a safety fault always wins.
-- [ ] **CHARGING stuck-detection.** `cmd.docked` can trigger purely on `distance ≤ CONTACT_DISTANCE_M` without real electrical contact. If the mower parks close but makes no contact, it enters CHARGING and waits forever for `soc ≥ FULL_SOC`. Add a CHARGING timeout → ERROR/retry fallback (mirror the `OBSTACLE_TIMEOUT_S` pattern in `MissionExecutive`).
-- [ ] **Cut the blade on DOCKING/RETURNING entry, not only at contact.** Today `DockingManager` calls `set_blade(False)` only at the DOCKED instant; nothing cuts it on entering RETURNING or DOCKING. This is latent while the blade is never commanded on, but the moment the blade is commissioned the mower would make its final ~1.2 m approach with a live blade. Cut the blade on the DOCKING (or RETURNING) transition — land this in the same change as blade commissioning + live wiring.
+- [x] **Actuation ordering vs. safety estop.** `SerialDriver.send(frame, priority=True)` now drains any queued normal frames (discarding an in-flight drive) and jumps a dedicated priority queue; `HardwareInterface.estop()` uses it. Combined with `DockingManager`'s pre-drive state re-check, a concurrent tilt/lift/geofence ESTOP always wins serial ordering. Tests: `tests/hal/test_hardware_interface.py::TestEstopPriority`.
+- [x] **CHARGING stuck-detection.** `MissionExecutive` starts `CHARGE_TIMEOUT_S` (2 h) on entering CHARGING; if `on_charge_complete` doesn't arrive it falls back to ERROR + ESTOP (`_charge_timeout`), cancelled on completion or any fault. Mirrors the `OBSTACLE_TIMEOUT_S` pattern. Tests: `tests/executive/test_mission_executive.py::TestDockingRobustness`.
+- [x] **Cut the blade on DOCKING/RETURNING entry, not only at contact.** `MissionExecutive._hw_blade_off()` fires on the transitions into RETURNING (`stop_mission`, `on_battery_low`) and DOCKING (`on_dock_success`), so the blade is off throughout the return/approach — not just at the DOCKED instant. Tests in `TestDockingRobustness`.
 
 ---
 

@@ -59,7 +59,9 @@ class HardwareInterface:
         self._driver.send(encode_blade(state))
 
     def estop(self):
-        self._driver.send(encode_estop())
+        # Priority send: an ESTOP must win serial ordering over any queued
+        # drive command (e.g. an in-flight docking manoeuvre).
+        self._driver.send(encode_estop(), priority=True)
 
     def ping(self, seq: int):
         self._driver.send(encode_ping(seq))

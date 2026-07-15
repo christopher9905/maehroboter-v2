@@ -136,3 +136,60 @@ class TestMowerStateTransitions:
         ex.on_state_change = lambda old, new: transitions.append((old, new))
         ex.start_mission()
         assert transitions == [(MowerState.IDLE, MowerState.MOWING)]
+
+
+class TestDockingRobustness:
+    """Deferred robustness items from the Phase 6 docking review."""
+
+    def test_blade_cut_when_entering_returning(self):
+        hw = MagicMock()
+        ex = _executive(hw)
+        ex.start_mission()          # MOWING
+        hw.set_blade.reset_mock()
+        ex.stop_mission()           # → RETURNING
+        hw.set_blade.assert_called_once_with(False)
+
+    def test_blade_cut_on_battery_low_returning(self):
+        hw = MagicMock()
+        ex = _executive(hw)
+        ex.start_mission()
+        hw.set_blade.reset_mock()
+        ex.on_battery_low(10)       # → RETURNING
+        hw.set_blade.assert_called_once_with(False)
+
+    def test_blade_cut_when_entering_docking(self):
+        hw = MagicMock()
+        ex = _executive(hw)
+        ex.start_mission()
+        ex.stop_mission()           # RETURNING
+        hw.set_blade.reset_mock()
+        ex.on_dock_success()        # → DOCKING
+        hw.set_blade.assert_called_once_with(False)
+
+    def _charging(self, hw=None):
+        ex = _executive(hw)
+        ex.start_mission()
+        ex.stop_mission()
+        ex.on_dock_success()
+        ex.on_charge_started()
+        assert ex.state == MowerState.CHARGING
+        return ex
+
+    def test_charge_timeout_goes_error(self):
+        hw = MagicMock()
+        ex = self._charging(hw)
+        ex._charge_timeout()        # simulate the timer firing
+        assert ex.state == MowerState.ERROR
+        hw.estop.assert_called()
+
+    def test_charge_complete_prevents_timeout(self):
+        ex = self._charging()
+        ex.on_charge_complete()     # → IDLE (timer cancelled)
+        assert ex.state == MowerState.IDLE
+        ex._charge_timeout()        # stale fire must be a no-op
+        assert ex.state == MowerState.IDLE
+
+    def test_charge_timeout_noop_when_not_charging(self):
+        ex = _executive()
+        ex._charge_timeout()        # never charging
+        assert ex.state == MowerState.IDLE
