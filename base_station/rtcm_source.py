@@ -42,6 +42,7 @@ class RtcmSerialSource:
         self._running = False
         if self._thread:
             self._thread.join(timeout=2.0)
+        self._serial.close()
 
     def _read_loop(self) -> None:
         while self._running:

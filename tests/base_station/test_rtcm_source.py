@@ -18,6 +18,9 @@ class _FakeSerial:
         time.sleep(0.01)
         return b""
 
+    def close(self):
+        pass
+
 
 class _FlakySerial:
     """Raises once on the first read(), then behaves like _FakeSerial."""
@@ -34,6 +37,9 @@ class _FlakySerial:
             return self._chunks.pop(0)
         time.sleep(0.01)
         return b""
+
+    def close(self):
+        pass
 
 
 def test_on_data_fires_with_bytes_read():
