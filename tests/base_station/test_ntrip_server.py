@@ -1,5 +1,6 @@
 import base64
 import socket
+import struct
 import time
 import pytest
 
@@ -48,16 +49,25 @@ def test_wrong_mountpoint_rejected(server):
     sock = socket.create_connection((HOST, _bound_port(server)), timeout=2.0)
     sock.sendall(_handshake_request("WRONGPOINT", USER, PASSWORD))
     resp = sock.recv(1024)
-    sock.close()
     assert b"ICY 200 OK" not in resp
+    # The rejected socket must not have been added to the broadcast list —
+    # confirm the server closed it server-side (recv returns b"" on a closed
+    # connection) rather than silently keeping it around as a "client".
+    time.sleep(0.05)
+    server.broadcast(b"x")
+    assert sock.recv(1024) == b""
+    sock.close()
 
 
 def test_wrong_credentials_rejected(server):
     sock = socket.create_connection((HOST, _bound_port(server)), timeout=2.0)
     sock.sendall(_handshake_request(MOUNTPOINT, USER, "wrong-password"))
     resp = sock.recv(1024)
-    sock.close()
     assert b"ICY 200 OK" not in resp
+    time.sleep(0.05)
+    server.broadcast(b"x")
+    assert sock.recv(1024) == b""
+    sock.close()
 
 
 def test_broadcast_delivers_to_connected_client(server):
@@ -93,12 +103,23 @@ def test_disconnected_client_does_not_break_broadcast(server):
     for s in (s1, s2):
         s.sendall(_handshake_request(MOUNTPOINT, USER, PASSWORD))
         s.recv(1024)
+    # Force an abortive close (RST) rather than a plain close() (FIN-only).
+    # TCP is full-duplex: after a graceful FIN-only close, the server's socket
+    # is still legally writable and its *first* sendall() after the close
+    # typically succeeds silently (observed deterministically on macOS) — the
+    # write only fails once the kernel has actually seen a reset, which a bare
+    # close() doesn't send. SO_LINGER(on, 0) forces that reset immediately so
+    # a single broadcast() call reliably surfaces the dead connection.
+    s1.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0))
     s1.close()  # s1 goes away before the broadcast
     time.sleep(0.05)
     server.broadcast(b"still-works")  # must not raise
     data = s2.recv(1024)
     s2.close()
     assert data == b"still-works"
+    # The dead socket must actually be pruned from the shared client list,
+    # not just silently skipped on this one broadcast call.
+    assert len(server._clients) == 1
 
 
 def test_real_ntrip_client_receives_broadcast(server):

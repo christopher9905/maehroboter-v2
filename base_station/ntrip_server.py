@@ -39,6 +39,10 @@ class NtripServer:
         self._running = True
         self._accept_thread = threading.Thread(target=self._accept_loop, daemon=True)
         self._accept_thread.start()
+        logger.info(
+            "NTRIP caster listening on %s:%d/%s",
+            self._host, self._listener.getsockname()[1], self._mountpoint,
+        )
 
     def stop(self) -> None:
         self._running = False
@@ -53,6 +57,7 @@ class NtripServer:
                 except OSError:
                     pass
             self._clients.clear()
+        logger.info("NTRIP caster stopped")
 
     def broadcast(self, data: bytes) -> None:
         with self._lock:
@@ -68,6 +73,7 @@ class NtripServer:
                 for c in dead:
                     if c in self._clients:
                         self._clients.remove(c)
+                        logger.info("NTRIP client disconnected — pruned from broadcast list")
                     try:
                         c.close()
                     except OSError:
@@ -78,7 +84,9 @@ class NtripServer:
             try:
                 conn, _addr = self._listener.accept()
             except OSError:
-                break  # listener closed -> stop() was called
+                if self._running:
+                    logger.error("NTRIP accept() failed unexpectedly", exc_info=True)
+                break  # listener closed (stop() was called) or unrecoverable accept error
             threading.Thread(target=self._handle_client, args=(conn,), daemon=True).start()
 
     def _handle_client(self, conn: socket.socket) -> None:
@@ -87,8 +95,14 @@ class NtripServer:
             if self._is_authorized(request):
                 conn.sendall(_SUCCESS_RESPONSE)
                 with self._lock:
-                    self._clients.append(conn)
+                    if self._running:
+                        self._clients.append(conn)
+                    else:
+                        # stop() already ran (and cleared _clients) while this
+                        # handshake was in flight — don't resurrect the socket.
+                        conn.close()
             else:
+                logger.warning("NTRIP handshake rejected (bad mountpoint or credentials)")
                 conn.sendall(_REJECT_RESPONSE)
                 conn.close()
         except OSError:
