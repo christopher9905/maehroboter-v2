@@ -50,6 +50,16 @@ class TestLocalizerInit:
         loc.update_gps(_make_fix())
         assert loc.initialized
 
+    def test_reset_requires_a_fresh_first_fix(self):
+        loc = Localizer()
+        loc.update_gps(_make_fix())
+
+        loc.reset()
+
+        assert not loc.initialized
+        loc.update_gps(_make_fix(utm_x=500100.0, ts=2.0))
+        assert loc.initialized
+
     def test_first_gps_sets_position(self):
         poses: list[Pose] = []
         loc = Localizer()
@@ -117,3 +127,26 @@ class TestLocalizerUpdates:
         loc.update_gps(_make_fix(ts=0.0))
         loc.update_odometry(_make_odo(ts=42.5))
         assert abs(poses[-1].timestamp - 42.5) < 0.01
+
+    def test_long_mixed_sensor_run_stays_numerically_stable(self):
+        loc = Localizer()
+        poses: list[Pose] = []
+        loc.on_pose = poses.append
+        loc.update_gps(_make_fix(ts=0.0))
+
+        for index in range(1, 401):
+            timestamp = index * 0.05
+            loc.update_imu(_make_imu(heading_deg=90.0, ts=timestamp))
+            # Deliberately older timestamp models callbacks queued on another thread.
+            loc.update_odometry(_make_odo(speed=0.25, ts=timestamp - 0.01))
+            if index % 5 == 0:
+                loc.update_gps(_make_fix(
+                    utm_x=500000.0 + timestamp * 0.25,
+                    utm_y=5320000.0,
+                    ts=timestamp - 0.005,
+                ))
+
+        assert poses
+        assert all(math.isfinite(value) for value in (
+            poses[-1].utm_x, poses[-1].utm_y, poses[-1].heading_rad, poses[-1].speed_mps,
+        ))

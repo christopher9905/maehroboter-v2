@@ -72,6 +72,23 @@ from mower.hal.hardware_interface import HardwareInterface
 
 
 class TestHardwareInterface:
+    def test_latest_output_commands_are_observable_and_clamped(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        observed = []
+        hw.on_outputs = observed.append
+
+        hw.drive(speed=2.0, steering=-80.0)
+        hw.set_blade(True)
+        hw.set_deck_lift(True, False)
+
+        outputs = hw.output_snapshot()
+        assert outputs["speed_command"] == 1.0
+        assert outputs["steering_deg"] == -45.0
+        assert outputs["blade_enabled"] is True
+        assert outputs["front_deck_raised"] is True
+        assert outputs["rear_deck_raised"] is False
+        assert observed[-1] == outputs
+
     def test_drive_sends_drive_frame(self, mock_driver):
         hw = HardwareInterface(driver=mock_driver)
         hw.drive(speed=0.3, steering=10.0)
@@ -80,6 +97,17 @@ class TestHardwareInterface:
         from mower.hal.protocol import decode_frame, CmdType
         cmd, payload = decode_frame(frame)
         assert cmd == CmdType.DRIVE
+
+    def test_motion_context_is_published_without_drive_frame(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        observed = []
+        hw.on_outputs = observed.append
+
+        hw.set_motion_context(0.7, "headland")
+
+        assert mock_driver.send.call_count == 0
+        assert observed[-1]["target_speed_kmh"] == pytest.approx(0.7)
+        assert observed[-1]["speed_mode"] == "headland"
 
     def test_estop_sends_estop_frame(self, mock_driver):
         hw = HardwareInterface(driver=mock_driver)
@@ -97,6 +125,15 @@ class TestHardwareInterface:
         cmd, payload = decode_frame(frame)
         assert cmd == CmdType.BLADE
         assert payload == b'\x01'
+
+    def test_deck_lift_sends_independent_front_rear_state(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        hw.set_deck_lift(True, False)
+        frame = mock_driver.send.call_args[0][0]
+        from mower.hal.protocol import decode_frame, CmdType
+        cmd, payload = decode_frame(frame)
+        assert cmd == CmdType.DECK_LIFT
+        assert payload == b'\x01\x00'
 
     def test_telemetry_callback_on_sensors(self, mock_driver):
         import struct
@@ -144,6 +181,32 @@ class TestHardwareInterface:
 def mock_driver():
     d = MagicMock()
     return d
+
+
+class TestDriveDirectionTracking:
+    """The unsigned encoder cannot sense direction — the commanded drive
+    direction signs the odometry speed before it reaches the localizer."""
+
+    def test_initial_direction_is_forward(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        assert hw.last_drive_direction == 1
+
+    def test_reverse_command_sets_negative_direction(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        hw.drive(-0.3, 0.0)
+        assert hw.last_drive_direction == -1
+
+    def test_forward_command_sets_positive_direction(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        hw.drive(-0.3, 0.0)
+        hw.drive(0.3, 0.0)
+        assert hw.last_drive_direction == 1
+
+    def test_zero_speed_keeps_previous_direction(self, mock_driver):
+        hw = HardwareInterface(driver=mock_driver)
+        hw.drive(-0.3, 0.0)
+        hw.drive(0.0, 0.0)  # stop tick during a gear change
+        assert hw.last_drive_direction == -1
 
 
 class TestEstopPriority:

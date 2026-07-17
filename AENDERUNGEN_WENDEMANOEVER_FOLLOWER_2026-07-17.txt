@@ -1,0 +1,165 @@
+ÄNDERUNGEN – WENDEMANÖVER-AUSFÜHRUNG IM FOLLOWER
+Stand: 17.07.2026
+
+FEHLERBILD
+==========
+- In der Simulation fuhr der Traktor beim Wendemanöver (Übergang Außenbahn →
+  erste Innenbahn) eine unerklärliche Schleife und anschließend rückwärts
+  bzw. mit Volleinschlag aus der Zone heraus.
+- Der geplante Pfad war dabei korrekt (alle Wegpunkte innerhalb der Zone);
+  die Abweichung entstand ausschließlich beim Abfahren.
+
+URSACHE
+=======
+1. Der Plan enthält am Bahnwechsel kurze Rückwärtsschübe (7–25 cm,
+   Gangwechsel vorwärts → rückwärts → vorwärts). Die Pfadprojektion des
+   Followers kann eine solche Richtungsumkehr nicht zuverlässig überqueren:
+   - Die Heading-Bewertung bestraft das Rückwärtssegment, solange der alte
+     Gang aktiv ist.
+   - Der monotone Fortschritts-Latch blieb dadurch exakt an der Ganggrenze
+     stehen; der Wegpunkt-Index zeigte weiter auf einen Vorwärts-Wegpunkt.
+   - Der Gang wechselte nie, die Vorschau wurde an der Grenze auf Länge null
+     abgeschnitten → degenerierte Referenz → Volleinschlag-Schleife und
+     unkontrollierte Weiterfahrt (deterministisch im Test reproduziert:
+     1,0 m seitlicher Ausbruch schon bei Zeitfaktor 1).
+2. Zusätzlich lieferte die geglättete Krümmung der Trajektorie am Cusp
+   unsinnige Werte (der 180-Grad-Richtungssprung fließt in das
+   Glättungsfenster ein) — ein gerader Rückwärtsschub bekam dadurch bis zu
+   20 Grad Lenkvorgabe und driftete seitlich weg.
+3. Bei beschleunigter Simulation verschärft: GPS liefert 5 Hz Wandzeit,
+   bei Faktor 5 kommt nur alle ~25 cm Fahrstrecke eine frische Position —
+   ein 7-cm-Schub liegt komplett zwischen zwei Positionsupdates.
+
+UMSETZUNG
+=========
+- Neue Methode ContinuousTrajectory.next_gear_change_s(): liefert die
+  Bogenlänge der nächsten Ganggrenze.
+- Der Fortschritts-Latch überquert eine Ganggrenze nie mehr von selbst
+  (Klammerung der Projektion an der Grenze).
+- Explizite Cusp-Übergabe: Erreicht der Fortschritt die Grenze und steht das
+  Fahrzeug nahe am Umkehrpunkt (oder die Rohprojektion bestätigt die
+  Ankunft), stoppt der Follower, schaltet den Gang und übernimmt das
+  Segment.
+- Kurze Segmente nach der Umkehr (bis 1,5 m) werden als streckenbegrenztes
+  Manöver gefahren: Referenzfortschritt = zurückgelegte Distanz ab
+  Umkehrpunkt, nicht Projektion. Damit ist die Ausführung unabhängig von
+  Projektions-Konvergenz und GPS-Rate.
+- Während des Manövers wird nicht der MPC verwendet, sondern eine
+  skriptierte Steuerung: Krümmungs-Feedforward (lokal aus dem eigenen
+  Gangblock berechnet, ohne Cusp-Verschmutzung) plus Heading-Korrektur.
+  Wichtig: Die Pfadkrümmung ist kappa = sign(v) * tan(delta) / Radstand —
+  im Rückwärtsgang wird der Lenkwinkel daher negiert (dieselbe Konvention
+  wie im MPC-Pfad). Ohne die Negation verstärkte ein gekrümmter
+  Rückwärtsbogen seinen eigenen Richtungsfehler und brach deterministisch
+  bei ~36 cm Abweichung ab, während alle geraden Schübe sauber liefen.
+- Wachhund im Manöver: Weicht die Position mehr als 35 cm von der Referenz
+  ab, wird gestoppt und die Mission mit klarer Begründung pausiert —
+  statt weiterzufahren.
+- Nach Manöverende: Stopp, Fortschritt an der Grenze aufsetzen, nächster
+  Takt entscheidet frisch (ggf. sofort nächste Übergabe, z. B. rückwärts →
+  vorwärts).
+- Manöverzustand wird bei jeder Routeninstallation zurückgesetzt.
+
+NACHTRAG – MANÖVERTEMPO BEI BESCHLEUNIGTER SIMULATION
+=====================================================
+- Erster End-to-End-Lauf bei Faktor 5: Der Außenbahn-Übergang und alle
+  7-cm-Schübe liefen sauber durch; der lange gekrümmte 67-cm-Rückwärtsbogen
+  brach dagegen kontrolliert mit 36 cm Spurabweichung ab (Wachhund griff,
+  Roboter blieb in der Zone — gewolltes Sicherheitsverhalten statt Runaway).
+- Ursache: GPS liefert wandzeitbasiert 5 Hz; bei Faktor 5 kommt nur alle
+  ~19 cm Fahrstrecke ein frischer Fix — ein gekrümmter 67-cm-Bogen wurde
+  damit fast blind gefahren.
+- Lösung: Die Manövergeschwindigkeit wird durch den Zeitfaktor geteilt.
+  Damit bleibt die Fahrstrecke pro GPS-Fix über alle Zeitfaktoren konstant
+  (auf der echten Maschine ist der Faktor 1, dort ändert sich nichts).
+  Nur Wendemanöver sind betroffen; Bahnen fahren weiter mit vollem Tempo.
+
+NACHTRAG 2 – ODOMETRIE-VORZEICHEN IM RÜCKWÄRTSGANG (tiefere Ursache)
+====================================================================
+- Trotz Manöver-Executor und Vorzeichenkorrektur brach der gekrümmte
+  67-cm-Rückwärtsbogen weiterhin deterministisch bei ~35 cm ab.
+- Tiefere Ursache gefunden: Der Radencoder ist vorzeichenlos (ein Kanal,
+  zählt immer aufwärts). Die Odometrie meldete dem UKF-Lokalisierer daher
+  auch im Rückwärtsgang eine POSITIVE Geschwindigkeit. Der Filter
+  prädizierte die Pose vorwärts entlang der Blickrichtung, während GPS
+  rückwärts zog — die fusionierte Position wurde bei jedem
+  Rückwärtsmanöver systematisch nach vorn verschleppt und pendelte.
+  (Das dürfte auch das früher beobachtete "Vor-/Rückwärtspendeln beim
+  Wenden" mitverursacht haben.)
+- Lösung: HardwareInterface merkt sich die zuletzt kommandierte
+  Fahrtrichtung (drive-Vorzeichen; Stopp behält die Richtung bei). Die
+  Sensor-Verdrahtung in mower/main.py signiert die Odometrie-Messung
+  damit, bevor sie in den Lokalisierer geht. Gilt für Simulation und
+  echte Maschine gleichermaßen (der Simulations-Encoder zählt
+  hardwaregetreu ebenfalls nur aufwärts).
+- Neue Tests: Richtungsverfolgung im HardwareInterface (initial vorwärts,
+  Rückwärtskommando, Vorwärtskommando, Stopp behält Richtung).
+
+NACHTRAG 3 – EINLENKBÖGEN UND WICHTIGE BETRIEBSNOTIZ ZUM NEUSTART
+=================================================================
+- Beobachtung aus dem Fahrbild (Birnen-Schleifen statt enger Wenden,
+  "hört auf einzuschlagen und fährt geradeaus"): Das MPC-Preview wird an
+  jeder Ganggrenze abgeschnitten. Auf dem Einlenkbogen VOR jedem
+  Umkehrpunkt kollabiert der Vorausblick, die Lenkung blendet aus und der
+  Traktor segelt geradeaus am Umkehrpunkt vorbei.
+- Lösung: Auch die letzten 1,2 m in einen Umkehrpunkt hinein fahren im
+  Skript-Modus (Krümmungs-Feedforward + Heading + Querablage-Korrektur in
+  Stanley-Konvention). Damit läuft die komplette Wende als Sequenz:
+  einlenken -> stoppen -> gegenlenken rückwärts bis parallel/fluchtend ->
+  stoppen -> vorwärts auf die neue Bahn (Übergabe an den MPC mit vollem
+  Preview). Mähwerk/Klinge bleiben auf Anfahrtsstücken mit Mäh-Operation
+  aktiv; nur echte Wendesegmente heben/stoppen.
+- Nebenbefund Planner: Ohne Platzbegrenzung liefert der Verbindungsplaner
+  eine Vorwärts-"Birne"; erst die Vorgewende-/Geofence-Grenze erzwingt
+  die Dreipunktwende. Der neue Test bildet das mit realer Platzgrenze ab.
+- BETRIEBSNOTIZ: Auf macOS erscheint der Simulationsserver in der
+  Prozessliste als ".../MacOS/Python -m mower.simulation" — ein
+  "pkill -f 'python3 -m mower.simulation'" trifft ihn NICHT. Mehrere
+  vermeintliche Neustarts starteten dadurch Prozesse, die still am
+  belegten Port 8090 starben, während der alte Server mit altem Code
+  weiterlief (identische Fehlerbilder trotz Fixes). Neustart daher immer
+  über den Portbesitzer: kill $(lsof -nP -iTCP:8090 -sTCP:LISTEN -t)
+  bzw. pkill -f "mower.simulation" (ohne "python3").
+
+END-TO-END-VERIFIKATION (nach korrektem Server-Neustart)
+========================================================
+- Vollständige Mission auf dem Simulationsfeld bei Zeitfaktor 5:
+  Außenbahn, alle Innenbahnen, alle Dreipunktwenden inklusive des
+  67-cm-Rückwärtsbogens und des Außenbahn-Übergangs — ohne Abbruch,
+  ohne Zonenaustritt während des Mähens.
+- Anschließend Rückfahrt und Andocken: RETURNING -> CHARGING, Ankunft
+  auf ~30 cm an der gespeicherten Ladestation (die Fahrt zur Station
+  verlässt die Mähzone planmäßig über den Abfahrtskorridor).
+- Manöver-Telemetrie über den ganzen Lauf: 5417 Ticks, maximale
+  Spurabweichung 27 cm (Wachhundschwelle 35 cm), Mittel 15,5 cm.
+- Die Manöver-Telemetrie bleibt über die Umgebungsvariable
+  MV2_CUSP_DEBUG=<dateipfad> aktivierbar und ist ohne diese inaktiv.
+
+NACHTRAG 4 – WENDENFORM: RAUSCHFESTE STRECKENMESSUNG
+====================================================
+- Nach dem ersten vollständigen Durchlauf waren die gefahrenen Wenden noch
+  deutlich breiter/runder als die geplanten engen Dreipunktwenden (der Plan
+  selbst war korrekt: alle Wenden max. 1,58 m mit Rückwärtsanteil).
+- Ursache: Die im Manöver zurückgelegte Strecke wurde als Betrag der
+  Pose-Deltas aufsummiert. GPS-Rauschen wird dabei gleichgerichtet und
+  zählt als Vorwärtsfortschritt — die Referenz lief der Maschine voraus,
+  jede Wenden-Etappe endete zu früh, die Wendenform wurde breit.
+- Lösung: Vorzeichenbehaftete Projektion des Pose-Deltas auf die aktuelle
+  Fahrtrichtung der Referenz (Rauschen mittelt sich heraus, Fortschritt
+  bleibt monoton).
+- Wirkung im vollständigen 5x-Lauf: maximale Manöverabweichung von 27,2
+  auf 16,5 cm, Mittel von 15,5 auf 9,7 cm; Mission erneut komplett bis
+  CHARGING durchgelaufen.
+
+PRÜFUNG
+=======
+- Neue Regressionstests tests/executive/test_cusp_following.py:
+  - Geschlossener Regelkreis (Fahrradmodell) über den kompletten Übergang
+    Außenbahn → 25-cm-Rückwärtsschub → Innenbahn, bei Zeitfaktor 1 und 5,
+    mit realistischer GPS-Rate (5 Hz Wandzeit): bleibt im Korridor,
+    kein Rückwärts-Runaway, erreicht die Innenbahn.
+  - Fortschritts-Latch darf die Ganggrenze nie ohne Übergabe überqueren.
+- Mutationsprüfung: Mit deaktivierter Cusp-Übergabe schlägt der Test
+  fehl (alter Fehler kehrt zurück) — der Test ist ein echter Wächter.
+- Follower-Regressionstests (Trajektorie, MPC, control_step, Fortschritt,
+  Wendesegment) unverändert grün.

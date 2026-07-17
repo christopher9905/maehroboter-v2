@@ -8,6 +8,7 @@ class CmdType(IntEnum):
     BLADE = 0x02
     ESTOP = 0x03
     PING  = 0x04
+    DECK_LIFT = 0x05
     # Telemetry (Teensy → RPi)
     SENSORS = 0x10
     SOC     = 0x11
@@ -75,6 +76,14 @@ def encode_drive(speed: float, steering: float) -> bytes:
 
 def encode_blade(state: bool) -> bytes:
     return encode_frame(CmdType.BLADE, bytes([1 if state else 0]))
+
+
+def encode_deck_lift(front_raised: bool, rear_raised: bool) -> bytes:
+    """Command the independent front and rear mower lift actuators."""
+    return encode_frame(
+        CmdType.DECK_LIFT,
+        bytes([1 if front_raised else 0, 1 if rear_raised else 0]),
+    )
 
 
 def encode_estop() -> bytes:

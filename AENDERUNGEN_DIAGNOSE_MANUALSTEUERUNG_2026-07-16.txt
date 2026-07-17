@@ -1,0 +1,66 @@
+ÄNDERUNGEN – DIAGNOSE UND MANUELLE STEUERUNG
+Stand: 16.07.2026
+
+Diagnose-Tab
+============
+- Die manuelle Steuerung steht jetzt als erster Bereich oben im Diagnose-Tab.
+- Die bisherigen vier Pfeiltasten wurden vollständig entfernt.
+- Stattdessen wird der runde Joystick aus dem Teach-In-Panel verwendet.
+- Das Bedienfeld enthält Live-Anzeigen für Tempo und Lenkwinkel.
+- Tempolimit und Lenklimit lassen sich direkt im Diagnose-Panel einstellen.
+- Der Steuerzustand wird als "Bereit" oder "Gesperrt" angezeigt.
+- Manuelles Fahren ist nur in Bereit/IDLE, Teach-In oder Pause erlaubt.
+- Beim Loslassen, Abbruch des Zeigers, Fensterwechsel oder Verlassen des
+  Diagnose-Tabs wird sofort ein Fahrstopp gesendet.
+
+Verbessertes Lenkverhalten
+==========================
+- Die alte lineare Zuordnung bis +/-45 Grad wurde ersetzt.
+- Neue Totzone um die Joystickmitte: 10 Prozent.
+- Neue progressive Lenkkennlinie mit Exponent 1,65.
+- Kleine Auslenkungen erzeugen dadurch deutlich kleinere Lenkwinkel.
+- Am Joystickrand wird weiterhin das eingestellte Lenklimit erreicht.
+- Standard-Lenklimit: 28 Grad; einstellbar von 10 bis 45 Grad.
+- Das Lenklimit wird nicht nur im Browser, sondern auch serverseitig erzwungen.
+- Teach-In und Diagnose verwenden exakt dieselbe Kennlinie und dieselben
+  Geschwindigkeits-/Lenkgrenzen.
+- Der ausgegebene Wert bleibt ein realer Vorderrad-Lenkwinkel in Grad. Die
+  Simulation verarbeitet ihn weiterhin korrekt mit dem Fahrradmodell
+  Kruemmung = tan(Lenkwinkel) / Radstand. Zu aggressiv war die bisherige
+  lineare Bedienkennlinie, nicht die Einheit des Lenksignals.
+
+Mähwerk- und Messerbedienung
+============================
+- Frontmähwerk separat anheben/absenken.
+- Heckmähwerk separat anheben/absenken.
+- Messer manuell ein-/ausschalten.
+- Messerstart erfordert eine Bestätigung des freien Gefahrenbereichs.
+- Messerstart ist gesperrt, solange Front- oder Heckmähwerk angehoben ist.
+- Beim Anheben eines Mähwerks werden Fahrt und laufendes Messer zuerst
+  automatisch gestoppt.
+- "Sicher stoppen" verwendet den bestehenden Soft-Stop und beendet Fahrt und
+  Messerbetrieb, ohne den Hardware-Not-Aus zu verriegeln.
+
+Server/API
+==========
+- Neuer Befehl: POST /api/manual/implement
+- Erweiterte Begrenzung von POST /api/manual/drive um das serverseitige
+  manual_steering_limit_deg.
+- Neue persistente Einstellung manual_steering_limit_deg mit Standard 28 Grad.
+- manual_speed_limit wird nun ebenfalls beim Speichern auf 5 bis 50 Prozent
+  begrenzt.
+- Manueller Messerbetrieb wird als Sicherheitsereignis protokolliert.
+
+Prüfung
+=======
+- Python-Syntax und JavaScript-Syntax geprüft.
+- API-Tests für Lenkbegrenzung, unabhängige Mähwerke, Messerbestätigung und
+  automatisches Abschalten beim Anheben ergänzt.
+- Lokale Browserprüfung auf dem laufenden Simulationssystem erfolgreich.
+- Frontmähwerk im Diagnose-Tab live angehoben, Telemetrie "Oben" geprüft und
+  anschließend wieder auf "Unten" zurückgesetzt.
+- Keine Browser-Konsolenfehler.
+- Mobile Breite 390 px: kein horizontaler Überlauf.
+- Relevanter Gesamttest: 126 Tests bestanden.
+- Der laufende Simulationsserver wurde kontrolliert neu gestartet, damit die
+  neuen API-Befehle sofort aktiv sind.

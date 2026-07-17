@@ -103,6 +103,15 @@ class Localizer:
     def initialized(self) -> bool:
         return self._initialized
 
+    def reset(self) -> None:
+        """Forget fused state after a simulated/world pose reset."""
+        with self._lock:
+            self._ukf.x = np.zeros(_DIM_X)
+            self._ukf.P = np.eye(_DIM_X) * 500.0
+            self._initialized = False
+            self._latest_fix_quality = 0
+            self._last_predict_time = None
+
     def update_gps(self, fix: GpsFix):
         with self._lock:
             self._latest_fix_quality = fix.fix_quality
@@ -158,11 +167,35 @@ class Localizer:
 
     def _predict(self, timestamp: float):
         dt = timestamp - self._last_predict_time
-        if dt > 0:
+        if dt <= 0:
+            # Sensor callbacks run on different threads. A measurement may
+            # have been timestamped before waiting for the filter lock and
+            # arrive after a newer one; never move filter time backwards.
+            return
+        self._stabilize_covariance()
+        try:
+            self._ukf.predict(dt=dt)
+        except np.linalg.LinAlgError:
+            logger.warning("Localizer covariance lost positive definiteness; applying diagonal recovery")
+            diagonal = np.maximum(np.diag(self._ukf.P), 1e-3)
+            self._ukf.P = np.diag(diagonal)
             self._ukf.predict(dt=dt)
         self._last_predict_time = timestamp
 
+    def _stabilize_covariance(self):
+        """Keep accumulated UKF round-off from producing a non-PD matrix."""
+        covariance = np.asarray(self._ukf.P, dtype=float)
+        covariance = (covariance + covariance.T) * 0.5
+        if not np.all(np.isfinite(covariance)):
+            self._ukf.P = np.eye(_DIM_X)
+            return
+        eigenvalues, eigenvectors = np.linalg.eigh(covariance)
+        eigenvalues = np.maximum(eigenvalues, 1e-6)
+        self._ukf.P = eigenvectors @ np.diag(eigenvalues) @ eigenvectors.T
+        self._ukf.P = (self._ukf.P + self._ukf.P.T) * 0.5
+
     def _publish(self, timestamp: float) -> Pose:
+        self._stabilize_covariance()
         x = self._ukf.x
         return Pose(
             utm_x=float(x[0]),

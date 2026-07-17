@@ -1,0 +1,833 @@
+MÄHROBOTER V2 – ÄNDERUNGEN UI / BACKEND
+Stand: 15.07.2026
+
+ZIEL
+Die bisher überwiegend lokale Demo-Oberfläche wurde zu einer servergestützten
+Bedienoberfläche für den realen Betrieb ausgebaut. Nicht vorhandene Sensorwerte
+werden ausdrücklich als "nicht verfügbar" angezeigt und nicht simuliert.
+
+
+1. SERVERSEITIGE DATENHALTUNG
+
+- Neue atomare JSON-Persistenz in mower/api/control_store.py.
+- Gespeichert werden Zonen, No-Go-Zonen, Home-/Docking-Position, Zeitpläne,
+  Einstellungen, Ereignisse und Missionsmetadaten.
+- Reale Standarddatei: mower/data/control.json.
+- Speicherort kann über MV2_DATA_PATH geändert werden.
+- localStorage ist nicht mehr die maßgebliche Datenquelle.
+- Neue CRUD-APIs für /api/zones, /api/schedules, /api/settings und /api/home.
+
+
+2. MISSION UND BEDIENUNG
+
+- Missionen werden mit konkreter zone_id gestartet.
+- Im Realbetrieb wird der Start gesperrt, wenn Zone oder Zonengeometrie fehlt.
+- Neuer Zustand PAUSED mit /api/mission/pause und /api/mission/resume.
+- Eigener Rückkehrbefehl /api/mission/return-home.
+- Permanenter Soft-Stop und prominenter Not-Aus in der UI.
+- Not-Aus verwendet den priorisierten Hardware-ESTOP und setzt ERROR.
+- Manuelle Fahrsteuerung für IDLE, Teach-In und Pause:
+  vorwärts, rückwärts, links, rechts und sofortiger Stopp beim Loslassen.
+- Serverseitiges Geschwindigkeitslimit für manuelle Fahrt, standardmäßig 25 %.
+- Kritische Aktionen besitzen Bestätigungsdialoge und serverseitige Bestätigung.
+
+
+3. KARTE UND NAVIGATION
+
+- Live-Position und Live-Spur des Roboters.
+- Umschaltbarer Follow-Modus; manuelles Verschieben deaktiviert das Folgen.
+- Mähzonen werden grün, No-Go-Zonen rot gestrichelt eingezeichnet.
+- Home-/Docking-Position kann aus der aktuellen GPS-Position gespeichert werden.
+- Karten-GPS-Badge für RTK Fix, RTK Float und kein Fix.
+- Satellit-, Straßen- und lokaler Offline-Layer sind umschaltbar.
+- Lokale Tiles werden aus MV2_TILE_PATH geladen, Standard mower/data/tiles.
+- Service Worker speichert bereits besuchte UI- und Kartenressourcen im Cache.
+- GPS-Leser wird über MV2_GPS_PORT aktiviert.
+- IMU wird über MV2_ENABLE_IMU=1 aktiviert.
+- Teach-In sammelt echte empfangene GPS-Punkte, zeigt die Spur und speichert
+  das Ergebnis als GeoJSON-Polygon auf dem Server.
+
+
+4. SICHERHEIT
+
+- Missionstart-Sperren für fehlenden RTK Fix, fehlende Zone/Grenze, Regen,
+  niedrigen Akku, Lift, ungültigen Geofence, Winterpause und Wochenende.
+- RTK-Verlust während einer Mission pausiert den Roboter.
+- Vorhandener RainGuard ist eingebunden: Entprellung, Pause und Trockenzeit.
+- Nächste mögliche Wiederaufnahme nach Regen wird angezeigt.
+- LiftGuard und TiltGuard sind in den realen Laufzeitpfad eingebunden.
+- Aktive Zone und No-Go-Zonen werden gegen die aktuelle GPS-Position geprüft.
+- Ereignislog mit Zeit, Schweregrad, Ursache und Handlungsempfehlung.
+- Vorbereitete verständliche Hardwarefehler:
+  "Bumper links blockiert", "Bumper rechts blockiert",
+  "RTK-Verbindung verloren" und "Messerstrom zu hoch".
+- Bumper und Strommessungen bleiben "nicht verfügbar", solange die Firmware
+  diese Werte nicht tatsächlich liefert.
+
+
+5. PLANUNG
+
+- Zeitpläne werden auf dem Raspberry Pi gespeichert und dort ausgeführt.
+- Jeder Zeitplan benötigt eine konkrete Mähzone.
+- Mähfenster mit Start- und Endzeit statt nur einer Startzeit.
+- Wochentage, Saisonmodus, Wochenendmodus und globale Ruhezeit.
+- "Nächste Mission überspringen" mit serverseitigem Status.
+- Wetter-, Akku-, GPS- und Zonensperren werden auch beim Zeitplanstart geprüft.
+- Regenpause verhindert einen automatischen Neustart vor Ablauf der Trockenzeit.
+
+
+6. DIAGNOSE UND WARTUNG
+
+- Neue Diagnoseansicht mit Hardware, GPS, IMU, Neigung, Regen, Bumper, Lift,
+  Geofence, Watchdog, Messer, Akku, Spannung, Strom und Temperatur.
+- Nicht gelieferte Werte erscheinen als "nicht verfügbar".
+- Akku-Spannung und Ladezustand werden aus echter Telemetrie übernommen.
+- Ereignis-/Log-Download als TXT über /api/logs/download.
+- App- und Firmwareversionsanzeige.
+- Geführte Assistenten für IMU, Kompass, RTK und Docking.
+- Bestätigte Kurztests für Motor und Lenkung mit automatischem Stopp.
+- Firmwaredateien (.hex/.bin, maximal 5 MB) können sicher bereitgestellt werden.
+  Das Bereitstellen flasht den Teensy ausdrücklich noch nicht. Flashen erfordert
+  weiterhin angeschlossene Hardware und die passende Teensy-Toolchain.
+
+
+7. OFFLINE, VERBINDUNG UND ZUGRIFF
+
+- Verbindungsbanner mit sichtbarem Retry.
+- Letzte Telemetriedaten bleiben sichtbar, wenn die Verbindung abreißt.
+- Fahr- und Missionsbefehle werden bei veralteter/getrennter Verbindung gesperrt.
+- WebSocket verwendet automatisch ws:// oder wss:// passend zur Seite.
+- Optionaler PIN-Schutz über MV2_UI_PIN.
+- PIN-Sitzung wird in einem HttpOnly-/SameSite-Cookie gespeichert.
+- WebSocket und APIs prüfen die Anmeldung.
+- Fehlgeschlagene PIN-Anmeldungen werden protokolliert.
+- Demo-Missionsdaten werden standardmäßig nicht mehr angezeigt.
+
+
+8. MOBILE UX
+
+- Responsive Layout für Breiten bis 700 px ergänzt.
+- Bei 390 x 844 px geprüft: kein horizontales Abschneiden mehr.
+- Gemessene Dokumentbreite: 390 px bei 390 px Viewport.
+- Topbar, Karten-/Seitenfläche, Diagnosekarten, Modale und permanente
+  Sicherheitsleiste bleiben innerhalb des Viewports.
+
+
+9. KONFIGURATION FÜR DEN RASPBERRY PI
+
+MV2_UI_PIN=1234                 optionaler lokaler Bedien-PIN
+MV2_GPS_PORT=/dev/ttyAMA0       GPS-Liveposition aktivieren
+MV2_ENABLE_IMU=1                BNO085/IMU aktivieren
+MV2_DATA_PATH=mower/data/control.json
+MV2_TILE_PATH=mower/data/tiles
+MV2_SERIAL_PORT=/dev/ttyACM0
+MV2_CAMERA_DEVICE=0
+MV2_CALIBRATION=mower/config/camera_calibration.npz
+
+Offline-Tiles werden als mower/data/tiles/{z}/{x}/{y}.png erwartet.
+
+
+10. TESTS UND PRÜFUNGEN
+
+- 282 automatisierte Tests bestanden.
+- Python-Kompilierung erfolgreich.
+- JavaScript-Syntaxprüfung für app.js und sw.js erfolgreich.
+- Neue Tests für Persistenz, Zonen, Zeitpläne, Einstellungen, Home-Position,
+  zonenspezifische Missionen, RTK-Sperre, Pause/Fortsetzen, Rückkehr,
+  manuelle Geschwindigkeitsbegrenzung, Not-Aus, PIN und Firmware-Staging.
+- pytest sammelt standardmäßig nur tests/; der manuelle Hardwaretest öffnet
+  dadurch nicht mehr versehentlich /dev/mower.
+- UI im lokalen Browser bei Desktop und 390 x 844 px geprüft.
+- Keine JavaScript-Fehler während der Browserprüfung.
+
+
+11. SIMULATIONSUMGEBUNG OHNE HARDWARE
+
+- Eigener, klar getrennter Ordner mower/simulation/.
+- Start mit: python3 -m mower.simulation
+- Produktions-UI: http://127.0.0.1:8090/
+- Simulationskonsole: http://127.0.0.1:8090/simulation/
+- Die Simulation ersetzt ausschließlich Hardware- und Sensorgrenzen.
+- Zustandsmaschine, Sicherheitslogik, API, Teach-In, Routenplanung,
+  Wegverfolgung und UI bleiben derselbe Produktionscode wie am Roboter.
+- Virtuelles 2D-Fahrzeugmodell in metrischen UTM-Koordinaten.
+- Der echte binäre DRIVE-/BLADE-/ESTOP-/PING-Pfad wird über das vorhandene
+  HardwareInterface verarbeitet.
+- Simulierte SENSORS-, SOC-, STATUS-, GPS- und IMU-Daten verwenden die
+  produktiven Datenmodelle und Callbacks.
+- Gemeinsame MissionRuntime verbindet den vorhandenen Localizer, TeachIn,
+  Boustrophedon-Planer und Stanley-Regler.
+- Serverseitiges Teach-In liefert eine WGS84-Geometrie an den Assistenten.
+- Missionen planen konkrete Wegpunkte und fahren sie autonom ab.
+- Die geplante Route wird cyan gestrichelt auf der Produktionskarte angezeigt.
+- Simulationskonsole für RTK Fix/Float/Verlust, Regen, Lift, Laden, Akku,
+  Pitch/Roll, Bumper, RTK-Hardwarefehler und Messerüberstrom.
+- Vollständiger Szenario-Reset setzt Pose, Sensoren, Akku, Fehlerzustand und
+  virtuelle Not-Aus-Verriegelung zurück.
+- Teach-In-Auto-Close besitzt jetzt eine Hysterese und kann kleine Flächen
+  nicht mehr bereits auf der ersten Geraden vorzeitig schließen.
+- Ende-zu-Ende geprüft: 24 Wegpunkte geplant, Roboter fährt mit aktivem Messer,
+  Bumperfehler stoppt Motor/Messer und erzeugt Sicherheitsereignisse.
+- Simulationskonsole und Produktions-UI wurden im Browser fehlerfrei geprüft.
+
+
+12. BUGFIX MISSIONSSTART
+
+- Der dynamische Startbutton hat das Browser-Klickereignis nicht mehr
+  versehentlich als zone_id an die API übergeben.
+- Strukturierte FastAPI-/Pydantic-Fehler werden jetzt in lesbaren Text
+  umgewandelt und erscheinen nicht mehr als "[object Object]".
+- Browserprüfung erfolgreich: Bestätigung startet die konkrete Zone,
+  Status wechselt auf "Mähen / Mission aktiv" und Toast zeigt
+  "Mission gestartet".
+
+
+13. ERWEITERTER TEACH-IN-ASSISTENT
+
+- Eigenes Teach-In-Cockpit mit Live-Karte und analogem Fahr-Joystick.
+- Der Joystick steuert vorwärts/rückwärts und links/rechts; die maximale
+  Geschwindigkeit bleibt durch das eingestellte Geschwindigkeitslimit begrenzt.
+- Beim Loslassen, bei Fokusverlust oder Pointer-Abbruch wird sofort ein
+  manueller Stopp gesendet.
+- Karte zeigt Roboterposition, bisher aufgezeichnete Route, Startpunkt und
+  bei einer Korrektur den Punkt, zu dem zurückgefahren werden soll.
+- GPS-Qualität, Routenlänge, Punktzahl und Entfernung zum Start werden
+  während der Aufzeichnung live angezeigt.
+- Follow-Modus ist umschaltbar, damit die Karte auf Wunsch am Roboter bleibt
+  oder frei verschoben werden kann.
+- Die letzten 1, 3 oder 5 Meter lassen sich exakt verwerfen. Liegt der
+  Schnittpunkt innerhalb eines Streckenabschnitts, wird er interpoliert.
+- Nach dem Verwerfen pausiert die Aufzeichnung. Die Rückfahrt zur violetten
+  Zielmarke wird dadurch nicht versehentlich Teil der neuen Zonengrenze.
+- Innerhalb von 0,5 m um die Zielmarke wird die Aufnahme automatisch wieder
+  fortgesetzt.
+- Alternativ ist "Ab hier neu fortsetzen" möglich; nach Bestätigung wird der
+  aktuelle Standort geradlinig mit dem letzten gültigen Punkt verbunden.
+- Serverseitiger Teach-In-Status und neue API-Befehle für Status, Verwerfen
+  und Fortsetzen sorgen dafür, dass UI und Produktionslogik denselben Stand
+  verwenden.
+- Der Localizer wurde gegen numerisch instabile Kovarianzen und verspätet
+  eintreffende Sensorzeitstempel gehärtet, damit lange Simulationen stabil
+  bleiben.
+- Desktop- und Mobile-Layout bei 390 x 844 px im Browser geprüft.
+
+
+14. KARTENZOOM, ROUTENLINIE UND BASISRÜCKKEHR
+
+- Hauptkarte und Teach-In-Karte können jetzt bis Zoomstufe 23 vergrößert
+  werden. Online-Karten werden oberhalb ihrer nativen Auflösung skaliert.
+- Die geplante Mähroute wird nicht mehr gestrichelt, sondern als gut sichtbare,
+  durchgezogene cyanfarbene Linie mit abgerundeten Kanten angezeigt.
+- Die Rückkehr zur Ladestation erzeugt jetzt eine echte RTK-Fahrroute von der
+  aktuellen Roboterposition zur serverseitig gespeicherten Home-Position.
+- Während der Rückfahrt bleibt das Messer ausgeschaltet.
+- Die Rückfahrroute wird als durchgezogene blaue Linie dargestellt.
+- Nach Erreichen der Ladestation wechselt der Roboter in den Zustand Andocken.
+- Wenn noch keine Ladestation gespeichert wurde, bleibt der Rückkehrbutton
+  gesperrt und erklärt im Tooltip, dass zuerst H auf der Karte verwendet werden
+  muss.
+- Ende-zu-Ende in der Simulation geprüft: Mission gestartet, Rückkehr ausgelöst,
+  Roboter zur Home-Position gefahren, Messer aus und Zustand Andocken erreicht.
+
+
+15. TRAKTORROUTEN UND MEHRPUNKTWENDEN
+
+- Planungsrouten werden standardmäßig alle 5 mm abgetastet. Der Punktabstand
+  ist von 2 bis 9 mm einstellbar und liegt damit immer unter einem Zentimeter.
+- Eine sichere Anfahrtsroute verbindet die aktuelle Traktorposition mit der
+  ersten Mähbahn. Während dieser Anfahrt bleiben Messer aus und Mähwerke oben.
+- Ein Wegpunkt gilt auch beim kontrollierten Überschreiten seiner Querlinie als
+  erreicht. Dadurch bleiben hochaufgelöste Routen nicht an verpassten Punkten
+  hängen.
+- Automatische Randreserve: bei 0 cm wird eine halbe Arbeitsbreite verwendet.
+  Dadurch reicht das Mähwerk bis zur Zonengrenze, während die Traktormitte
+  innerhalb des Geofence Platz zum Wenden behält.
+- Wendestrategien: automatisch, Vorwärtsbogen, Rücksetzwende und mehrzügig.
+- Die Automatik vergleicht Spurbreite und konfigurierten Wenderadius. Reicht
+  der Platz nicht, wird eine Mehrpunktwende mit Rückwärtsfahrt geplant.
+- Wendungen bestehen jetzt aus echten Ackermann-Kreisbögen. Die maximale
+  Krümmung ist auf 1 / Mindestwenderadius begrenzt; der Radius wird nicht mehr
+  nur optisch angenähert. Kann keine sichere Wende innerhalb der Zone gefunden
+  werden, wird die Planung mit einer konkreten Meldung abgelehnt.
+- Die diskrete Suche wird numerisch bis auf die exakte Pose der nächsten Bahn
+  verfeinert. Orange Wendelinien und cyanfarbene Mähbahnen besitzen dadurch
+  identische Übergabepunkte ohne sichtbare oder geometrische Lücke.
+- Maximal 2 bis 6 Züge, Wenderadius und Wendegeschwindigkeit sind einstellbar.
+- Front- und Heckmähwerk können getrennt für Wendemanöver aktiviert werden.
+- Vor dem Anheben wird das Messer ausgeschaltet und der Traktor angehalten.
+  Nach Anheben und Absenken wird die konfigurierte Hub-Wartezeit eingehalten.
+- Neues binäres DECK_LIFT-Kommando im Raspberry-Pi-/Teensy-Protokoll.
+- HardwareInterface, Teensy-Firmware und Simulation benutzen denselben
+  unabhängigen Front-/Heckhub-Befehl.
+- Cyan zeigt ausschließlich Mähbahnen; Wendemanöver werden als durchgezogene
+  orange Linie hervorgehoben. Beide Geometrien teilen ihre Endpunkte exakt.
+- Die orange Ist-Spur wird bei jedem neuen Missionsstart zurückgesetzt.
+- Simulation korrigiert: Nach Erreichen der Home-Position schließt der virtuelle
+  Ladekontakt und der Zustand wechselt von Andocken zu Laden.
+- Ende-zu-Ende geprüft: Anfahrt, Absenken, Mähen, Anheben, Messer aus,
+  Rückwärtszug, Vorwärtszug, Geofence sowie Rückkehr und Ladebeginn.
+- Firmware-Vorgabe: Front-/Heckhub liegen zunächst auf Teensy-Pin 9 und 10.
+  Servorichtung und Endlagen müssen vor dem ersten Hardwaretest an den real
+  verbauten Hubaktoren kalibriert und bei Bedarf invertiert werden.
+
+
+16. AUSSENKANTENSTRATEGIE UND TRAKTORANZEIGE
+
+- Neue konfigurierbare Bahnstrategie: "Außenkante zuerst" oder direkte
+  Innenbahnen.
+- Für das Vorgewende können 1, 2 oder 3 gemähte Außenbahnen eingestellt
+  werden. Die Auswahl wird serverseitig gespeichert.
+- Die Außenbahnen werden zuerst abgefahren. Erst danach beginnt die
+  Innenfläche, die entsprechend nach innen versetzt geplant wird. Dadurch
+  steht für die späteren Wenden bereits gemähte Fläche zur Verfügung.
+- Auch die gerundeten Ecken der Außenbahnen werden aus dem eingestellten
+  Mindestwenderadius berechnet. Passt eine gewählte Außenbahn geometrisch
+  nicht in die Zone, wird die Planung mit einer konkreten Meldung abgelehnt.
+- Die eigene Vorgewende-Geometrie wird auf der Karte grün/türkis dargestellt
+  und bleibt von den cyanfarbenen Innenbahnen und orangefarbenen Wendungen
+  unterscheidbar.
+- Der bisherige Positionspunkt wurde auf Hauptkarte und Teach-In-Karte durch
+  die vorhandene Traktor-Draufsicht aus der Spurabstand-Einstellung ersetzt.
+- Das Traktorsymbol bewegt sich mit der RTK-Position und dreht sich in die
+  tatsächliche Fahrtrichtung.
+- Die Symbolgröße wird aus Spurabstand, Kartenbreite und Zoomstufe berechnet.
+  Eine Mindestgröße hält den Traktor auch bei weit herausgezoomter Karte
+  sichtbar.
+- Front- und Heckmähwerk zeigen ihren Zustand getrennt an: abgesenkt gelb,
+  angehoben blau. In der aktuellen Hardwareanbindung ist dies der befohlene
+  Hubzustand; eine physische Endlagenrückmeldung benötigt passende Sensoren.
+- Im laufenden Simulator und im Browser geprüft: Strategieauswahl,
+  Speicherung, Routengeometrie, Traktorgröße, Kursdrehung und Mähwerkfarben.
+
+
+17. MISSIONSSTART AUS DEM LADEMODUS
+
+- Eine bestätigte Mission kann jetzt direkt aus dem Zustand "Laden" gestartet
+  werden. Der Roboter wechselt von CHARGING zu MOWING und verlässt die Station
+  entlang der für die ausgewählte Zone geplanten Anfahrtsroute.
+- Der Lade-Watchdog wird beim Losfahren abgebrochen. Ein alter Lade-Timeout
+  kann die bereits gestartete Mission dadurch nicht nachträglich stoppen.
+- Zonen-, RTK-, Wetter-, Geofence- und Akkuprüfungen bleiben auch beim Start
+  aus der Ladestation aktiv.
+- Liegt die Station knapp außerhalb der Mähzone, wird eine einmalige, maximal
+  drei Meter lange Ausfahrt mit begrenztem Geofence-Korridor zugelassen. Der
+  Korridor verfällt, sobald der Traktor sicher innerhalb der Zone angekommen
+  ist; ein späteres Verlassen der Zone bleibt damit gesperrt.
+- Der simulierte Ladekontakt wird beim Losfahren geöffnet, sodass Akku- und
+  Ladeanzeige nach dem Auskoppeln ebenfalls konsistent wechseln.
+- Im Status "Laden" zeigt die Bedienoberfläche nun den Button "Mission starten".
+  Der Bestätigungsdialog weist zusätzlich auf das Verlassen der Ladestation hin.
+- Auch fällige Zeitpläne dürfen bei ausreichendem Akku aus dem Lademodus
+  starten.
+
+
+18. DURCHGÄNGIGER WENDERADIUS UND RUHIGE FAHRREGELUNG
+
+- Der Standardwert für den minimalen Wenderadius beträgt jetzt 25 cm.
+  Einstellbar sind 10 bis 100 cm in 5-cm-Schritten; API und Speicherung
+  begrenzen Werte ebenfalls auf diesen Bereich.
+- Nicht nur die Bahnenden, sondern auch Anfahrt, Übergänge zwischen mehreren
+  Außenbahnen, Wechsel von Außen- zu Innenbahnen und die Rückfahrt zur Basis
+  verwenden nun radiusbegrenzte Fahrkurven.
+- Direkte gerade Verbindungslinien mit geometrisch unmöglichen Knicken wurden
+  entfernt. Zunächst werden Vorwärts- und Rückwärts-Dubins-Kurven geprüft.
+  Reicht das innerhalb der Zonengrenze nicht aus, plant ein begrenzter
+  mehrzügiger Suchlauf mit Vorwärts- und Rückwärtssegmenten.
+- Der Startpunkt der Außenbahn wird passend zur aktuellen Position und
+  Fahrtrichtung gewählt. Bei Innenbahnen wird zwischen den beiden möglichen
+  Enden der Bahnfolge gewählt, damit nicht unnötig quer durch die Fläche
+  angefahren wird.
+- Die geplante lokale Krümmung wird der Stanley-Regelung als Vorsteuerung
+  übergeben. GPS-/IMU-Abweichungen liefern nur noch die Korrektur, statt die
+  komplette Kurvenlenkung erst nach einer Positionsabweichung aufzubauen.
+- Ein stabiler Vor-/Rückblick berechnet Tangente und Krümmung aus mehreren
+  Planpunkten. Die Lenkänderung ist zusätzlich auf 120 Grad pro Sekunde
+  begrenzt, wodurch einzelne Messwertsprünge nicht als harter Lenksprung am
+  Aktor ankommen.
+- Die Simulationsphysik verwendet jetzt dasselbe Ackermann-/Fahrradmodell mit
+  25 cm Radstand und integriert Kreisbögen exakt. Die Kurvenbewegung hängt
+  damit korrekt von Fahrtempo, Lenkwinkel und Fahrtrichtung ab.
+- Beim Speichern der Ladestation wird auch die aktuelle Ausrichtung abgelegt,
+  sodass die radiusbegrenzte Rückfahrroute mit passender Dockingrichtung endet.
+- Neue Tests prüfen dichte, lückenlose Verbindungskurven, den eingehaltenen
+  Mindestwenderadius, die Krümmungsvorsteuerung und den Einstellbereich.
+
+
+19. MÄHBREITE, LÜCKENLOSE FLÄCHENABDECKUNG UND AUSGABEDIAGNOSE
+
+- Die reale Mähbreite ist jetzt eine eigene, serverseitig gespeicherte
+  Einstellung. Der neue Slider reicht von 30 bis 120 cm; Standard sind 60 cm.
+- Der Spurabstand bleibt eine getrennte Größe und ist immer höchstens so groß
+  wie die reale Mähbreite. Die UI zeigt daraus live die absolute und prozentuale
+  Überlappung, zum Beispiel 60 cm Mähbreite, 52 cm Spurabstand und 8 cm bzw.
+  13 Prozent Überlappung.
+- Die maßstabsgetreue Traktordarstellung verwendet nun die reale Mähbreite und
+  nicht mehr den Spurabstand als Werkzeugabmessung.
+- Außenbahnen liegen mit der halben realen Mähbreite innerhalb der Grenze;
+  weitere Außenbahnen folgen im konfigurierten Spurabstand.
+- Die frühere automatische halbe Randreserve wurde entfernt. Sie hatte zwischen
+  der letzten Außenbahn und der ersten Innenbahn einen ungemähten Streifen
+  erzeugt. 0 cm Randreserve bedeutet jetzt tatsächlich keinen ungemähten
+  Sicherheitsabstand.
+- Innenbahnen beginnen exakt einen Spurabstand hinter der letzten Außenbahn.
+  Dadurch entspricht ihre Überdeckung ebenfalls der eingestellten Differenz
+  aus Mähbreite und Spurabstand.
+- Am gegenüberliegenden Feldrand wird bei einem verbleibenden Rest gezielt eine
+  zusätzliche Abschlussbahn gesetzt. Der Spurabstand ist damit ein Maximalwert;
+  ein beliebig schmaler Reststreifen wird nicht mehr ausgelassen.
+- Enge Verbindungen zu dieser Abschlussbahn verwenden bei Bedarf automatisch
+  die allgemeine mehrzügige, zonen- und radiusbegrenzte Fahrwegplanung.
+- Jede geplante Mission berechnet jetzt zusätzlich eine geschätzte
+  Flächenabdeckung aus allen Messer-ein-Abschnitten. Mähbreite, Spurabstand,
+  Überlappung, Abdeckungsgrad und geschätzte Restfläche stehen in den
+  Routeneigenschaften der API.
+- Das gespeicherte Simulationsfeld erreicht mit 60 cm Mähbreite und 52 cm
+  Spurabstand etwa 99,3 Prozent geschätzte Abdeckung. Die verbleibenden rund
+  0,26 m² liegen in scharfen, mit konstantem Wenderadius physikalisch nicht
+  vollständig erreichbaren Ecken; durchgehende ausgelassene Streifen sind weg.
+- Die Hardware-Schnittstelle protokolliert jetzt die tatsächlich an den Treiber
+  übergebenen Soll-Ausgänge: normierte Gasstellung, Fahrtrichtung, Lenkwinkel,
+  Messer, Front-/Heckmähwerk und Not-Aus-Befehl.
+- In der Diagnose gibt es dafür den neuen Abschnitt "Ausgänge · Sollwerte".
+  Er aktualisiert sich live sowohl mit dem realen Teensy-Treiber als auch mit
+  der Simulation. Die Anzeige unterscheidet ausdrücklich zwischen ausgegebenem
+  Sollwert und Sensor-/Endlagenrückmeldung.
+- Beim Zurücksetzen der Simulation werden auch alle beobachtbaren Ausgänge über
+  die produktive Hardware-Schnittstelle auf Stopp, Messer aus, Lenkung neutral
+  und beide Mähwerke unten zurückgesetzt.
+- Automatische Tests prüfen Mähbreite/Spurabstand, beide Feldränder,
+  Flächenabdeckung, begrenzte Einstellungen und die ausgegebenen Aktorbefehle.
+
+
+20. FLÜSSIGE SIMULATION, IST-SPUR UND TATSÄCHLICH GEMÄHTE FLÄCHE
+
+- Die WebSocket-Telemetrie wird nun mit 10 Hz statt nur einmal pro Sekunde
+  übertragen. Die simulierte RTK-Quelle arbeitet ebenfalls mit 10 Hz; die
+  Missionsregelung läuft in der Simulation mit 20 Hz. Der Kartenmarker wird
+  zwischen den Positionsschritten per kurzer linearer Bewegung geglättet.
+- Die Traktorgrafik wird anhand ihres tatsächlich sichtbaren Bildbereichs
+  skaliert. Die sichtbare Werkzeugbreite entspricht damit bei ausreichender
+  Zoomstufe der real eingestellten Mähbreite und steht im richtigen Verhältnis
+  zum Spurabstand. Nur bei weitem Herauszoomen greift eine kleine Mindestgröße.
+- Beim Missionsstart wird die vollständige Route automatisch passend in die
+  Karte eingepasst. Der Zentrieren-Button springt mindestens auf Zoomstufe 22,
+  damit Fahrzeugbreite, Spurabstand und echte Mähspur vergleichbar bleiben.
+- Eine transparente grüne Mähspur zeigt live die wirklich bearbeitete Fläche.
+  Ihre Breite stammt aus der realen Mähbreite. Sie wird ausschließlich ergänzt,
+  wenn die Mission fährt, das Messer tatsächlich befohlen ist und beide
+  Mähwerke abgesenkt sind; Wenden und Rückfahrten färben die Fläche nicht ein.
+- Die Linien haben jetzt eindeutige Bedeutungen: Cyan ist die geplante Mähbahn,
+  Türkis die geplante Außenbahn, violett gestrichelt die geplante Wende und eine
+  dünne weiße Linie die tatsächlich gefahrene Ist-Spur. Eine feste Kartenlegende
+  erklärt Planbahn, Planwende, Ist-Spur und gemähte Fläche.
+- Die Ist-Spur beginnt erst mit einer tatsächlich bewegten Mission und wird bei
+  jedem neuen Missionsstart zusammen mit der grünen Mähspur geleert. Dadurch
+  entstehen keine scheinbaren Fahrwege aus GPS-Ruhestandsdaten.
+- Ist-Spur und Messer-ein-Abschnitte werden zusätzlich im Missionskern geführt
+  und über die Routen-API bereitgestellt. Nach einem Browser-Neuladen werden
+  die bereits gefahrene und gemähte Strecke deshalb wiederhergestellt und live
+  fortgesetzt, solange der Server läuft.
+- Der Restabstand am gegenüberliegenden Feldrand wird bei sehr schmalen
+  Abschlussstreifen gleichmäßig auf die letzten beiden Bahnlücken verteilt.
+  Beide Feldkanten bleiben vollständig abgedeckt, während eine winzige letzte
+  Bahn mit unnötig komplizierter Mehrpunktwende vermieden wird.
+- Radiusbegrenzte Verbindungsfahrten bevorzugen nun Vorwärtsfahrt. Eine rein
+  rückwärts gefahrene Dubins-Verbindung wird nur noch gewählt, wenn ihr Vorteil
+  die zusätzliche Gangwechsel-/Rückwärtsstrafe überwiegt oder vorwärts keine
+  gültige Verbindung existiert.
+- Eine 30-sekündige Referenzfahrt im Simulationsfeld ergab 0,84 cm mittlere
+  Abweichung zur geplanten Gesamtroute, 3,42 cm am 95. Perzentil und 4,44 cm
+  maximale kurzzeitige Abweichung in Wende-/Übergangsphasen.
+- Beim Simulationsreset werden jetzt auch Odometrie und Lokalisierungsfilter
+  zurückgesetzt. Ein zurückspringender Encoderzähler kann dadurch nicht mehr
+  kurzzeitig eine unrealistisch hohe Geschwindigkeit erzeugen.
+
+
+21. EINSTELLBARE SIMULATIONSGESCHWINDIGKEIT
+
+- Die separate Simulationskonsole unter `/simulation/` besitzt jetzt einen
+  Speedslider von 1x bis 5x. Der aktuelle Faktor wird groß neben dem Slider
+  angezeigt; Markierungen kennzeichnen realistische, mittlere und schnelle
+  Testgeschwindigkeit.
+- Der Faktor läuft über den neuen Simulationsendpunkt
+  `PUT /api/simulation/speed` und wird im Weltzustand als
+  `simulation_speed_factor` zurückgegeben.
+- Virtuelle Bewegung, Ladevorgang und Akkuverbrauch werden gemeinsam
+  beschleunigt. Dadurch lassen sich Missionen und Lade-/Fehlerszenarien schneller
+  durchspielen, ohne Zeitpläne oder Produktions-Einstellungen zu verändern.
+- Der gewählte Faktor bleibt bei einem vollständigen Welt-Reset erhalten. Für
+  Wegregler-, Wenderadius- und Genauigkeitsmessungen bleibt 1x der verbindliche
+  Referenzmodus; 2x bis 5x dienen schnellen Funktionsprüfungen.
+- Live geprüft: 3x wird von Slider und API übernommen, bleibt beim Reset aktiv
+  und legt bei identischem Fahrbefehl in einer realen Sekunde ungefähr den
+  dreifachen virtuellen Weg zurück. Abschließend wurde auf 1x und IDLE
+  zurückgestellt.
+
+
+22. DREI MÄHWERKE, KONTINUIERLICHE TRAJEKTORIE UND PRÄDIKTIVE REGELUNG
+
+- Die tatsächlich gemähte Fläche wird nicht mehr als breite Linie mit runden
+  Enden angenähert. Ein Zentimeterraster erfasst die rechteckigen Fußabdrücke
+  von Frontmähwerk, linkem Heckmähwerk und rechtem Heckmähwerk getrennt.
+- Zwischen zwei Positionsmeldungen werden Zwischenlagen in höchstens 75 Prozent
+  einer Rasterzelle und zwei Grad Winkelschritt ergänzt. Auch bei höherer
+  Simulationsgeschwindigkeit entstehen daher keine künstlichen Löcher.
+- Die drei Rasterebenen werden als echte Polygone über die Routen-API geliefert.
+  Die Karte zeichnet diese transparent grün und kann sie nach einem Neuladen
+  wiederherstellen. Runde Linienenden beziehungsweise grüne Kreise entfallen.
+- Auf der Karte liegen zusätzlich drei maßstäbliche Rechtecke direkt an den
+  real konfigurierten Mähwerkspositionen. Abgesenkte Mähwerke sind gelb,
+  angehobene Mähwerke blau; die Decks werden mit der Fahrzeugrichtung gedreht.
+- Frontbreite, Werkzeugtiefe, Front-/Heckabstand zur Hinterachse, Lücke zwischen
+  den beiden Heckmähwerken und Rasterauflösung sind im Einstellungstab
+  konfigurierbar und werden serverseitig gespeichert.
+- Die Simulation stellt jetzt ihre exakte Weltposition getrennt vom fusionierten
+  GPS-/IMU-/Encoder-Pose bereit. Eine gelb gestrichelte Sim-Wahrheit und die
+  weiße Filterspur machen sichtbar, ob ein Wackeln im Fahrmodell oder nur in
+  Lokalisierung beziehungsweise Darstellung entsteht.
+- Die Fahrregelung arbeitet nicht mehr einzelne 5-mm-Planpunkte als Ziele ab.
+  Eine fortlaufende, nach Bogenlänge parametrisierte Trajektorie projiziert die
+  Fahrzeugposition lokal auf den Fahrweg, interpoliert Diagonalen und Kurven
+  kontinuierlich und verhindert Sprünge auf nahe benachbarte Bahnen.
+- Vorschau und Projektion werden an Gang- und Operationswechseln begrenzt. Ein
+  Regler kann dadurch weder über eine Rückwärtsgrenze noch vom Mähen in eine
+  Wende hineinschauen.
+- Der bisherige Stanley-Regler wurde in der Missionsausführung durch einen
+  deterministischen kinematischen MPC-Regler ersetzt. Er simuliert mehrere
+  begrenzte Lenkverläufe mit Ackermann-Fahrmodell voraus und bewertet
+  Querfehler, Richtungsfehler, Lenkgeschwindigkeit und Lenkrutigkeit.
+- Der MPC verwendet den neu einstellbaren realen Radstand. Lenkwinkel und
+  Lenkgeschwindigkeit bleiben begrenzt; der bestehende Soft-Limiter bleibt als
+  zweite Schutzebene aktiv.
+- Die allgemeine Hybrid-A*/State-Lattice-Verbindungsplanung wird nun auch dann
+  mit einer reinen Rückwärtsverbindung verglichen, wenn diese geometrisch
+  möglich wäre. Rückwärtsmeter zählen vierfach, Gangwechsel werden zusätzlich
+  bestraft. Vorwärtslösungen haben Vorrang.
+- Jede Route veröffentlicht transparente Optimierungskennzahlen: Mähmeter,
+  Leerfahrtmeter, Rückwärtsmeter, Gangwechsel, Restfläche und Gesamtkosten.
+  Die Kostenfunktion lautet sinngemäß Leerfahrt + 4 x Rückwärtsfahrt +
+  Gangwechselstrafe + Restflächenstrafe.
+- Diese Kennzahlen bilden später eine geeignete Reward-Funktion für einen
+  lernenden übergeordneten Routenoptimierer. Noch nicht umgesetzt ist ein
+  Reinforcement-Learning-Modell; sicherheitskritische Fahrdynamik und
+  Wenderadius bleiben bewusst deterministisch eingeschränkt.
+- Live über die produktiven Simulations-/Missions-APIs geprüft: MPC aktiv,
+  getrennte Sim-Wahrheit vorhanden, drei Deckflächen erzeugt, reale Abdeckung
+  steigt während Messer-ein-Fahrt, Faktor 1x. Danach wurde auf IDLE
+  zurückgestellt.
+- Vollständige automatische Prüfung: 312 Tests erfolgreich. Zusätzliche Tests
+  decken Deckgeometrie/Rasterinterpolation, diagonale Trajektorien,
+  Spurprojektionsschutz, Ganggrenzen und MPC-Lenkung ab.
+
+
+23. MASSSTÄBLICHE MÄHWERKSVORSCHAU UND VERZÖGERUNGSFREIE LIVE-SPUR
+
+- Der Einstellungsbereich "Fahrzeug- & Mähwerksgeometrie" besitzt jetzt eine
+  maßstäbliche Draufsicht auf Traktor, Achsen, Räder und alle drei Mähwerke.
+- Ein festes 10-cm-Raster sorgt dafür, dass Breiten, Abstände und Radstand nicht
+  nur relativ, sondern im gleichen Maßstab zueinander dargestellt werden.
+- Frontbreite, Mähwerkstiefe, Frontabstand, Heckabstand, Hecklücke, gesamte
+  Mähbreite und Radstand verändern die Grafik ohne Wartezeit direkt während der
+  Sliderbewegung. Maßlinien zeigen Gesamtbreite sowie Front- und Heckabstand.
+- Veraltete Geometriedaten einer früher geplanten Route überschreiben die
+  aktuelle Sliderdarstellung nicht mehr. Die serverseitig gespeicherten
+  Einstellungen sind für Vorschau und Live-Werkzeuge maßgeblich.
+- Die grüne Mähspur wartet nicht mehr bis zu 1,5 Sekunden auf die nächste
+  vollständige Raster-Geometrie. Zwischen zwei 10-Hz-Telemetriepositionen wird
+  pro aktivem Mähwerk sofort ein rechteckiger, eckiger Sweep gezeichnet.
+- Frontmähwerk, linkes Heckmähwerk und rechtes Heckmähwerk besitzen weiterhin
+  getrennte Grünflächen. Angehobene oder ausgeschaltete Werkzeuge erzeugen
+  sofort keine weitere Einfärbung.
+- Sobald das dauerhafte Serverraster aktualisiert ist, ersetzt es die kleinen
+  Live-Segmente. Dadurch bleibt die Anzeige unmittelbar am Werkzeug und nach
+  Browser-Neuladen trotzdem reproduzierbar.
+- Die frühere 110-ms-Positions- und 180-ms-Drehverzögerung des Traktormarkers
+  wurde entfernt. Traktorbild, gelb/blaue Werkzeugrechtecke und grüne
+  Bearbeitungsfläche verwenden nun denselben Telemetriezeitpunkt.
+- Rückwärtsgeschwindigkeit wird bei der Bewegungsprüfung über ihren Betrag
+  erkannt, damit Fahrzeug- und Ist-Spur auch bei negativen Geschwindigkeiten
+  synchron bleiben.
+- Im lokalen Browser geprüft: drei Werkzeugrechtecke, 21 unmittelbare
+  Live-Sweep-Polygone neben drei Server-Rasterebenen und 0 Sekunden künstliche
+  Marker-Verzögerung. Der Frontbreiten-Slider änderte die maßstäbliche
+  Werkzeugbreite im Test direkt von 44 auf 54 cm und wurde anschließend auf
+  den ursprünglichen Wert zurückgestellt.
+
+
+24. SLIDER UND MÄHWERKSGEOMETRIE OHNE NACHLAUF
+
+- Die verbliebene 120-ms-CSS-Animation des orangefarbenen Slider-Füllbalkens
+  und der Wertblase wurde entfernt. Griff, Balken und Zahlenwert bewegen sich
+  jetzt im selben Browser-Frame.
+- Vorschau und Kartenwerkzeuge lesen Geometriewerte direkt aus der momentanen
+  Position des jeweiligen Range-Eingabefelds. Sie warten nicht mehr darauf,
+  dass der Wert zunächst in das Einstellungsobjekt übernommen oder nach
+  250 ms an den Server gesendet wird.
+- Dies gilt für Gesamtmähbreite, Frontbreitenanteil, Mähwerkstiefe,
+  Frontabstand, Heckabstand, Hecklücke und Radstand.
+- Auch die Traktorgrafik in der Spurabstands-Vorschau wird nun anhand der
+  aktuellen realen Mähbreite maßstäblich skaliert.
+- Im Browser ohne Wartezeit geprüft: Mähwerkstiefe 11 auf 30 cm änderte das
+  SVG-Rechteck unmittelbar von 0,11 auf 0,30 m; Frontabstand 57 auf 70 cm
+  verschob das Rechteck unmittelbar von -0,625 auf -0,755 m. Beim
+  Frontbreitenwert 80 Prozent waren Füllbalken und Wertblase auf 0 Sekunden
+  Übergangszeit und die gelbe Box sofort 0,48 m breit. Alle Testwerte wurden
+  anschließend auf die zuvor gespeicherten Werte zurückgestellt.
+
+
+BEWUSSTE HARDWAREGRENZEN
+
+- Bumper, Motorstrom, Messerstrom, Akkustrom und Akkutemperatur fehlen im
+  aktuellen Teensy-Protokoll. UI und API sind vorbereitet, zeigen aber n/v.
+- Firmwaredateien werden nur bereitgestellt, nicht automatisch geflasht.
+- Offline-Karten benötigen zuvor bereitgestellte Tiles oder einmal online
+  besuchte und vom Service Worker gecachte Kartenbereiche.
+- GPS, IMU, echte Zonenaufzeichnung und Geofence benötigen die genannten
+  Geräte und Umgebungsvariablen am Raspberry Pi.
+25. GÜLTIGE COVERAGE-ZONEN BEI TEACH-IN-MESSARTEFAKTEN
+--------------------------------------------------------
+- Ursache der Meldung "coverage zone must be a valid polygon" behoben.
+- Teach-In kann bei sehr dicht beieinanderliegenden Korrekturpunkten winzige
+  Selbstüberschneidungen erzeugen, die geometrisch als zusätzliche Polygone
+  mit praktisch null Fläche interpretiert werden.
+- Die Missionsplanung bereinigt jetzt ausschließlich solche vernachlässigbaren
+  GPS-/Fließkomma-Artefakte und verwendet die dominante reale Feldfläche.
+- Neue Teach-In-Geometrien werden bereits vor der Speicherung auf dieselbe
+  Weise normalisiert.
+- Echte, mehrdeutige Selbstüberschneidungen (z. B. eine Achterform mit zwei
+  relevanten Teilflächen) werden weiterhin sicher abgelehnt und liefern eine
+  konkrete deutsche Handlungsempfehlung.
+- In diesem Fall bleibt das Teach-In aktiv und gestoppt, damit die fehlerhaften
+  letzten Meter zurückgenommen werden können; die Aufzeichnung geht nicht verloren.
+- Die bereits gespeicherte Zone "Test1" wurde erfolgreich gestartet; Route,
+  Coverage-Raster und UI wechselten ohne Fehlermeldung in "Mission aktiv".
+- Abschlusstest: 315 Tests bestanden.
+26. SPURABSTAND BEI GEÄNDERTER MÄHBREITE SYNCHRONISIERT
+-----------------------------------------------------------
+- Wird die reale Mähbreite geändert, wird weiterhin das zulässige Maximum
+  des Spurabstands angepasst.
+- Danach werden nun immer auch Griffposition, orange Füllung und Wertblase des
+  Spurabstandsreglers mit dem neuen Wertebereich neu berechnet.
+- Dies geschieht auch dann, wenn der numerische Spurabstand nicht verkleinert
+  werden muss. Beispiel: 50 cm entsprechen bei 60 cm Maximum 80 Prozent, bei
+  80 cm Maximum dagegen 57,14 Prozent.
+- Muss der Spurabstand wegen einer kleineren Mähbreite begrenzt werden, werden
+  Zahlenwert, Visualisierung und Serverwert weiterhin gemeinsam aktualisiert.
+27. MÄHWERKSVORSCHAU VERGRÖSSERT UND KORREKT BEMAßT
+---------------------------------------------------------
+- Die SVG-Draufsicht verwendet keinen festen 1,5-m-/2,02-m-Ausschnitt mehr,
+  sondern zoomt automatisch auf Fahrzeug, Mähwerke und Maßlinien.
+- 10-cm-Raster und Maßstab bleiben dabei erhalten; kleine reale Abmessungen
+  werden lediglich größer und besser lesbar dargestellt.
+- Maßtexte sind größer, kontrastreicher und mit Hilfslinien eindeutig den
+  jeweiligen Bezugspunkten zugeordnet.
+- Der Frontmähwerk-Abstand wird nun fachlich eindeutig vor der Vorderachse
+  gemessen. Vorschau, Karten-Footprint und serverseitiges Coverage-Raster
+  verwenden dieselbe korrigierte Position.
+- Bezeichnung und Hilfetext im Einstellungstab wurden entsprechend angepasst.
+28. MÄHWERKSBOXEN AUF DER KARTE UMSCHALTBAR
+---------------------------------------------
+- Neuer Toggle "Mähwerksflächen auf Karte" direkt bei der Fahrzeug- und
+  Mähwerksgeometrie.
+- Der Schalter blendet ausschließlich die aktuellen gelben (Mähwerk unten)
+  beziehungsweise blauen (Mähwerk angehoben) Front-/Heckmähwerk-Boxen aus.
+- Die grüne tatsächlich gemähte Fläche bleibt weiterhin sichtbar.
+- Die Änderung wirkt sofort und wird serverseitig als
+  show_mower_footprints gespeichert.
+29. KONTINUIERLICHE LIVE-MÄHSPUR OHNE PERIODISCHE HÄNGER
+----------------------------------------------------------
+- Die drei Mähwerksspuren werden nicht mehr aus je einem halbtransparenten
+  Polygon pro Telemetriepaket zusammengesetzt. Diese Überlappungen erzeugten
+  sichtbare dunklere Blöcke und immer mehr einzelne Kartenobjekte.
+- Front-, Heck-links- und Heck-rechts-Mähwerk erzeugen jetzt jeweils ein
+  zusammenhängendes, maßstabsgerechtes Flächenband. Lange Spuren werden in
+  begrenzte Abschnitte aufgeteilt, damit die Zeichenkosten auch bei langen
+  Simulationen stabil bleiben.
+- Die vollständige Server-Coverage und komplette Planroute werden während
+  des Mähens nicht mehr alle 1,5 Sekunden angefordert und komplett neu
+  gezeichnet. Diese Raster-zu-Polygon-Berechnung verursachte die regelmäßigen
+  Animationsstopps und das anschließende sichtbare Korrigieren der Spur.
+- Die Server-Coverage wird stattdessen an sicheren Zustandsgrenzen wie Pause,
+  Rückkehr, Missionsende oder Laden abgeglichen. Während der Fahrt bleibt die
+  leichte Live-Spur ohne Unterbrechung erhalten.
+- Browserprüfung in der laufenden Simulation: Über mehrere Messfenster blieben
+  genau drei Live-Flächenobjekte bestehen, während sich alle drei Pfade und die
+  Traktorposition kontinuierlich weiterbewegten. Es gab keine Browserwarnungen
+  oder JavaScript-Fehler.
+- Abschlusstest: 316 Tests bestanden; JavaScript-Syntax und Diff-Prüfung ohne
+  Fehler.
+30. SPURFÜHRUNG UND SIMULATIONSZEIT STABILISIERT
+--------------------------------------------------
+- Die prädiktive Regelung darf beim Übergang vom Wendemanöver auf die nächste
+  Vorwärts-Mähbahn über die Operationsgrenze hinausschauen. Dadurch richtet
+  sich der Traktor bereits am Wendeausgang tangential auf die Bahn aus, statt
+  erst verspätet auf sie einzuschwenken. Nur ein echter Wechsel zwischen
+  Vorwärts- und Rückwärtsfahrt begrenzt die Vorschau weiterhin zwingend.
+- Die MPC-Bewertung berücksichtigt jetzt neben Quer- und Winkelfehler auch den
+  Längsfehler zum Vorschaupunkt. Das verhindert Abkürzungen und das sichtbare
+  seitliche Nachlaufen an der geplanten Route.
+- Bei erhöhter Simulationsgeschwindigkeit werden Hardware-, GPS-, IMU- und
+  Regelzyklen sowie die zulässige Lenkänderung im selben Zeitverhältnis wie
+  die virtuelle Fahrzeugphysik skaliert. Die Bahn bleibt damit auch bei 5x
+  geometrisch repräsentativ und löst nicht mehr künstlich den Geofence aus.
+- Die hochauflösende Ausführungsroute bleibt mit Planpunkten im Millimeterbereich
+  unverändert erhalten. Nur die Karten-/API-Darstellung wird mit maximal 2 mm
+  geometrischer Abweichung reduziert.
+- Die Coverage-Fläche wird aus einem kurzen, threadsicheren Raster-Snapshot
+  außerhalb der Missionssperre aufgebaut. Route- und Kartenabrufe blockieren
+  dadurch weder Sensorverarbeitung noch Fahrregelung.
+- Die Antwort von /api/mission/route sank im Test von ca. 5,17 MB und 655 ms
+  auf ca. 24 KB und 3 ms.
+- Gemessene Spurabweichung bei 1x: Mittel 1,8 cm, Median 1,1 cm, 95 Prozent
+  höchstens 6,1 cm (vorher Mittel 9,7 cm). Bei 5x: Mittel 1,9 cm, Median
+  1,4 cm, 95 Prozent höchstens 6,4 cm, ohne Sicherheitsfehler.
+
+31. GROSSE MÄHWERKSGRAFIK AUS EINSTELLUNGEN ENTFERNT
+------------------------------------------------------
+- Die große schematische Draufsicht mit Traktor, Front-/Heckmähwerken, Raster
+  und Maßlinien wurde aus dem Einstellungstab entfernt.
+- Alle Geometrie-, Mähbreiten- und Spurabstandsregler bleiben erhalten und
+  steuern weiterhin die maßstabsgerechten Mähwerksflächen auf der Karte.
+- Auch der Toggle "Mähwerksflächen auf Karte" bleibt direkt im Abschnitt
+  "Fahrzeug- & Mähwerksgeometrie" verfügbar.
+- Browserprüfung mit der neuen UI-Version: Grafik nicht mehr im DOM, Toggle
+  sichtbar, Verbindung aktiv und keine JavaScript-Warnungen oder -Fehler.
+- Abschlusstest: 318 Tests bestanden; JavaScript-Syntax, Python-Kompilierung
+  und Diff-Prüfung ohne Fehler.
+
+32. COVERAGE-PLANER V2, MASCHINENKONTUR UND TEACH-IN-REFERENZ
+--------------------------------------------------------------
+- Die Innenbahnen werden auf dem tatsächlichen Flächenpolygon erzeugt. Die
+  bisherige globale Verkleinerung des Feldes wurde entfernt, weil sie bei
+  konkaven Flächen ganze Keile und mittig endende Bahnen verursachen konnte.
+- Der nötige Wendeplatz kürzt jetzt nur die Enden der jeweiligen Fahrbahn in
+  ihrer Fahrtrichtung. Die Kürzung berücksichtigt neben dem konfigurierten
+  Wendeplatz auch die tatsächlichen Abstände von Traktor und Mähwerken vor und
+  hinter der Hinterachse.
+- Randbahn und Innenbahnen werden flächenbasiert ausgewertet. Sehr kurze
+  Zusatzbahnen, die gegenüber der bereits gemähten Randfläche praktisch keine
+  neue Fläche erreichen, werden verworfen. So entstehen keine unnötigen
+  Rangiermanöver für winzige Randreste.
+- Der Plan enthält die Kennung `coverage_v2` und wird vor der Ausführung gegen
+  eine konfigurierbare Mindestabdeckung geprüft.
+- Reale Prüfung mit der gespeicherten Zone "Test1": 99,99 Prozent geplante
+  Abdeckung, nur 0,005 m² Restfläche, 18 Mähbahnen und 17 Wendemanöver. Der
+  vorherige Plan lag bei 95,33 Prozent und ließ 2,871 m² aus.
+- Die Geofence- und No-Go-Prüfung verwendet jetzt nicht mehr nur den GPS-Punkt
+  in der Fahrzeugmitte. Geprüft wird eine mit dem Fahrzeugkurs gedrehte Linie
+  zwischen der äußersten rechten und linken Kante von Traktor beziehungsweise
+  Mähwerken. Die Längsausdehnung wird bei Bahnenden und Verbindungen in der
+  Planung berücksichtigt. Damit darf die Mitte innerhalb der Wiese liegen,
+  während ein äußeres Mähwerk an einer Wand oder No-Go-Zone trotzdem einen
+  Sicherheitsstopp auslöst.
+- Im Teach-In-Assistenten kann die aufgezeichnete Grenzreferenz nun als
+  "Links", "Mitte" oder "Rechts" gewählt werden. Links/rechts werden aus der
+  realen konfigurierten Geometrie berechnet und verwenden automatisch den
+  breitesten Punkt von Traktor oder Mähwerk relativ zum aktuellen Kurs.
+- Verwerfen der letzten Meter, Rückfahrt und Fortsetzen arbeiten mit derselben
+  gewählten Referenz, sodass die Grenzlinie nicht zwischen Fahrzeugmitte und
+  Außenkante springt.
+- API-Erweiterung: `POST /api/teach-in/start` akzeptiert `reference` mit
+  `left`, `center` oder `right`; Status- und Stop-Antwort enthalten Referenz
+  und seitlichen Offset.
+- Browserprüfung: alle drei Optionen sichtbar, Mitte als Standard, Wechsel auf
+  Rechts erfolgreich, Verbindung aktiv und keine JavaScript-Warnungen oder
+  -Fehler.
+- Abschlusstest: 324 Tests bestanden; JavaScript-Syntax, Python-Kompilierung
+  und Diff-Prüfung ohne Fehler.
+
+33. VERALTETEN GEOFENCE-SPERRWERT BEIM MISSIONSSTART BEHOBEN
+--------------------------------------------------------------
+- `geofence_ok` gehört immer zur zuletzt aktiv geprüften Mission und Zone.
+  Ein `false` aus einer beendeten Mission wurde bisher im Zustand "Bereit"
+  weiterverwendet und blockierte dadurch auch den Start einer neu ausgewählten,
+  gültigen Zone.
+- Neue Missionen und Zeitpläne ignorieren diesen alten Missionswert. Sobald
+  die Planung akzeptiert wurde, wird er auf "noch nicht geprüft" zurückgesetzt
+  und mit dem nächsten GPS-Zyklus anhand der gewählten Zone sowie der
+  ausgerichteten breitesten Maschinenkante neu berechnet.
+- Beim Fortsetzen einer pausierten Mission bleibt die Prüfung absichtlich
+  streng: Ein aktuelles `geofence_ok=false` verhindert weiterhin das
+  Fortsetzen.
+- Wechsel nach "Bereit" oder "Laden" sowie ein Simulationsreset löschen den
+  nicht mehr gültigen Geofence-Zustand ebenfalls.
+- Laufender Integrationstest: Mission im "Simulationsfeld" startet mit HTTP
+  200, bleibt im Zustand MOWING und liefert in fünf aufeinanderfolgenden
+  Live-Prüfungen `geofence_ok=true`. Anschließend wurde die Simulation wieder
+  auf IDLE mit `geofence_ok=null` zurückgesetzt.
+- Die ältere Zone "Test1" begann an der damaligen Simulations-Resetposition
+  direkt auf ihrer aufgezeichneten Grenzlinie. Dieser Startfall wird durch die
+  in Abschnitt 34 ergänzte sichere, ausgerichtete Resetposition behoben.
+- Browserprüfung: Beide Missionsstart-Schaltflächen im Zustand "Bereit" wieder
+  aktiv; keine JavaScript-Warnungen oder -Fehler.
+- Abschlusstest: 326 Tests bestanden; Python-Kompilierung und Diff-Prüfung ohne
+  Fehler.
+
+34. SICHERER SIMULATIONSSTART UND GEOFENCE-FAHRRESERVE
+--------------------------------------------------------
+- Der bisherige Simulationsursprung lag bei der aufgezeichneten Zone "Test1"
+  exakt auf der Begrenzung. Dadurch begann eine Mission mit einem ungerichteten
+  Anfahrmanöver zur Außenbahn und konnte bereits nach wenigen Sekunden den
+  Geofence auslösen.
+- Start und Reset wählen nun bevorzugt den ersten Punkt der tatsächlich
+  geplanten Außenbahn in der zuletzt aktualisierten Mähzone. Position und Kurs
+  stimmen damit bereits vor Missionsstart mit der Route überein; ein
+  anfälliges Anfahrmanöver entfällt.
+- Auch Teach-In-Ringe mit einer winzigen Überlappung am Schließpunkt werden
+  repariert. Entsteht dabei ein MultiPolygon, wird die dominante Feldfläche
+  verwendet und nicht mehr irrtümlich auf eine ungerichtete Innenposition
+  zurückgefallen.
+- Die breiteste Maschinenkante ist das Geofence-Kollisionskriterium. Die
+  Außenbahn erhält zusätzlich 5 cm physische Spurführungsreserve nach innen;
+  eine getrennte Toleranz von 1 cm fängt ausschließlich RTK-Rauschen ab.
+- Außenbahnen werden mit der konfigurierten Wendegeschwindigkeit gefahren,
+  ohne Messer oder Mähwerke anzuheben. Damit reduziert sich der Regelfehler in
+  engen Randkurven, während die Außenbahn weiter gemäht wird.
+- Für konkave Felder sucht die Planung bei Bedarf bis zu 2 m rückwärts auf der
+  abgeschlossenen Außenbahn nach dem spätesten radiusbegrenzten Übergang zu den
+  Innenbahnen. Ein einzelner ungünstiger Übergabepunkt verwirft dadurch nicht
+  mehr den kompletten Plan.
+- Die berechnete Position bleibt als deterministischer Resetpunkt gespeichert;
+  wiederholte Tests beginnen dadurch immer an derselben sicheren Stelle und
+  mit demselben Kurs.
+- Falls keine Mähzone groß genug für die vollständige Maschine ist, erfolgt
+  keine automatische Verschiebung. Die normale Geofence-Sicherung bleibt dann
+  aktiv und verhindert weiterhin einen physisch unsicheren Start.
+- Reale Prüfung mit "Test1": ausgerichtete Resetposition ungefähr x=-4,18 m /
+  y=2,61 m bei 2,185 rad; Mission startet mit HTTP 200 und bleibt im
+  45-Sekunden-Lauf durch mehrere Randkurven durchgehend im Zustand MOWING mit
+  `geofence_ok=true`.
+- Nach der Prüfung wurde die Simulation wieder auf denselben sicheren Punkt
+  und den Zustand IDLE zurückgesetzt. Browserstatus "Bereit", Verbindung und
+  RTK Fix korrekt; keine JavaScript-Warnungen oder -Fehler.
+- Abschlusstest: 330 Tests bestanden; Python-Kompilierung und Diff-Prüfung ohne
+  Fehler.
+
+35. KONTINUIERLICHES GESCHWINDIGKEITSSIGNAL UND AKTIVES FAHRZIEL
+-----------------------------------------------------------------
+- Die Geschwindigkeit wurde zuvor aus jedem einzelnen Encoderintervall
+  berechnet. Bei 9,4 mm Weg pro Tick entstanden zwischen zwei Impulsen dadurch
+  abwechselnd Nullwerte und zu hohe Momentanwerte, obwohl das Fahrzeug mit
+  konstanter Geschwindigkeit fuhr.
+- Die Odometrie berechnet die Geschwindigkeit jetzt über ein gleitendes
+  0,4-Sekunden-Fenster aus der tatsächlich zurückgelegten Strecke. Das Signal
+  bleibt zwischen Encoderticks kontinuierlich und fällt bei echtem Stillstand
+  innerhalb desselben Fensters kontrolliert auf null.
+- Der Filter läuft serverseitig in der gemeinsamen Produktionspipeline und
+  wirkt damit sowohl für die Simulation als auch für reale Encodersignale.
+- Die Anzeige verwendet zusätzlich eine leichte Nachführung, damit kleine
+  Restschwankungen des GPS-/Odometrie-Filters nicht an der Rundungsgrenze
+  zwischen beispielsweise 0,6 und 0,7 km/h hin- und herschalten. Ein echter
+  Stillstand mit Fahrbefehl null wird weiterhin eindeutig als 0,0 angezeigt.
+- Die Telemetrie enthält nun zusätzlich die wirklich aktive
+  Sollgeschwindigkeit und den Fahrmodus. Die Hauptansicht unterscheidet damit
+  beispielsweise "Außenbahn 0,7 km/h", "Mähbahn", "Wenden", "Rückfahrt",
+  "Gangwechsel" und "Mähwerkwechsel".
+- Die frei gewählte Geschwindigkeit wird im Stillstand eindeutig als
+  "Mähbahn max." bezeichnet. Sie wird nicht mehr fälschlich als aktuelles Ziel
+  angezeigt, während die sichere Wendegeschwindigkeit aktiv ist.
+- Live-Prüfung auf der Außenbahn: Simulationswahrheit konstant 0,70 km/h;
+  Anzeige stabil bei 0,7 km/h statt der früheren Sprünge zwischen 0/0,6 und
+  1,2 km/h. Beim Stoppen fällt das Signal über vier 100-ms-Schritte auf null.
+- Abschlusstest: 333 Tests bestanden; JavaScript-Syntax, Python-Kompilierung
+  und Diff-Prüfung ohne Fehler.

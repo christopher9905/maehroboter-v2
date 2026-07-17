@@ -3,7 +3,7 @@ import struct
 import pytest
 from mower.hal.protocol import (
     CmdType, encode_frame, decode_frame, FrameError,
-    encode_drive, encode_ping, encode_estop, encode_blade,
+    encode_drive, encode_ping, encode_estop, encode_blade, encode_deck_lift,
     decode_sensors, decode_soc, decode_status,
 )
 
@@ -85,6 +85,12 @@ class TestCommandEncoding:
         frame = encode_blade(False)
         _, payload = decode_frame(frame)
         assert payload == b'\x00'
+
+    def test_encode_independent_deck_lift(self):
+        frame = encode_deck_lift(front_raised=True, rear_raised=False)
+        cmd, payload = decode_frame(frame)
+        assert cmd == CmdType.DECK_LIFT
+        assert payload == b'\x01\x00'
 
     def test_encode_estop(self):
         frame = encode_estop()

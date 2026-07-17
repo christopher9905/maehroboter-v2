@@ -1,0 +1,50 @@
+ÄNDERUNGEN – VERBINDUNGSPLANUNG MIT MINDESTWENDERADIUS
+Stand: 16.07.2026
+
+FEHLERBILD
+- Beim Missionsstart erschien teilweise:
+  "Keine Verbindung mit dem eingestellten Mindestwenderadius gefunden"
+- Betroffen waren insbesondere Startpositionen nahe einer Zonenkante.
+
+URSACHE
+- Der bisherige Verbindungsplaner verwendete zunächst einen pauschal nach
+  innen versetzten Bereich für die Hinterachsposition.
+- Eine reale Fahrzeugposition konnte mit kompletter Kontur noch sicher sein,
+  obwohl dieser konservative Mittelpunktbereich die Hinterachse bereits
+  ausgeschlossen hatte.
+- Zusätzlich beeinflusste die aktuelle Startposition den Einstiegspunkt der
+  geschlossenen Außenbahn. Dadurch konnte eine ansonsten gültige Verbindung
+  zwischen Außenbahn und Innenbahnen unnötig unfahrbar werden.
+
+UMSETZUNG
+- Die interne Feldroute wird jetzt unabhängig von der aktuellen
+  Fahrzeugposition geplant.
+- Erst nach einer konsistenten Außen- und Innenbahnplanung wird die Anfahrt
+  vom aktuellen Fahrzeugstandort ergänzt.
+- Für diese Anfahrt ist nun die tatsächlich bewegte Kontur von Traktor,
+  Frontmähwerk und beiden Heckmähwerken die maßgebliche Sicherheitsprüfung.
+- Ein sicherer Randstart darf den vollständigen Feldbereich für die Anfahrt
+  verwenden; jede Kandidatenroute wird weiterhin exakt gegen Geofence und
+  No-Go-Zonen geprüft.
+- Wenn eine sofortige Kurve das Mähwerk über die Grenze schwingen lassen
+  würde, fährt der Planer zunächst ein kurzes gerades Stück in freien Raum.
+- Anschließend beginnt die normale radiusbegrenzte Kurve.
+- Gerade Fahrt hat Krümmung null; der konfigurierte Mindestwenderadius wird
+  daher nicht verkleinert oder umgangen.
+- Die Hybrid-Suche prüft bei Bedarf weitere Fahr- und Rangieralternativen mit
+  der vollständigen Maschinenkontur.
+- Direkte und einfache Staging-Verbindungen werden vor der teureren
+  Rangiersuche geprüft, damit die Planung schnell bleibt.
+- Wenn die Startposition wirklich unsicher ist, erscheint nun die konkrete
+  Meldung, dass Traktor oder Mähwerk über den Geofence beziehungsweise in eine
+  No-Go-Zone ragt und manuell in einen freien Bereich gefahren werden muss.
+
+PRÜFUNG
+- Neuer Regressionstest für einen sicheren Start nahe der Zonenkante.
+- Pfadplaner-, Mindestwenderadius-, Geofence-, Deck- und Rückkehrtests
+  erfolgreich.
+- Mission "Test1" im laufenden Browser erfolgreich gestartet.
+- UI-Zustand wechselte auf "Mähen / Mission aktiv".
+- Erzeugter Plan: Mindestwenderadius 25 cm, Sicherheitsprüfung gültig.
+- Keine Fehler in der Browserkonsole.
+- Simulation nach der Prüfung wieder auf "Bereit" zurückgesetzt.

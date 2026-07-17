@@ -1,0 +1,24 @@
+ÄNDERUNGEN: FIELDS2COVER-RANDABSTAND UND FRONTMÄHWERK
+Stand: 16.07.2026
+
+- Der bisherige große Fields2Cover-Rücksprung über eine diagonale Gesamtbox
+  von Traktor und Anbaugeräten wurde entfernt.
+- Ein schmales, innerhalb der Gesamtmähbreite liegendes Frontmähwerk erzeugt
+  dadurch keinen pauschalen zusätzlichen Randabstand mehr.
+- Die Planung beginnt weiterhin mit der eingestellten tatsächlichen
+  Randreserve von 5 cm an der äußersten seitlichen Maschinenkontur.
+- Falls eine Route nicht passt, wird der Abstand nun in kleinen geometrisch
+  begründeten Schritten erhöht statt direkt auf einen sehr großen Wert zu
+  springen.
+- Jeder Versuch wird weiterhin mit der vollständigen, gedrehten und über die
+  Route geschwenkten Traktor-/Mähwerkskontur geprüft. Eine reale Kollision mit
+  Wand, Geofence oder No-Go-Zone bleibt daher gesperrt.
+- Der Hinweis im Fields2Cover-Einstellungstab beschreibt die neue Logik.
+- UI-Cache auf Version 47 erhöht.
+
+Prüfung:
+- JavaScript- und Python-Syntaxprüfung erfolgreich.
+- 46 Planungs- und Geometrietests bestanden.
+- Laufende Oberfläche neu geladen; neuer Hinweis sichtbar und keine
+  Browser-/JavaScript-Fehler festgestellt.
+

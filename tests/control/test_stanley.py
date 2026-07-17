@@ -29,6 +29,22 @@ class TestStanleyController:
         assert abs(out.heading_error_deg) < 1e-6
         assert abs(out.steering_deg) < 1e-6
 
+    def test_curvature_feedforward_steers_before_tracking_error_exists(self):
+        ctrl = StanleyController()
+        out = ctrl.compute(
+            _pose(0, 0, 0.0),
+            (0.0, 0.0),
+            (1.0, 0.0),
+            path_curvature=2.0,
+            wheelbase_m=0.25,
+        )
+
+        expected = math.degrees(math.atan(0.5))
+        assert out.cross_track_error_m == pytest.approx(0.0)
+        assert out.heading_error_deg == pytest.approx(0.0)
+        assert out.feedforward_deg == pytest.approx(expected)
+        assert out.steering_deg == pytest.approx(expected)
+
     def test_cross_track_right_of_path_steers_left(self):
         """Robot to RIGHT of eastward path → positive cross-track → positive steering (left)."""
         ctrl = StanleyController()

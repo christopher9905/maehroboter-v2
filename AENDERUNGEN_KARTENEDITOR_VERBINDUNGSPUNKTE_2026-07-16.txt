@@ -1,0 +1,27 @@
+ÄNDERUNGEN – VERBINDUNGSLINIEN IM KARTENEDITOR
+Stand: 16.07.2026
+
+FEHLER
+- Im Werkzeug "Verbindung" konnten auf vorhandenen Mähzonen keine Punkte
+  gesetzt werden.
+- Ein Klick auf eine Zone wählte stattdessen immer das Kartenobjekt aus.
+
+UMSETZUNG
+- Die Objektauswahl reagiert auf Kartenklicks nur noch im Werkzeug "Auswahl".
+- In den Werkzeugen "Mähzone", "No-Go", "Verbindung" und "Station" wird ein
+  Klick auf ein vorhandenes Kartenobjekt an das aktive Zeichenwerkzeug
+  weitergegeben.
+- Beim Start eines Zeichenwerkzeugs wird eine bestehende Objektauswahl
+  aufgehoben.
+- Eckpunkt-Griffe vorhandener Objekte werden während des Zeichnens
+  ausgeblendet und können dadurch keine Zeichenklicks mehr abfangen.
+- Frontend- und Service-Worker-Cacheversion wurden erhöht.
+
+PRÜFUNG
+- JavaScript-Syntaxprüfung erfolgreich.
+- Verbindung-Werkzeug im laufenden Karteneditor geprüft.
+- Erster Klick auf vorhandene Mähzone: "1 Punkt gesetzt".
+- Zweiter Klick auf vorhandene Mähzone: "2 Punkte gesetzt".
+- Dabei wurde kein bestehendes Kartenobjekt ausgewählt.
+- Testzeichnung anschließend verworfen; keine Kartendaten gespeichert.
+- Keine Fehler in der Browserkonsole.

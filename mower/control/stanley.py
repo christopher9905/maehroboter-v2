@@ -21,6 +21,7 @@ class StanleyOutput:
     steering_deg: float          # positive = steer LEFT (CCW/math convention)
     heading_error_deg: float
     cross_track_error_m: float   # positive = robot to RIGHT of path
+    feedforward_deg: float       # steering implied by planned path curvature
 
 
 class StanleyController:
@@ -39,6 +40,9 @@ class StanleyController:
         pose: Pose,
         path_start: tuple[float, float],
         path_end: tuple[float, float],
+        *,
+        path_curvature: float = 0.0,
+        wheelbase_m: float = 0.25,
     ) -> StanleyOutput:
         ax, ay = path_start
         bx, by = path_end
@@ -50,6 +54,7 @@ class StanleyController:
                 steering_deg=0.0,
                 heading_error_deg=0.0,
                 cross_track_error_m=0.0,
+                feedforward_deg=0.0,
             )
 
         # Cross-track error: positive = robot is to the RIGHT of path direction
@@ -60,13 +65,21 @@ class StanleyController:
         heading_error = path_heading - pose.heading_rad
         heading_error = (heading_error + math.pi) % (2 * math.pi) - math.pi
 
-        # Stanley formula
+        # Bicycle-model feed-forward plus Stanley feedback. On a planned
+        # radius-bounded arc this supplies the nominal steering immediately;
+        # GPS/IMU errors only add the smaller corrective component.
         speed = max(pose.speed_mps, 0.0)
-        delta = heading_error + math.atan2(self._k * cross_track, speed + self._eps)
+        feedforward = math.atan(max(0.01, wheelbase_m) * path_curvature)
+        delta = (
+            feedforward
+            + heading_error
+            + math.atan2(self._k * cross_track, speed + self._eps)
+        )
         delta = max(-self._max_steering_rad, min(self._max_steering_rad, delta))
 
         return StanleyOutput(
             steering_deg=math.degrees(delta),
             heading_error_deg=math.degrees(heading_error),
             cross_track_error_m=cross_track,
+            feedforward_deg=math.degrees(feedforward),
         )

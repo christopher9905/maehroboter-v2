@@ -1,0 +1,73 @@
+ÄNDERUNGEN BAHNPLANUNG, WENDEN UND MAXIMALE ABDECKUNG
+Stand: 16.07.2026
+
+1. Unnötige Vollkreise verhindert
+- Radiusbegrenzte Verbindungen vergleichen Vorwärts- und Rangierpfade.
+- Dubins-Verbindungen mit nahezu einer Vollumdrehung werden verworfen.
+- Kleine Lenkkorrekturen verwenden einen kurzen, begrenzten Rangierpfad.
+- Die maximale Drehung eines geplanten Wendemanövers wird als Qualitätswert erfasst.
+
+2. Lange Rückwärtsfahrten begrenzt
+- Der Routensucher startet im Vorwärtsgang und bewertet Rückwärtsfahrt deutlich teurer.
+- Ein einzelner Rückwärtsabschnitt darf höchstens 1,0 m lang sein.
+- Der längste Rückwärtszug wird in den Routenmetriken ausgegeben.
+- Ungeeignete native Fields2Cover-Routen werden vor Missionsstart verworfen.
+
+3. Realistischeres Dreipunktwenden
+- Enge Wendungen bestehen aus einer symmetrischen Folge aus Rückwärts-, Vorwärts-
+  und erneutem Rückwärtsbogen mit dem eingestellten Mindestwenderadius.
+- Reicht der Platz direkt am Bahnende nicht, darf das Manöver in den bereits gemähten
+  Vorgewendebereich zurückgesetzt werden.
+- Jede Variante wird mit der vollständigen Traktor-/Mähwerk-Kontur geprüft.
+
+4. Vollständige Innenbahnen trotz Außenbahnen
+- Außenbahnen ersetzen oder löschen keine regulären Innenbahnen mehr.
+- Kleine, geometrisch erreichbare Teilbereiche werden nicht mehr als Optimierung entfernt.
+- Die Länge der Innenbahnen hängt nur von Fahrzeugkontur und Randreserve ab,
+  nicht von der Anzahl der Außenbahnen (1, 2 oder 3).
+- Bereits gemähte Außenbereiche dürfen für Wendungen erneut befahren werden.
+- Die seitliche Bahnposition berücksichtigt weiterhin den real notwendigen Kurvenschwenk
+  des breitesten Mähwerks sowie 3 cm Einlenkstrecke; dies ist keine zusätzliche
+  einstellbare Randreserve.
+
+5. Robustere Bahnreihenfolge
+- Die Richtung benachbarter Bahnen wird explizit abwechselnd gesetzt und nicht mehr
+  von der zufälligen Linienrichtung der Geometriebibliothek abgeleitet.
+- Die Winkelauswahl vermeidet kurze Inselbahnen und unnötige feldweite Verbindungen.
+- Mehrfach zerlegte Restflächen bleiben erhalten, sofern sie fahrbar verbunden werden können.
+
+6. Fields2Cover-Hybrid verbessert
+- Fields2Cover bleibt als nativer auswählbarer Planer aktiv.
+- Die vollständigen Swaths werden mit dem MV2-Traktormodell und dessen realer
+  Mähwerkskontur in einen ausführbaren Pfad umgewandelt.
+- Der Ausgang der Außenbahn wird an die tatsächlich gewählte erste Innenbahn ausgerichtet.
+- Entfernte Restfragmente: 0.
+
+7. Neue Routen-Qualitätsgrenzen
+- Längster einzelner Rückwärtszug: maximal 1,0 m.
+- Maximale aufsummierte Drehung eines Wendemanövers: maximal 285 Grad.
+- Geofence-Prüfung: komplette bewegte Kontur von Traktor, Front- und Heckmähwerken.
+- Abdeckungsprüfung bleibt unabhängig von der Anzahl der Außenbahnen.
+
+8. UI-Hinweis
+- Der Einstellungstext erklärt jetzt, dass Außenbahnen zusätzliche Mäh- und
+  Wendefläche erzeugen und die vollständigen Innenbahnen erhalten bleiben.
+
+PRÜFUNGEN
+- 26/26 Pfad-, Wende- und Fields2Cover-Tests bestanden.
+- 3/3 ausgewählte Runtime-Tests für konkave Felder, gemeinsame Bahnendpunkte
+  und Headland-First-Reihenfolge bestanden.
+- JavaScript-Syntax, Python-Kompilierung und lokaler Browser ohne Fehler geprüft.
+- Gespeicherter Test1-Plan: 0 entfernte Fragmente, längster Rückwärtszug 0,33 m,
+  maximale Drehung 196,1 Grad, vollständige Mähwerk-Geofence-Prüfung bestanden.
+
+BETROFFENE DATEIEN
+- mower/path/tractor_route.py
+- mower/path/boustrophedon.py
+- mower/path/fields2cover_native.py
+- mower/executive/mission_runtime.py
+- mower/api/static/app.js
+- mower/api/static/sw.js
+- tests/path/test_tractor_route.py
+- tests/path/test_fields2cover_native.py
+- tests/executive/test_mission_runtime.py

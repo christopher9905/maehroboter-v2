@@ -24,6 +24,7 @@ class MowerState(Enum):
     IDLE = auto()
     TEACH_IN = auto()
     MOWING = auto()
+    PAUSED = auto()
     OBSTACLE_AVOIDANCE = auto()
     RETURNING = auto()
     DOCKING = auto()
@@ -33,6 +34,7 @@ class MowerState(Enum):
 
 _ACTIVE_STATES = frozenset({
     MowerState.MOWING,
+    MowerState.PAUSED,
     MowerState.OBSTACLE_AVOIDANCE,
     MowerState.RETURNING,
     MowerState.DOCKING,
@@ -46,7 +48,10 @@ class MissionExecutive:
         self._hw = hardware_interface
         self._state = MowerState.IDLE
         self._error_reason: str = ""
+        self._pause_reason: str = ""
+        self._geofence_override_active: bool = False
         self._avoidance_attempts: int = 0
+        self._active_zone_id: Optional[str] = None
         self._obstacle_timer: Optional[threading.Timer] = None
         self._charge_timer: Optional[threading.Timer] = None
         self._lock = threading.Lock()
@@ -62,10 +67,29 @@ class MissionExecutive:
         with self._lock:
             return self._error_reason
 
+    @property
+    def pause_reason(self) -> str:
+        with self._lock:
+            return self._pause_reason
+
+    @property
+    def geofence_override_active(self) -> bool:
+        with self._lock:
+            return self._geofence_override_active
+
+    @property
+    def active_zone_id(self) -> Optional[str]:
+        with self._lock:
+            return self._active_zone_id
+
     def _set_state(self, new_state: MowerState, reason: str = "") -> MowerState:
         old = self._state
         self._state = new_state
         self._error_reason = reason if new_state == MowerState.ERROR else ""
+        if new_state != MowerState.PAUSED:
+            self._pause_reason = ""
+        if new_state != MowerState.MOWING:
+            self._geofence_override_active = False
         return old
 
     def _go_error(self, reason: str) -> MowerState:
@@ -121,28 +145,110 @@ class MissionExecutive:
             old = self._set_state(MowerState.IDLE)
         self._notify(old, MowerState.IDLE)
 
-    def start_mission(self):
+    def start_mission(self, zone_id: Optional[str] = None):
         with self._lock:
-            if self._state != MowerState.IDLE:
+            if self._state not in (MowerState.IDLE, MowerState.CHARGING):
                 return
+            # A confirmed mission may deliberately leave the charging dock.
+            # Cancel the watchdog before switching state so a stale charging
+            # timeout cannot stop the newly started mission.
+            self._cancel_charge_timer()
             self._avoidance_attempts = 0
+            self._geofence_override_active = False
+            self._active_zone_id = zone_id
             old = self._set_state(MowerState.MOWING)
         self._notify(old, MowerState.MOWING)
 
-    def stop_mission(self):
+    def pause_mission(self, reason: str = ""):
         with self._lock:
             if self._state not in (MowerState.MOWING, MowerState.OBSTACLE_AVOIDANCE):
+                return False
+            self._cancel_obstacle_timer()
+            self._pause_reason = str(reason or "")
+            old = self._set_state(MowerState.PAUSED)
+        if self._hw:
+            self._hw.drive(0.0, 0.0)
+        self._hw_blade_off()
+        self._notify(old, MowerState.PAUSED)
+        return True
+
+    def resume_mission(self):
+        with self._lock:
+            if self._state != MowerState.PAUSED:
+                return
+            old = self._set_state(MowerState.MOWING)
+        self._notify(old, MowerState.MOWING)
+
+    def resume_with_geofence_override(self) -> bool:
+        """Acknowledge one active violation and continue until re-entry.
+
+        This deliberately does not reset or bypass the physical ESTOP.  It is
+        only available after the geofence handler produced a soft PAUSED state.
+        The override is automatically re-armed as soon as the complete machine
+        footprint is inside the allowed area again.
+        """
+        with self._lock:
+            if (
+                self._state != MowerState.PAUSED
+                or not self._pause_reason.startswith("Geofence violation")
+            ):
+                return False
+            self._geofence_override_active = True
+            old = self._set_state(MowerState.MOWING)
+        self._notify(old, MowerState.MOWING)
+        return True
+
+    def on_geofence_recovered(self) -> bool:
+        """Re-arm geofence protection after the complete footprint re-enters."""
+        with self._lock:
+            was_active = self._geofence_override_active
+            self._geofence_override_active = False
+        return was_active
+
+    def stop_mission(self):
+        with self._lock:
+            if self._state not in (MowerState.MOWING, MowerState.PAUSED, MowerState.OBSTACLE_AVOIDANCE):
                 return
             self._cancel_obstacle_timer()
             old = self._set_state(MowerState.RETURNING)
         self._hw_blade_off()
         self._notify(old, MowerState.RETURNING)
 
+    def return_to_dock(self):
+        """Explicit operator command to end work and return to the home station."""
+        self.stop_mission()
+
+    def soft_stop(self):
+        """Stop motion without latching the hardware ESTOP.
+
+        Active mowing becomes PAUSED. During Teach-In/manual recovery the state
+        is retained so recording can continue after the operator releases stop.
+        """
+        if self.state in (MowerState.MOWING, MowerState.OBSTACLE_AVOIDANCE):
+            self.pause_mission()
+            return
+        if self._hw:
+            self._hw.drive(0.0, 0.0)
+            self._hw.set_blade(False)
+
+    def emergency_stop(self, reason: str = "Not-Aus durch Bediener"):
+        """Latch ERROR and send the priority ESTOP command."""
+        with self._lock:
+            self._cancel_timers()
+            if self._state == MowerState.ERROR:
+                return
+            old = self._go_error(reason)
+        self._hw_estop()
+        self._notify(old, MowerState.ERROR)
+
     def reset_error(self):
         with self._lock:
             if self._state != MowerState.ERROR:
                 return
             old = self._set_state(MowerState.IDLE)
+            self._active_zone_id = None
+        if self._hw and hasattr(self._hw, "reset_estop"):
+            self._hw.reset_estop()
         self._notify(old, MowerState.IDLE)
 
     def on_lift(self):
@@ -167,14 +273,13 @@ class MissionExecutive:
 
     def on_geofence_violation(self, pose):
         with self._lock:
-            if self._state not in _ACTIVE_STATES:
-                return
-            self._cancel_timers()
-            old = self._go_error(
-                f"Geofence violation at ({pose.utm_x:.2f}, {pose.utm_y:.2f})"
-            )
-        self._hw_estop()
-        self._notify(old, MowerState.ERROR)
+            if self._state not in (MowerState.MOWING, MowerState.OBSTACLE_AVOIDANCE):
+                return False
+            if self._geofence_override_active:
+                return False
+        return self.pause_mission(
+            f"Geofence violation at ({pose.utm_x:.2f}, {pose.utm_y:.2f})"
+        )
 
     def on_obstacle_detected(self, detections):
         do_estop = False
@@ -253,6 +358,7 @@ class MissionExecutive:
                 return
             self._cancel_charge_timer()
             old = self._set_state(MowerState.IDLE)
+            self._active_zone_id = None
         self._notify(old, MowerState.IDLE)
 
     def _charge_timeout(self):

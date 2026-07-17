@@ -47,6 +47,21 @@ async def test_mission_start_from_non_idle_returns_409(app, executive):
     assert resp.status_code == 409
 
 
+async def test_mission_start_from_charging_departs_dock(app, executive):
+    executive.start_mission()
+    executive.stop_mission()
+    executive.on_dock_success()
+    executive.on_charge_started()
+    assert executive.state == MowerState.CHARGING
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        resp = await client.post("/api/mission/start")
+
+    assert resp.status_code == 200
+    assert resp.json()["state"] == "MOWING"
+    assert executive.state == MowerState.MOWING
+
+
 async def test_teach_in_start(app, executive):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         resp = await client.post("/api/teach-in/start")

@@ -17,10 +17,15 @@
 // Charge-contact detect: placeholder pin, no dock circuit built yet
 // (Phase 6 bring-up) — adjust once the charging-station contacts exist.
 #define CHARGE_DETECT_PIN 8
+#define FRONT_DECK_LIFT_PIN 9
+#define REAR_DECK_LIFT_PIN 10
 
 MotorControl motor(MOTOR_DIR_PIN, MOTOR_PWM_PIN);
 ServoControl steering(SERVO_PIN);
 BladeControl blade(BLADE_ESC_PIN);
+// End positions may need inversion/calibration for the installed actuators.
+ServoControl front_deck_lift(FRONT_DECK_LIFT_PIN);
+ServoControl rear_deck_lift(REAR_DECK_LIFT_PIN);
 SensorReader sensors(RAIN_ADC_PIN, LIFT_PIN, ENCODER_PIN_A, CHARGE_DETECT_PIN);
 Watchdog watchdog(500);
 
@@ -58,6 +63,14 @@ void process_command(CmdType cmd, const uint8_t* payload, uint8_t len) {
     case CMD_PING:
       // Watchdog already fed above
       break;
+    case CMD_DECK_LIFT:
+      if (len >= 2) {
+        // Never move a mowing deck while the blade is powered.
+        if (payload[0] || payload[1]) blade.set_on(false);
+        front_deck_lift.set_angle(payload[0] ? 45.0f : -45.0f);
+        rear_deck_lift.set_angle(payload[1] ? 45.0f : -45.0f);
+      }
+      break;
     default:
       break;
   }
@@ -68,6 +81,10 @@ void setup() {
   motor.begin();
   steering.begin();
   blade.begin();
+  front_deck_lift.begin();
+  rear_deck_lift.begin();
+  front_deck_lift.set_angle(-45.0f);
+  rear_deck_lift.set_angle(-45.0f);
   sensors.begin();
   watchdog.reset();
   // Lift interrupt (hardware safety — independent of main loop)

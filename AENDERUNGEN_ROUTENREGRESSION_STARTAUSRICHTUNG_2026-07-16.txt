@@ -1,0 +1,72 @@
+ÄNDERUNGEN – ROUTENREGRESSION UND STARTAUSRICHTUNG
+Stand: 16.07.2026
+
+FEHLERBILD
+- Mit unveränderten Zonen und Einstellungen wurde keine Mission mehr gefunden.
+- Meldung: "Keine Verbindung mit dem eingestellten Mindestwenderadius gefunden".
+- Weil die Planung scheiterte, konnte auch kein gültiger Plan in den neuen
+  Missionsplan-Cache geschrieben werden.
+
+URSACHE
+- Die eigentliche Feld- und Bahnplanung war weiterhin gültig.
+- MV2 und Fields2Cover erzeugten ohne aktuelle Startpose sichere Feldrouten.
+- Der Simulations-Spawn setzte den Traktor auf den Beginn der zunächst
+  erzeugten Außenbahn.
+- Der Missionsplaner richtete diese geschlossene Außenbahn danach erneut auf
+  die erste Innenbahn aus.
+- Dadurch lag der tatsächliche Missionsanfang etwa 4,2 m vom Traktor entfernt.
+- Die Fahrtrichtung unterschied sich um rund 175 Grad.
+- Aus der randnahen Startpose konnte diese künstliche Gegenrichtung nicht mit
+  25 cm Mindestwenderadius und kompletter Mähwerk-Kontur verbunden werden.
+
+BEHEBUNG
+- Spawn-Assistent und Missionsplaner verwenden jetzt dieselbe Planungslogik.
+- Berücksichtigt werden identisch:
+  - reale Mähbreite und Spurabstand,
+  - Traktor- und Mähwerk-Kontur,
+  - Randreserve,
+  - normaler und Mäh-Wenderadius,
+  - Längsüberhang der Mähwerke,
+  - 3-cm-Einlenkstrecke,
+  - automatisch gewählter Bahnwinkel,
+  - ausgerichteter Start der Außenbahn.
+- Die Simulation startet dadurch direkt auf dem tatsächlich ausgeführten
+  ersten Routenabschnitt und in dessen Fahrtrichtung.
+- Eine unnötige Anfahrtsroute oder 180-Grad-Rangiersuche entfällt.
+
+ERGEBNIS AM GESPEICHERTEN SIMULATIONSFELD
+- Erste Neuplanung mit unveränderten Einstellungen erfolgreich.
+- Planungszeit: 19,51 s.
+- Status danach: MOWING.
+- Wegpunkte: 13.287.
+- Zusätzliche Anfahrtswegpunkte: 0.
+- Staging-/Rangieranfahrt: false.
+- Geofence-Prüfung: bestanden.
+- Eingestellte Tracking-Reserve: bestanden.
+- Plan wurde persistent gespeichert.
+
+CACHE-NACHWEIS
+- Server nach erfolgreicher Erstplanung komplett neu gestartet.
+- Zweiter Start derselben Zone: 0,332 s.
+- plan_cache_hit: true.
+- Status danach: MOWING.
+
+FEHLERABGRENZUNG
+- Der Cache war nicht die Ursache der fehlenden Route.
+- Fehlgeschlagene Pläne wurden korrekt nicht gespeichert.
+- Nach Wiederherstellung einer gültigen Startausrichtung funktioniert der
+  Cache wie vorgesehen.
+
+TESTS
+- 25 relevante Spawn-, Pfad-, Cache-, Persistenz- und API-Tests bestanden.
+- Zusätzlicher Regressionstest koppelt den Produktions-Spawn an den vom
+  Missionsplaner verwendeten Außenbahnstart.
+- Echter API-Erststart und Cache-Start nach Serverneustart erfolgreich.
+- Lokale UI: verbunden, bereit zum Starten, keine Browserfehler.
+
+BETROFFENE DATEIEN
+- mower/simulation/spawn.py
+- mower/executive/mission_runtime.py
+- mower/path/tractor_route.py
+- tests/simulation/test_spawn.py
+- tests/executive/test_mission_runtime.py

@@ -1,0 +1,35 @@
+ÄNDERUNGEN – EIGENE BESTÄTIGUNGSDIALOGE
+Stand: 16.07.2026
+
+- Nativen Browser-Dialog beim Missionsstart entfernt.
+- Eigene Zonenauswahl für den Missionsstart eingebaut.
+- Eigene Missionsbestätigung mit Zonenname und eindeutigem Start-Button eingebaut.
+- Dialoge an das bestehende dunkle UI-Design angepasst.
+- Mobile Darstellung als Bottom-Sheet für kleine Displays umgesetzt.
+- Varianten für normale, informative, erfolgreiche und gefährliche Aktionen ergänzt.
+- Tastaturbedienung ergänzt: Enter bestätigt, Escape bricht ab.
+- Fokus wird nach dem Schließen zum auslösenden Bedienelement zurückgesetzt.
+- Native confirm-, prompt- und alert-Dialoge vollständig aus dem Frontend entfernt.
+- Folgende Aktionen auf den neuen Dialog umgestellt:
+  - Mission starten und Zone auswählen
+  - Zur Ladestation zurückkehren
+  - Not-Aus auslösen
+  - Fehler zurücksetzen
+  - Ladestation speichern
+  - Zonen, Zeitpläne und Kartenobjekte löschen
+  - Ungespeicherte Kartenänderungen verwerfen
+  - Teach-In ab aktueller Position fortsetzen
+  - Doppelten Teach-In-Zonennamen bestätigen
+  - Kalibrierung und Hardwaretest starten
+  - Firmwaredatei bereitstellen
+  - Messer im manuellen Diagnosebetrieb einschalten
+- Kalibrierungsschritte werden nun ebenfalls in einem App-Dialog angezeigt.
+- Frontend-Cache-Version erhöht, damit Browser und Service Worker die neue Oberfläche laden.
+
+PRÜFUNG
+- JavaScript-Syntaxprüfung erfolgreich.
+- Keine nativen Browserdialoge mehr im Quellcode gefunden.
+- Missionsablauf mit zwei Mähzonen im laufenden Browser geprüft.
+- Abbrechen lässt den Zustand auf „Bereit“ und startet keine Mission.
+- Mobile Ansicht bei 390 x 844 Pixeln ohne horizontalen Überlauf geprüft.
+- Keine Fehler in der Browserkonsole.

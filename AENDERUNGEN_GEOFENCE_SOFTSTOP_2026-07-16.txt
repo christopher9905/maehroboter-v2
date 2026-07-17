@@ -1,0 +1,44 @@
+ÄNDERUNGEN: GEOFENCE-SOFT-STOP UND BEWUSSTES WEITERFAHREN
+Stand: 16.07.2026
+
+1. Verhalten bei einer Geofence-Verletzung
+- Eine Geofence-Verletzung löst keinen verriegelten Hardware-NOT-AUS mehr aus.
+- Die Mission wechselt stattdessen in den Zustand PAUSIERT.
+- Fahrantrieb wird sofort auf 0 gesetzt.
+- Front- und Heckmähwerk beziehungsweise die Messer werden ausgeschaltet.
+- Die Ursache der Pause wird als Geofence-Verletzung gespeichert und im UI angezeigt.
+- Der echte NOT-AUS bleibt für den Bediener und andere kritische Sicherheitszustände unverändert erhalten.
+
+2. Fehler bewusst ignorieren und weiterfahren
+- Bei einer aktiven Geofence-Verletzung erscheint anstelle des normalen Fortsetzen-Buttons die Aktion „Verletzung ignorieren“.
+- Vor dem Weiterfahren erscheint ein deutlicher Bestätigungsdialog mit Gefahrenhinweis.
+- Erst nach der ausdrücklichen Bestätigung setzt das System die Mission fort.
+- Das Weiterfahren entriegelt keinen Hardware-NOT-AUS und umgeht ausschließlich die aktuelle Geofence-Prüfung.
+- Die Ausnahme ist in Status, Telemetrie und Diagnose als aktiv erkennbar.
+
+3. Automatisches Wiederaktivieren des Schutzes
+- Die Geofence-Ausnahme gilt nur, solange der breiteste Fahrzeug-/Mähwerk-Footprint außerhalb der erlaubten Fläche liegt.
+- Sobald der komplette Footprint wieder innerhalb der erlaubten Fläche liegt, wird die Ausnahme automatisch beendet.
+- Danach ist die normale Geofence-Überwachung sofort wieder aktiv.
+- Eine spätere erneute Grenzverletzung führt erneut zu einem Soft-Stop und muss wieder ausdrücklich bestätigt werden.
+
+4. Protokollierung
+- Der Geofence-Soft-Stop wird mit Ursache und Position als Sicherheitsereignis protokolliert.
+- Das bewusste Ignorieren wird als kritisches Ereignis im Ereignislog gespeichert.
+- Auch die automatische Reaktivierung der Geofence-Überwachung wird protokolliert.
+
+5. API- und UI-Erweiterungen
+- Neuer bestätigungspflichtiger API-Befehl:
+  POST /api/mission/resume-geofence-override
+- Status- und Telemetriedaten enthalten nun:
+  pause_reason
+  geofence_override_active
+- Der normale Fortsetzen-Befehl bleibt gesperrt, solange die Geofence-Prüfung negativ ist.
+- Der spezielle Override-Befehl ist nur bei einem echten, quittierbaren Geofence-Stopp verfügbar.
+
+6. Prüfung
+- JavaScript-Syntaxprüfung erfolgreich.
+- Python-Syntaxprüfung erfolgreich.
+- Automatische Executive- und API-Tests: 47 bestanden.
+- Oberfläche unter http://127.0.0.1:8090/ geprüft: Backend verbunden, keine Browser-/JavaScript-Fehler.
+

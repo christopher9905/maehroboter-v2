@@ -10,6 +10,7 @@ enum CmdType : uint8_t {
   CMD_BLADE   = 0x02,
   CMD_ESTOP   = 0x03,
   CMD_PING    = 0x04,
+  CMD_DECK_LIFT = 0x05,
   // Telemetry (Teensy → RPi)
   CMD_SENSORS = 0x10,
   CMD_SOC     = 0x11,

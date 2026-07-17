@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-state="IDLE" data-connection="connecting">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
@@ -55,12 +55,16 @@
 }
 [data-state="IDLE"]               { --sc:#3FC66B; --sc-lt:rgba(63,198,107,.16); --sc-gl:rgba(63,198,107,.16); }
 [data-state="MOWING"]             { --sc:#FFAA01; --sc-lt:rgba(255,170,1,.16);  --sc-gl:rgba(255,170,1,.18);  }
+[data-state="PAUSED"]             { --sc:#FFC658; --sc-lt:rgba(255,198,88,.16);  --sc-gl:rgba(255,198,88,.16);  }
 [data-state="OBSTACLE_AVOIDANCE"] { --sc:#FFB020; --sc-lt:rgba(255,176,32,.16); --sc-gl:rgba(255,176,32,.16); }
 [data-state="RETURNING"]          { --sc:#5B8DF6; --sc-lt:rgba(91,141,246,.16); --sc-gl:rgba(91,141,246,.16); }
 [data-state="DOCKING"]            { --sc:#3FB6E0; --sc-lt:rgba(63,182,224,.16); --sc-gl:rgba(63,182,224,.16); }
 [data-state="CHARGING"]           { --sc:#FFB020; --sc-lt:rgba(255,176,32,.16); --sc-gl:rgba(255,176,32,.16); }
 [data-state="TEACH_IN"]           { --sc:#A784F2; --sc-lt:rgba(167,132,242,.16); --sc-gl:rgba(167,132,242,.16);}
 [data-state="ERROR"]              { --sc:#F2565B; --sc-lt:rgba(242,86,91,.16);  --sc-gl:rgba(242,86,91,.16);  }
+[data-connection="offline"]       { --sc:#F2565B; --sc-lt:rgba(242,86,91,.16);  --sc-gl:rgba(242,86,91,.16);  }
+[data-connection="stale"]         { --sc:#FFC658; --sc-lt:rgba(255,198,88,.16); --sc-gl:rgba(255,198,88,.16); }
+[data-connection="connecting"]    { --sc:#6C7686; --sc-lt:rgba(108,118,134,.16);--sc-gl:rgba(108,118,134,.16); }
 
 /* ═══════════════════════════════════════════════════════════════
    RESET
@@ -717,6 +721,9 @@ input,select { font:inherit; }
   border-radius:var(--r);
   overflow:hidden;
 }
+.planner-native-status{margin:10px 16px 2px;padding:9px 11px;border-radius:10px;background:var(--blue-lt);color:#8db2ff;font-size:11px;font-weight:700}
+.planner-native-status.available{background:var(--green-lt);color:var(--green)}
+.planner-native-status.unavailable{background:var(--red-lt);color:#ff8b8f}
 .settings-row {
   display:flex; align-items:center; gap:12px;
   padding:14px 16px;
@@ -841,8 +848,8 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
 .map-float {
   position:fixed;
   right:16px; top:16px;
-  z-index:10;
-  display:flex; flex-direction:column; gap:6px;
+  z-index:700;
+  display:flex; flex-direction:column; align-items:flex-end; gap:6px;
 }
 .map-fab {
   width:40px; height:40px;
@@ -856,21 +863,31 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
 .map-fab:hover { background:var(--sc); color:#fff; box-shadow:0 4px 12px var(--sc-gl); }
 .map-fab svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 
-/* Robot map marker */
-.robot-marker { position:relative; width:28px; height:28px; }
-.robot-marker-ring {
-  position:absolute; inset:0; border-radius:50%;
-  background:var(--sc,#16A34A); opacity:.2;
-  animation:marker-ring 2s ease-out infinite;
+/* Scale-aware top-down tractor marker. The 160 px container stays fixed so
+   Leaflet's anchor does not jump while zooming; only the image scales. */
+.map-tractor-marker{ position:relative; width:160px; height:160px; pointer-events:none; }
+.smooth-tractor-icon{ transition:transform .1s linear; will-change:transform; }
+.map-tractor-img{
+  position:absolute; left:50%; top:50%;
+  width:var(--tractor-size,32px); height:var(--tractor-size,32px);
+  transform:translate(-50%,-50%) rotate(var(--tractor-heading,180deg));
+  transform-origin:50% 50%;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.72));
+  transition:width .15s ease,height .15s ease,transform .1s linear;
 }
-.robot-marker-body {
-  position:absolute; inset:6px;
-  background:var(--sc,#16A34A);
-  border:2.5px solid #fff;
-  border-radius:50%;
-  box-shadow:0 2px 8px rgba(0,0,0,0.25);
+
+.map-legend{
+  position:fixed; right:26px; bottom:88px; z-index:650;
+  display:grid; grid-template-columns:auto auto; gap:5px 10px;
+  padding:8px 10px; border:1px solid var(--bd); border-radius:10px;
+  background:color-mix(in srgb,var(--sf) 88%,transparent); box-shadow:var(--sh-md);
+  color:var(--text2); font-size:10px; backdrop-filter:blur(8px); pointer-events:none;
 }
-@keyframes marker-ring { 0%{transform:scale(.8);opacity:.4;} 100%{transform:scale(2.2);opacity:0;} }
+.map-legend-item{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.map-legend-line{width:20px;height:3px;border-radius:3px;background:var(--legend-color)}
+.map-legend-line.turn{height:0;border-top:2px dashed var(--legend-color);background:none}
+.map-legend-line.swath{height:7px;opacity:.35}
+@media(max-width:600px){.map-legend{right:14px;bottom:82px;grid-template-columns:auto;padding:7px 8px}}
 
 /* ═══════════════════════════════════════════════════════════════
    OVERLAYS (modals, wizard)
@@ -896,6 +913,86 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
   overflow:hidden;
 }
 .overlay.open .modal-sheet { transform:translateY(0); }
+.app-dialog-overlay {
+  z-index:2400;
+  align-items:center;
+  padding:18px;
+  background:rgba(4,8,13,.76);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.app-dialog-card {
+  width:min(430px,100%);
+  max-height:min(680px,calc(100dvh - 36px));
+  overflow:auto;
+  padding:22px;
+  border:1px solid var(--border2);
+  border-radius:22px;
+  background:linear-gradient(150deg,var(--sf2),var(--sf));
+  box-shadow:0 28px 90px rgba(0,0,0,.65);
+  transform:translateY(12px) scale(.97);
+  transition:transform .24s var(--spring);
+}
+.app-dialog-overlay.open .app-dialog-card { transform:none; }
+.app-dialog-head { display:flex; align-items:flex-start; gap:14px; }
+.app-dialog-icon {
+  width:44px; height:44px; flex:0 0 44px;
+  display:grid; place-items:center;
+  border-radius:14px;
+  background:var(--amber-lt); color:var(--amber-soft);
+  font-size:22px; font-weight:900;
+}
+.app-dialog-overlay[data-tone="danger"] .app-dialog-icon { background:var(--red-lt); color:#ff7c80; }
+.app-dialog-overlay[data-tone="success"] .app-dialog-icon { background:var(--green-lt); color:var(--green); }
+.app-dialog-overlay[data-tone="info"] .app-dialog-icon { background:var(--blue-lt); color:#76a3ff; }
+.app-dialog-copy { min-width:0; padding-top:2px; }
+.app-dialog-title { font:750 21px/1.2 'Bricolage Grotesque',sans-serif; color:var(--text); }
+.app-dialog-message { margin-top:7px; color:var(--text2); font-size:13px; line-height:1.55; white-space:pre-line; }
+.app-dialog-choices { display:grid; gap:8px; margin-top:18px; }
+.app-dialog-choice {
+  display:flex; align-items:center; gap:11px;
+  width:100%; padding:12px 13px;
+  border:1px solid var(--border2); border-radius:12px;
+  background:var(--sf3); text-align:left;
+  transition:border-color .16s,background .16s,transform .16s;
+}
+.app-dialog-choice:hover { border-color:rgba(255,170,1,.55); transform:translateY(-1px); }
+.app-dialog-choice.selected { border-color:var(--amber); background:var(--amber-lt); }
+.app-dialog-choice-dot { width:10px; height:10px; flex:0 0 10px; border-radius:50%; background:var(--text3); box-shadow:0 0 0 4px rgba(255,255,255,.04); }
+.app-dialog-choice.selected .app-dialog-choice-dot { background:var(--amber); box-shadow:0 0 0 4px var(--amber-lt); }
+.app-dialog-choice-copy { min-width:0; display:grid; gap:2px; }
+.app-dialog-choice-copy strong { font-size:13px; color:var(--text); }
+.app-dialog-choice-copy small { font-size:11px; color:var(--text3); }
+.app-dialog-actions { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:22px; }
+.app-dialog-button { min-height:46px; padding:10px 14px; border-radius:12px; font-size:13px; font-weight:800; }
+.app-dialog-cancel { background:var(--sf3); color:var(--text2); border:1px solid var(--border); }
+.app-dialog-confirm { background:var(--amber); color:#251700; }
+.app-dialog-overlay[data-tone="danger"] .app-dialog-confirm { background:var(--red); color:#fff; }
+.app-dialog-overlay[data-tone="success"] .app-dialog-confirm { background:var(--green); color:#071a0e; }
+.app-dialog-confirm:disabled { opacity:.38; cursor:not-allowed; }
+.mission-planning-overlay {
+  position:fixed; inset:0; z-index:750; display:none; place-items:center;
+  padding:20px; background:rgba(5,12,10,.66); backdrop-filter:blur(7px);
+}
+.mission-planning-overlay.open { display:grid; }
+.mission-planning-card {
+  width:min(420px,calc(100vw - 28px)); padding:24px; border-radius:22px;
+  background:var(--sf2); border:1px solid var(--border); box-shadow:0 24px 70px rgba(0,0,0,.42);
+  display:grid; grid-template-columns:46px 1fr; gap:16px; align-items:center;
+}
+.mission-planning-spinner {
+  width:42px; height:42px; border-radius:50%; border:4px solid rgba(63,198,107,.18);
+  border-top-color:var(--green); animation:mission-planning-spin .8s linear infinite;
+}
+.mission-planning-copy strong { display:block; color:var(--text); font-size:17px; line-height:1.2; }
+.mission-planning-copy span { display:block; margin-top:7px; color:var(--text2); font-size:12px; line-height:1.5; }
+@keyframes mission-planning-spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion:reduce) { .mission-planning-spinner { animation-duration:1.8s; } }
+@media(max-width:480px){
+  .app-dialog-overlay{padding:12px;align-items:flex-end}
+  .app-dialog-card{width:100%;padding:18px;border-radius:20px 20px 14px 14px;max-height:calc(100dvh - 24px)}
+  .app-dialog-actions{grid-template-columns:1fr}.app-dialog-confirm{grid-row:1}.app-dialog-cancel{grid-row:2}
+}
 .modal-handle {
   width:40px; height:4px; border-radius:2px;
   background:var(--border2);
@@ -1019,6 +1116,66 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
 }
 .modal-input:focus { border-color:var(--sc); }
 
+/* Full map editor: independent Leaflet canvas so it remains usable on mobile. */
+.section-actions{display:flex;align-items:center;gap:6px}
+.map-edit-action{color:#79beff}
+.map-editor-overlay{z-index:1800;align-items:center;padding:18px;background:rgba(5,9,14,.78);backdrop-filter:blur(10px)}
+.map-editor-sheet{
+  width:min(1180px,100%);height:min(820px,calc(100vh - 36px));display:flex;flex-direction:column;
+  overflow:hidden;border:1px solid var(--border2);border-radius:22px;background:var(--sf);box-shadow:0 26px 90px rgba(0,0,0,.62);
+  transform:translateY(18px) scale(.985);transition:transform .25s var(--ease);
+}
+.map-editor-overlay.open .map-editor-sheet{transform:none}
+.map-editor-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+.map-editor-subtitle{margin-top:3px;color:var(--text3);font-size:12px}
+.map-editor-layout{display:grid;grid-template-columns:minmax(0,1fr) 328px;flex:1;min-height:0}
+.map-editor-canvas-wrap{position:relative;min-width:0;overflow:hidden;background:#101820}
+#map-editor-map{position:absolute;inset:0;z-index:1}
+.map-editor-map-hint{position:absolute;top:12px;left:50%;z-index:550;transform:translateX(-50%);max-width:calc(100% - 28px);padding:8px 12px;border:1px solid rgba(255,255,255,.15);border-radius:9px;background:rgba(13,20,29,.9);color:#eef7ff;font-size:12px;font-weight:600;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.35);pointer-events:none}
+.map-editor-zoom-note{position:absolute;left:12px;bottom:12px;z-index:550;padding:6px 9px;border-radius:8px;background:rgba(13,20,29,.8);color:#c5d0dc;font-size:10px;pointer-events:none}
+.map-editor-panel{min-height:0;overflow:auto;padding:14px;border-left:1px solid var(--border);background:var(--sf);scrollbar-width:thin}
+.map-editor-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:12px}
+.map-editor-tool{min-width:0;padding:8px 3px 7px;border:1px solid var(--border2);border-radius:9px;background:var(--sf2);color:var(--text3);font-size:9px;transition:.16s}
+.map-editor-tool b{display:block;margin-bottom:3px;color:var(--text2);font-size:18px;font-weight:500;line-height:1}
+.map-editor-tool:hover,.map-editor-tool.active{border-color:#45a8ff;background:rgba(69,168,255,.14);color:#91caff}
+.map-editor-tool.danger.active{border-color:var(--red);background:var(--red-lt);color:#ff9296}
+.map-editor-tool.link.active{border-color:#5baeff;background:rgba(69,168,255,.16)}
+.map-editor-tool.dock.active{border-color:var(--amber);background:rgba(255,179,0,.14);color:var(--amber-soft)}
+.map-editor-draw-actions{display:grid;grid-template-columns:1fr 1.2fr;gap:6px;margin-bottom:12px;padding:9px;border:1px solid rgba(69,168,255,.25);border-radius:10px;background:rgba(69,168,255,.08)}
+.map-editor-draw-actions button{padding:8px;border-radius:8px;background:var(--sf3);color:var(--text2);font-size:11px;font-weight:600}
+.map-editor-draw-actions button.primary{background:#2389e8;color:white}.map-editor-draw-actions button:last-child{grid-column:1/-1}
+.map-editor-object-form{padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--sf2);margin-bottom:12px}
+.map-editor-form-title{display:flex;gap:8px;align-items:center;margin-bottom:12px;color:var(--text);font-weight:700}
+.map-editor-object-form .modal-field-label{margin-top:11px;margin-bottom:5px}
+.map-editor-object-form .modal-input,.map-editor-object-form .modal-select{padding:9px 10px;font-size:13px}
+.map-editor-unit-input{display:flex;align-items:center;border:1px solid var(--border2);border-radius:9px;background:var(--sf)}
+.map-editor-unit-input input{min-width:0;flex:1;padding:9px 10px;border:0;outline:0;background:transparent;color:var(--text);font-size:13px}
+.map-editor-unit-input span{padding-right:10px;color:var(--text3);font-size:11px}
+.map-editor-check{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--text2);font-size:12px}
+.map-editor-form-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:13px}.map-editor-form-actions .wiz-btn{padding:9px;font-size:11px}.map-editor-form-actions .wiz-btn-danger{grid-column:1/-1}
+.map-editor-topology{margin:10px 0;padding:9px 10px;border-left:3px solid var(--green);border-radius:7px;background:rgba(63,198,107,.08);color:var(--text2);font-size:11px;line-height:1.45}
+.map-editor-topology.warning{border-left-color:var(--amber);background:rgba(255,179,0,.08)}
+.map-editor-list-head{display:flex;align-items:center;justify-content:space-between;margin:14px 1px 7px;color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}.map-editor-list-head button{color:#79beff;font-size:10px}
+.map-editor-object-list{display:flex;flex-direction:column;gap:5px}
+.map-editor-list-item{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 9px;border:1px solid var(--border);border-radius:9px;background:var(--sf2);color:var(--text2);text-align:left}
+.map-editor-list-item:hover,.map-editor-list-item.active{border-color:#45a8ff;background:rgba(69,168,255,.09)}
+.map-editor-list-dot{width:8px;height:8px;border-radius:50%;background:var(--object-color)}
+.map-editor-list-item strong{display:block;overflow:hidden;text-overflow:ellipsis;color:var(--text);font-size:12px;white-space:nowrap}.map-editor-list-item small{color:var(--text3);font-size:9px}.map-editor-list-item em{font-style:normal;color:var(--text3);font-size:13px}
+.map-editor-vertex{width:13px!important;height:13px!important;margin:-7px 0 0 -7px!important;border:2px solid white;border-radius:50%;background:#2389e8;box-shadow:0 2px 8px rgba(0,0,0,.65)}
+.map-editor-draft-vertex{width:9px!important;height:9px!important;margin:-5px 0 0 -5px!important;border:2px solid #fff;border-radius:50%;background:#ffb300}
+.map-editor-home-icon{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:2px solid white;border-radius:10px;background:#f0a11f;color:#1b1403;font-size:24px;box-shadow:0 3px 10px rgba(0,0,0,.5)}
+
+@media(max-width:760px){
+  .map-editor-overlay{padding:0;align-items:stretch}
+  .map-editor-sheet{width:100%;height:100dvh;max-height:none;border:0;border-radius:0}
+  .map-editor-header{padding:11px 12px}.map-editor-subtitle{display:none}
+  .map-editor-layout{grid-template-columns:1fr;grid-template-rows:minmax(300px,55dvh) minmax(0,1fr)}
+  .map-editor-panel{border-left:0;border-top:1px solid var(--border);padding:10px 10px 22px}
+  .map-editor-tools{position:sticky;top:-10px;z-index:20;padding:8px 0;background:var(--sf)}
+  .map-editor-map-hint{top:8px;font-size:10px}.map-editor-zoom-note{display:none}
+  .map-editor-object-form{padding:10px}.section-actions{gap:4px}
+}
+
 /* ═══════════════════════════════════════════════════════════════
    TOASTS
 ═══════════════════════════════════════════════════════════════ */
@@ -1067,6 +1224,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform:scale(1.15); }
 /* ═══════════════════════════════════════════════════════════════
    DARK THEME · FLOATING PILL NAV · GRAPHIC CONTROLS  (overrides)
 ═══════════════════════════════════════════════════════════════ */
+.hidden{ display:none!important; }
 .visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
 
 /* Sidebar = darkest layer so cards float above it */
@@ -1253,6 +1411,7 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
 .speed-viz span{ flex:1; height:9px; border-radius:4px; background:var(--sf3); transition:height .2s var(--spring), background .2s; }
 .speed-viz span.on{ background:var(--green); }
 .speed-viz span.on:nth-child(2){ height:13px; }
+
 .speed-viz span.on:nth-child(3){ height:17px; }
 .speed-viz span.on:nth-child(4){ height:21px; background:#FFC24D; }   /* warnt: schnell */
 .speed-viz span.on:nth-child(5){ height:26px; background:var(--red); } /* zu schnell */
@@ -1288,7 +1447,7 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
 .slider-head{ margin-bottom:2px; }
 .rng{ position:relative; height:48px; margin-top:2px; }
 .rng-track{ position:absolute; left:0; right:0; bottom:11px; height:8px; border-radius:6px; background:var(--sf3); overflow:hidden; }
-.rng-fill{ position:absolute; left:0; top:0; bottom:0; width:var(--pct,50%); background:linear-gradient(90deg,var(--amber-soft),var(--amber)); border-radius:6px; transition:width .12s var(--ease); }
+.rng-fill{ position:absolute; left:0; top:0; bottom:0; width:var(--pct,50%); background:linear-gradient(90deg,var(--amber-soft),var(--amber)); border-radius:6px; transition:none; }
 .rng input[type="range"]{
   position:absolute; left:0; right:0; bottom:5px; width:100%; height:20px; margin:0;
   -webkit-appearance:none; appearance:none; background:transparent; cursor:pointer;
@@ -1303,7 +1462,7 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
   background:var(--amber); color:#231600;
   font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700;
   padding:3px 9px; border-radius:8px; white-space:nowrap; pointer-events:none;
-  box-shadow:0 3px 9px rgba(0,0,0,.4); transition:left .12s var(--ease);
+  box-shadow:0 3px 9px rgba(0,0,0,.4); transition:none;
 }
 .rng-bubble::after{ content:''; position:absolute; left:50%; bottom:-4px; transform:translateX(-50%); border:4px solid transparent; border-top-color:var(--amber); }
 
@@ -1324,6 +1483,150 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
 .sc-btn{ width:42px; height:42px; border-radius:13px; background:var(--sf3); color:var(--text); font-size:24px; font-weight:500; line-height:1; display:flex; align-items:center; justify-content:center; transition:all .15s; }
 .sc-btn:hover{ background:var(--sc); color:#12161d; }
 .sc-btn:active{ transform:scale(.9); }
+
+/* ═══ Operational controls, diagnostics and responsive repair ═══ */
+.connection-banner{ position:fixed; top:10px; left:calc(var(--sidebar) + 16px); z-index:900; display:none; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; background:#3a2024; border:1px solid rgba(242,86,91,.4); color:#ffb4b7; font-size:13px; box-shadow:var(--sh-md); }
+.connection-banner.show{ display:flex; }
+.connection-banner button{ color:#fff; text-decoration:underline; font-weight:700; }
+.command-dock{ position:fixed; right:18px; bottom:18px; z-index:800; display:flex; gap:8px; padding:8px; border:1px solid var(--border2); border-radius:18px; background:rgba(24,28,37,.92); backdrop-filter:blur(16px); box-shadow:var(--sh-md); }
+.command-btn{ min-height:46px; padding:0 16px; border-radius:12px; background:var(--sf3); font-size:13px; font-weight:800; display:flex; align-items:center; gap:7px; }
+.command-btn.soft{ color:#ffc658; }
+.command-btn.home{ color:#87adff; }
+.command-btn.estop{ background:#c92a31; color:#fff; font-size:14px; }
+.command-btn:disabled,.ha-btn:disabled,.sc-btn:disabled,.zone-play:disabled,.section-action:disabled,.danger-row:disabled{ opacity:.38; cursor:not-allowed; transform:none; }
+.gps-map-badge{ background:rgba(24,28,37,.9); color:#fff; border:1px solid rgba(255,255,255,.15); border-radius:10px; padding:7px 10px; font:700 12px Figtree,sans-serif; box-shadow:var(--sh); }
+.map-float .gps-map-badge{ margin:0 0 2px; pointer-events:none; white-space:nowrap; }
+.gps-map-badge.fix{ color:#61df87; }.gps-map-badge.float{ color:#ffc658; }.gps-map-badge.none{ color:#ff7c80; }
+.leaflet-bottom.leaflet-right{ bottom:0; right:0; }
+.leaflet-control-attribution{ margin:0!important; padding:1px 4px!important; background:rgba(24,28,37,.72)!important; color:rgba(255,255,255,.72)!important; font-size:10px!important; }
+.leaflet-control-zoom.leaflet-bar{
+  display:flex; flex-direction:column; gap:6px;
+  margin-left:16px; margin-bottom:10px;
+  border:0; background:transparent; box-shadow:none;
+}
+.leaflet-control-zoom.leaflet-bar a,
+.leaflet-control-zoom.leaflet-bar a:first-child,
+.leaflet-control-zoom.leaflet-bar a:last-child{
+  width:40px; height:40px; line-height:38px;
+  border:1px solid var(--border)!important; border-radius:10px!important;
+  background:var(--sf); color:var(--text2);
+  box-shadow:var(--sh-md);
+  font:600 22px/38px 'Figtree',sans-serif;
+  transition:background .2s,color .2s,transform .15s,box-shadow .2s;
+}
+.leaflet-control-zoom.leaflet-bar a:hover,
+.leaflet-control-zoom.leaflet-bar a:focus-visible{
+  background:var(--sc); color:#12161d; box-shadow:0 4px 12px var(--sc-gl);
+}
+.leaflet-control-zoom.leaflet-bar a:active{ transform:scale(.92); }
+.leaflet-control-zoom.leaflet-bar a.leaflet-disabled{ opacity:.38; background:var(--sf); color:var(--text3); cursor:not-allowed; }
+.map-follow-on{ background:var(--sc)!important; color:#12161d!important; }
+.diagnostic-manual-card{ padding:15px; border:1px solid var(--border2); border-radius:18px; background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012)); box-shadow:var(--sh); }
+.diagnostic-manual-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:5px; }
+.diagnostic-manual-head strong{ font-size:14px; }.diagnostic-manual-state{ padding:5px 8px; border-radius:8px; background:var(--sf3); color:var(--text3); font-size:10px; font-weight:800; white-space:nowrap; }.diagnostic-manual-state.ready{ background:var(--green-lt); color:var(--green); }
+.diagnostic-joystick-wrap{ display:grid; place-items:center; }
+.diagnostic-joystick-wrap .teach-joystick{ width:180px; height:180px; flex-basis:180px; margin:10px auto 8px; }
+.diagnostic-limits{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+.diagnostic-limit{ padding:9px 10px; border-radius:11px; background:var(--sf3); }
+.diagnostic-limit label{ display:flex; justify-content:space-between; gap:8px; color:var(--text3); font-size:10px; font-weight:700; }.diagnostic-limit b{ color:var(--text); font-family:'JetBrains Mono',monospace; }
+.diagnostic-limit input{ width:100%; margin-top:7px; accent-color:var(--amber); }
+.implement-controls{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+.implement-btn{ min-height:48px; padding:8px 10px; border:1px solid var(--border); border-radius:12px; background:var(--sf3); color:var(--text2); font-size:11px; font-weight:800; line-height:1.2; }
+.implement-btn.active{ border-color:rgba(72,169,255,.55); background:rgba(72,169,255,.14); color:#8bc7ff; }.implement-btn.blade.active{ border-color:rgba(245,189,62,.58); background:var(--amber-lt); color:var(--amber-soft); }.implement-btn.stop{ border-color:rgba(242,86,91,.35); background:var(--red-lt); color:#ff8c90; }
+.implement-btn:disabled{ opacity:.38; cursor:not-allowed; }
+.diag-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.diag-card{ padding:13px; border-radius:13px; background:var(--sf); border:1px solid var(--border); min-width:0; }
+.diag-label{ color:var(--text3); font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
+.diag-value{ color:var(--text); font:600 14px 'JetBrains Mono',monospace; margin-top:5px; overflow-wrap:anywhere; }
+.diag-value.ok{ color:var(--green); }.diag-value.warn{ color:var(--amber-soft); }.diag-value.bad{ color:#ff7c80; }.diag-value.na{ color:var(--text3); }
+.event-list{ display:flex; flex-direction:column; gap:8px; }
+.event-row{ padding:11px 12px; border-radius:12px; background:var(--sf); border-left:3px solid var(--blue); }
+.event-row.warning{ border-color:var(--amber); }.event-row.error,.event-row.critical{ border-color:var(--red); }
+.event-title{ font-size:13px; font-weight:700; }.event-meta,.event-action{ font-size:11px; color:var(--text3); margin-top:3px; }.event-action{ color:var(--text2); }
+.maintenance-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.maintenance-actions button,.log-download{ padding:11px; border-radius:11px; background:var(--sf3); font-size:12px; font-weight:700; text-align:center; }
+.demo-banner{ display:none; padding:8px 12px; margin:8px 16px 0; border-radius:10px; background:var(--amber-lt); color:var(--amber-soft); font-size:12px; font-weight:700; }.demo-banner.show{display:block}
+.login-gate{ position:fixed; inset:0; z-index:2000; display:none; align-items:center; justify-content:center; background:rgba(10,12,17,.92); padding:20px; }
+.login-gate.open{ display:flex; }.login-card{ width:min(360px,100%); padding:24px; border-radius:22px; background:var(--sf); border:1px solid var(--border2); box-shadow:var(--sh-md); }.login-card h2{ margin-bottom:8px; }.login-card p{ color:var(--text2); font-size:13px; margin-bottom:16px; }.login-card input{ width:100%; padding:13px; border-radius:11px; border:1px solid var(--border2); background:var(--sf2); color:var(--text); margin-bottom:10px; }.login-card button{ width:100%; padding:13px; border-radius:11px; background:var(--amber); color:#231600; font-weight:800; }
+.schedule-skip{ padding:5px 8px; border-radius:8px; background:var(--amber-lt); color:var(--amber-soft); font-size:10px; font-weight:700; }
+
+/* ═══ Teach-In driving cockpit ═══ */
+#teach-wizard{ z-index:1000; }
+.teach-sheet{ transition:max-width .3s var(--ease),height .3s var(--ease),transform .4s var(--spring); }
+.teach-header-actions{ display:flex; align-items:center; gap:7px; }
+.teach-header-estop{ min-height:32px; padding:0 10px; border-radius:8px; background:#c92a31; color:#fff; font-size:10px; font-weight:900; letter-spacing:.03em; }
+.teach-header-estop:disabled{ opacity:.38; cursor:not-allowed; }
+.teach-sheet.record-mode{ max-width:1040px; height:min(90vh,780px); display:flex; flex-direction:column; }
+.teach-sheet.record-mode .modal-body{ flex:1; min-height:0; overflow:auto; padding-top:10px; }
+.teach-record-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.teach-record-head .wiz-step-body{ margin-bottom:14px; max-width:600px; }
+.teach-record-head .rec-indicator{ min-width:230px; margin:0; }
+.teach-drive-layout{ display:grid; grid-template-columns:minmax(0,1.45fr) minmax(280px,.7fr); gap:14px; min-height:500px; }
+.teach-map-card,.teach-control-card{ position:relative; min-width:0; border:1px solid var(--border); border-radius:18px; background:var(--sf2); overflow:hidden; }
+.teach-map-card{ min-height:500px; }
+#teach-map{ position:absolute; inset:0; z-index:1; background:#111820; }
+.teach-map-placeholder{ position:absolute; inset:0; z-index:0; display:grid; place-items:center; color:var(--text3); font-size:13px; }
+.teach-map-follow,.teach-map-gps{ position:absolute; z-index:500; top:12px; border:1px solid rgba(255,255,255,.15); border-radius:10px; background:rgba(24,28,37,.9); color:#fff; box-shadow:var(--sh); font-size:12px; font-weight:750; }
+.teach-map-follow{ right:12px; padding:8px 10px; }.teach-map-follow.on{ background:var(--sc); color:#15110a; }
+.teach-map-gps{ left:12px; padding:8px 10px; }.teach-map-gps.fix{ color:#61df87; }.teach-map-gps.float{ color:#ffc658; }.teach-map-gps.none{ color:#ff7c80; }
+.teach-stats{ position:absolute; z-index:500; left:12px; right:12px; bottom:12px; display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:7px; border:1px solid rgba(255,255,255,.12); border-radius:13px; background:rgba(17,21,28,.9); backdrop-filter:blur(12px); box-shadow:var(--sh); }
+.teach-stats div{ padding:6px 8px; min-width:0; }.teach-stats span{ display:block; color:var(--text3); font-size:9px; letter-spacing:.05em; text-transform:uppercase; }.teach-stats strong{ display:block; color:#fff; font:650 14px 'JetBrains Mono',monospace; margin-top:2px; overflow:hidden; text-overflow:ellipsis; }
+.teach-control-card{ display:flex; flex-direction:column; align-items:center; padding:16px; overflow:auto; }
+.teach-control-title{ align-self:stretch; color:var(--text); font-size:13px; font-weight:750; }
+.teach-joystick{ position:relative; width:190px; height:190px; flex:0 0 190px; margin:13px auto 10px; border:1px solid var(--border2); border-radius:50%; background:radial-gradient(circle at 40% 35%,#343b49,#181d27 65%); box-shadow:inset 0 0 0 12px rgba(255,255,255,.025),inset 0 8px 20px rgba(255,255,255,.04),0 16px 30px rgba(0,0,0,.24); touch-action:none; user-select:none; -webkit-user-select:none; cursor:grab; }
+.teach-joystick.active{ cursor:grabbing; border-color:var(--sc); box-shadow:inset 0 0 0 12px var(--sc-lt),0 0 28px var(--sc-gl); }.teach-joystick.disabled{ opacity:.38; cursor:not-allowed; }
+.teach-joystick-axis{ position:absolute; background:rgba(255,255,255,.1); pointer-events:none; }.teach-joystick-axis.horizontal{ left:20px; right:20px; top:50%; height:1px; }.teach-joystick-axis.vertical{ top:20px; bottom:20px; left:50%; width:1px; }
+.teach-joystick-knob{ position:absolute; left:50%; top:50%; width:68px; height:68px; margin:-34px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(145deg,#f5b23e,#c67b12); color:#30200a; box-shadow:0 8px 18px rgba(0,0,0,.45),inset 0 2px 3px rgba(255,255,255,.5); pointer-events:none; transform:translate(0,0); transition:transform .08s linear; }.teach-joystick.active .teach-joystick-knob{ transition:none; }.teach-joystick-knob span{ font-size:15px; opacity:.5; }
+.teach-drive-values{ width:100%; display:flex; justify-content:space-between; gap:10px; padding:8px 10px; border-radius:10px; background:var(--sf3); color:var(--text3); font-size:11px; }.teach-drive-values b{ color:var(--text); font:650 11px 'JetBrains Mono',monospace; }
+.teach-control-hint{ color:var(--text3); font-size:10px; margin:7px 0 12px; text-align:center; }
+.teach-correction{ width:100%; display:grid; grid-template-columns:auto 1fr; gap:8px; padding:10px; margin-bottom:10px; border:1px solid rgba(167,132,242,.38); border-radius:12px; background:rgba(167,132,242,.11); }.teach-correction-icon{ font-size:24px; color:#bfa6ff; }.teach-correction strong{ color:#d4c7ff; font-size:12px; }.teach-correction p{ color:var(--text2); font-size:10px; line-height:1.4; margin-top:2px; }.teach-correction button{ grid-column:1/-1; padding:9px; font-size:11px; }
+.teach-undo{ width:100%; padding-top:10px; margin-top:auto; border-top:1px solid var(--border); }.teach-undo>span{ display:block; color:var(--text3); font-size:10px; margin-bottom:7px; }.teach-undo>div{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }.teach-undo button{ padding:8px 4px; border-radius:9px; background:var(--sf3); color:var(--text2); font-size:11px; font-weight:700; }.teach-undo button:hover{ background:var(--sc-lt); color:var(--sc); }.teach-undo button:disabled{ opacity:.35; }
+.teach-control-card .wiz-btn-row{ width:100%; margin-top:10px; }
+.teach-reference{margin:0 0 12px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.025)}
+.teach-reference-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:7px}
+.teach-reference-hint{font-size:11px;line-height:1.35;color:var(--muted);margin-top:7px}
+.teach-reference-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.teach-reference-options label{position:relative;display:flex;align-items:center;justify-content:center;min-height:38px;padding:6px;border:1px solid var(--border);border-radius:9px;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer}
+.teach-reference-options input{position:absolute;opacity:0;pointer-events:none}
+.teach-reference-options label:has(input:checked){border-color:#46cfff;background:rgba(70,207,255,.14);color:#9be8ff}
+.teach-reference-options label:has(input:disabled){opacity:.55;cursor:not-allowed}
+.teach-return-marker{ width:28px; height:28px; display:grid; place-items:center; border:3px solid #fff; border-radius:50%; background:#a784f2; color:#fff; font-weight:900; box-shadow:0 0 0 7px rgba(167,132,242,.28),0 3px 12px #0008; }
+.teach-start-marker{ width:24px; height:24px; display:grid; place-items:center; border:2px solid #fff; border-radius:50%; background:#2fbf68; color:#fff; font:800 10px 'Figtree',sans-serif; box-shadow:0 3px 10px #0008; }
+
+@media (max-width:700px){
+  :root{ --sidebar:100vw; }
+  html,body,.shell{ width:100%; max-width:100%; overflow:hidden; }
+  .sidebar{ width:100vw; min-width:0; }
+  #map{ left:0; opacity:.24; pointer-events:none; }
+  .map-float{ display:none; }
+  .topbar{ left:8px; right:8px; top:8px; gap:6px; }
+  .brand-icon{ display:none; }.brand-name{ font-size:14px; }.brand-model{ font-size:10px; }
+  .soc-pill{ padding:5px 7px; }.soc-pill svg{ display:none; }
+  .view{ width:100%; padding-top:68px; padding-bottom:92px; }
+  .hero-card{ margin-left:10px; margin-right:10px; padding:16px; }
+  .section{ padding-left:10px; padding-right:10px; }
+  .tel-grid{ grid-template-columns:1fr 1fr; }
+  .speed-ctrl{ padding:12px; gap:9px; }.sc-icon{ display:none; }.sc-btn{ width:38px; height:38px; }
+  .command-dock{ left:8px; right:8px; bottom:max(8px,env(safe-area-inset-bottom)); justify-content:stretch; gap:5px; padding:6px; }
+  .command-btn{ flex:1; min-width:0; justify-content:center; padding:0 7px; font-size:11px; }.command-btn.estop{ font-size:12px; }
+  .connection-banner{ left:8px; right:8px; top:68px; }
+  .diag-grid{ grid-template-columns:1fr 1fr; }
+  .modal-sheet{ width:100%; max-width:100%; }
+  .teach-sheet.record-mode{ height:100dvh; max-height:100dvh; border-radius:0; }
+  .teach-sheet.record-mode .modal-handle{ display:none; }
+  .teach-sheet.record-mode .modal-header{ padding-top:10px; }
+  .teach-sheet .modal-header{ gap:8px; }
+  .teach-header-estop{ padding:0 8px; font-size:9px; }
+  .teach-sheet.record-mode .wiz-dots{ padding-bottom:8px; }
+  .teach-sheet.record-mode .modal-body{ padding:8px 10px 96px; }
+  .teach-record-head{ display:block; }.teach-record-head .wiz-step-title{ font-size:18px; }.teach-record-head .wiz-step-body{ font-size:12px; line-height:1.4; margin-bottom:8px; }.teach-record-head .rec-indicator{ min-width:0; padding:8px 10px; margin-bottom:8px; }
+  .teach-drive-layout{ grid-template-columns:1fr; min-height:0; gap:10px; }
+  .teach-map-card{ min-height:300px; }.teach-control-card{ min-height:440px; }
+  .teach-joystick{ width:180px; height:180px; flex-basis:180px; }
+  .schedule-card,.settings-card,.week-grid{ max-width:100%; overflow:hidden; }
+}
+
+@media (min-width:701px){ .sidebar{ max-width:400px; } }
 </style>
 </head>
 <body>
@@ -1382,6 +1685,10 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
           <span class="ni-ic"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
           <span>Verlauf</span>
         </button>
+        <button class="nav-item" data-view="v-diagnostics">
+          <span class="ni-ic"><svg viewBox="0 0 24 24"><path d="M4 14a8 8 0 1116 0"/><path d="M12 14l4-4"/><circle cx="12" cy="14" r="2"/></svg></span>
+          <span>Diagnose</span>
+        </button>
         <button class="nav-item" data-view="v-settings">
           <span class="ni-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
           <span>Einstellungen</span>
@@ -1438,9 +1745,9 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
           <div class="hero-state">
             <div class="state-chip">
               <div class="state-dot"></div>
-              <span class="state-chip-label" id="sc-state">Bereit</span>
+              <span class="state-chip-label" id="sc-state">Verbinden…</span>
             </div>
-            <div class="state-sub-label" id="state-sub">Bereit zum Starten</div>
+            <div class="state-sub-label" id="state-sub">Roboterstatus wird geladen</div>
           </div>
 
           <div class="hero-actions" id="sc-actions"></div>
@@ -1450,7 +1757,13 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
         <div class="section">
           <div class="speed-ctrl">
             <div class="sc-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M12 4v2M4.9 7.2l1.4 1.4M2 15h2M20 15h2M17.7 8.6l1.4-1.4"/><path d="M12 15l4-3"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 17a8 8 0 0 1 16 0"/>
+                <path d="M7 13l-1.5-1.2M12 10V7M17 13l1.5-1.2"/>
+                <path d="M12 17l4-5"/>
+                <circle cx="12" cy="17" r="1.4"/>
+                <path d="M6 19h12"/>
+              </svg>
             </div>
             <div class="sc-info">
               <div class="sc-name">Fahrtempo</div>
@@ -1458,8 +1771,8 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
               <div class="sc-target" id="tel-speed-target">Ziel —</div>
             </div>
             <div class="sc-btns">
-              <button class="sc-btn" id="speed-down" aria-label="Langsamer">−</button>
-              <button class="sc-btn" id="speed-up" aria-label="Schneller">+</button>
+              <button class="sc-btn" id="speed-down" data-online-command aria-label="Langsamer">−</button>
+              <button class="sc-btn" id="speed-up" data-online-command aria-label="Schneller">+</button>
             </div>
           </div>
         </div>
@@ -1512,7 +1825,10 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
         <div class="section">
           <div class="section-head">
             <span class="section-label">Mähbereiche</span>
-            <button class="section-action" id="teach-fab-btn">+ Teach-In</button>
+            <div class="section-actions">
+              <button class="section-action map-edit-action" type="button" onclick="openMapEditor()">✎ Karte</button>
+              <button class="section-action" id="teach-fab-btn" data-online-command>+ Teach-In</button>
+            </div>
           </div>
           <div id="zone-list" class="zone-list">
             <div class="zone-empty">
@@ -1545,7 +1861,7 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
         <div class="section">
           <div class="section-head">
             <span class="section-label">Wochenübersicht</span>
-            <button class="section-action" id="teach-nav-btn">Bereich aufnehmen</button>
+            <button class="section-action" id="teach-nav-btn" data-online-command>Bereich aufnehmen</button>
           </div>
           <div class="week-grid" id="week-grid"></div>
         </div>
@@ -1584,6 +1900,76 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
 
         <div style="height:8px"></div>
       </div><!-- /v-history -->
+
+      <div id="v-diagnostics" class="view">
+        <div class="section">
+          <div class="section-head"><span class="section-label">Manuelle Steuerung</span></div>
+          <div class="diagnostic-manual-card">
+            <div class="diagnostic-manual-head">
+              <div><strong>Fahren & Mähwerke</strong><div class="toggle-sub">Nur Bereit, Teach-In oder Pause · Loslassen stoppt sofort</div></div>
+              <span class="diagnostic-manual-state" id="diagnostic-manual-state">Gesperrt</span>
+            </div>
+            <div class="diagnostic-joystick-wrap">
+              <div class="teach-joystick disabled" id="diagnostic-joystick" role="application" aria-label="Diagnose-Fahr-Joystick">
+                <div class="teach-joystick-axis horizontal"></div>
+                <div class="teach-joystick-axis vertical"></div>
+                <div class="teach-joystick-knob" id="diagnostic-joystick-knob"><span>●</span></div>
+              </div>
+              <div class="teach-drive-values">
+                <span>Tempo <b id="diagnostic-drive-speed">0 %</b></span>
+                <span>Lenkung <b id="diagnostic-drive-steering">0°</b></span>
+              </div>
+              <div class="teach-control-hint">Progressive Lenkung · Mitte feinfühlig, Rand maximales Lenklimit</div>
+            </div>
+            <div class="diagnostic-limits">
+              <div class="diagnostic-limit">
+                <label for="diagnostic-speed-limit"><span>Tempolimit</span><b id="diagnostic-speed-limit-value">25 %</b></label>
+                <input id="diagnostic-speed-limit" type="range" min="5" max="50" step="1" value="25">
+              </div>
+              <div class="diagnostic-limit">
+                <label for="diagnostic-steering-limit"><span>Lenklimit</span><b id="diagnostic-steering-limit-value">28°</b></label>
+                <input id="diagnostic-steering-limit" type="range" min="10" max="45" step="1" value="28">
+              </div>
+            </div>
+            <div class="implement-controls">
+              <button class="implement-btn" id="diagnostic-front-deck" type="button">Frontmähwerk anheben</button>
+              <button class="implement-btn" id="diagnostic-rear-deck" type="button">Heckmähwerk anheben</button>
+              <button class="implement-btn blade" id="diagnostic-blade" type="button">Messer einschalten</button>
+              <button class="implement-btn stop" id="diagnostic-manual-stop" type="button">Sicher stoppen</button>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-head"><span class="section-label">Sensoren & Sicherheit</span></div>
+          <div class="diag-grid" id="diagnostic-grid"></div>
+        </div>
+        <div class="section">
+          <div class="section-head"><span class="section-label">Ausgänge · Sollwerte</span></div>
+          <div class="toggle-sub" style="margin-bottom:10px">Letzte Befehle, die an Teensy beziehungsweise Simulation ausgegeben wurden.</div>
+          <div class="diag-grid" id="output-grid"></div>
+        </div>
+        <div class="section">
+          <div class="section-head"><span class="section-label">Sicherheitsereignisse</span><a class="log-download" href="/api/logs/download">TXT laden</a></div>
+          <div class="event-list" id="event-list"></div>
+        </div>
+        <div class="section">
+          <div class="section-head"><span class="section-label">Wartung</span></div>
+          <div class="maintenance-actions">
+            <button onclick="startCalibration('imu')">IMU kalibrieren</button>
+            <button onclick="startCalibration('compass')">Kompass kalibrieren</button>
+            <button onclick="startCalibration('rtk')">RTK prüfen</button>
+            <button onclick="startCalibration('docking')">Docking kalibrieren</button>
+            <button onclick="runHardwareTest('motor_forward')">Motor kurz testen</button>
+            <button onclick="runHardwareTest('steering_left')">Lenkung testen</button>
+          </div>
+          <div class="settings-card" style="padding:12px;margin-top:10px">
+            <div class="toggle-sub" style="margin-bottom:8px">Firmware bereitstellen (.hex/.bin; Flashen bleibt ein separater Hardware-Schritt)</div>
+            <input id="firmware-file" type="file" accept=".hex,.bin" class="modal-input"/>
+            <button class="log-download" style="width:100%;margin-top:8px" onclick="stageFirmware()">Firmwaredatei prüfen & bereitstellen</button>
+          </div>
+          <div class="toggle-sub" id="version-info" style="margin-top:10px">Versionen werden geladen…</div>
+        </div>
+      </div><!-- /v-diagnostics -->
 
       <!-- ▸ SETTINGS VIEW -->
       <div id="v-settings" class="view">
@@ -1632,10 +2018,36 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
             <div class="slider-row">
               <div class="slider-head">
                 <span class="slider-label">
+                  <span class="sl-ic"><svg viewBox="0 0 24 24"><path d="M3 12h18M3 8v8M21 8v8M7 10v4M17 10v4"/></svg></span>
+                  Reale Mähbreite
+                </span>
+              </div>
+              <div class="toggle-sub" style="margin-bottom:12px">Gesamtbreite von Front- und Heckmähwerk laut Hardware.</div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-mowing-width" min="30" max="120" step="1"/>
+                <div class="rng-bubble">60 cm</div>
+              </div>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row">
+              <div class="slider-head"><span class="slider-label">Minimaler Kurvenradius beim Mähen</span></div>
+              <div class="toggle-sub" id="mowing-turn-radius-note" style="margin-bottom:12px">Für Außenbahnen und andere Kurven mit abgesenktem Mähwerk.</div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-mowing-turn-radius" min="15" max="150" step="5"/>
+                <div class="rng-bubble">50 cm</div>
+              </div>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row">
+              <div class="slider-head">
+                <span class="slider-label">
                   <span class="sl-ic"><svg viewBox="0 0 24 24"><path d="M4 4v16M9 4v16M15 4v16M20 4v16"/></svg></span>
                   Spurabstand
                 </span>
               </div>
+              <div class="toggle-sub" id="lane-overlap-note" style="margin-bottom:12px">Bestimmt die Überlappung benachbarter Mähbahnen.</div>
               <!-- graphic lane-spacing visualiser -->
               <div class="lane-viz" id="lane-viz">
                 <div class="lane-stripes"></div>
@@ -1644,7 +2056,7 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
               </div>
               <div class="rng">
                 <div class="rng-track"><div class="rng-fill"></div></div>
-                <input type="range" id="s-lane" min="20" max="60" step="2"/>
+                <input type="range" id="s-lane" min="10" max="120" step="1"/>
                 <div class="rng-bubble" id="s-lane-val">38 cm</div>
               </div>
             </div>
@@ -1662,6 +2074,184 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
                 <div class="rng-track"><div class="rng-fill"></div></div>
                 <input type="range" id="s-speed" min="0.3" max="1.8" step="0.1"/>
                 <div class="rng-bubble" id="s-speed-val">0,9 km/h</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Fahrzeug- & Mähwerksgeometrie</div>
+          <div class="settings-card">
+            <div class="toggle-row">
+              <div class="toggle-text">
+                <div class="toggle-label">Mähwerksflächen auf Karte</div>
+                <div class="toggle-sub">Gelbe bzw. blaue Front- und Heckmähwerk-Boxen anzeigen</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="s-mower-footprints" checked>
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row"><div class="slider-head"><span class="slider-label">Frontmähwerk · Breitenanteil</span></div><div class="toggle-sub" style="margin-bottom:12px">Anteil an der eingestellten Gesamtmähbreite.</div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-front-width" min="35" max="100" step="1"/><div class="rng-bubble">60 %</div></div></div>
+            <div class="settings-divider"></div>
+            <div class="slider-row"><div class="slider-head"><span class="slider-label">Mähwerk-Tiefe</span></div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-deck-depth" min="5" max="40" step="1"/><div class="rng-bubble">14 cm</div></div></div>
+            <div class="settings-divider"></div>
+            <div class="slider-row"><div class="slider-head"><span class="slider-label">Frontmähwerk vor Vorderachse</span></div><div class="toggle-sub" style="margin-bottom:12px">Abstand von der Vorderachse bis zur Mitte des Frontmähwerks.</div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-front-offset" min="10" max="80" step="1"/><div class="rng-bubble">35 cm</div></div></div>
+            <div class="settings-divider"></div>
+            <div class="slider-row"><div class="slider-head"><span class="slider-label">Heckmähwerke hinter Hinterachse</span></div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-rear-offset" min="5" max="60" step="1"/><div class="rng-bubble">22 cm</div></div></div>
+            <div class="settings-divider"></div>
+            <div class="slider-row"><div class="slider-head"><span class="slider-label">Lücke zwischen Heckmähwerken</span></div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-rear-gap" min="0" max="30" step="1"/><div class="rng-bubble">6 cm</div></div></div>
+            <div class="settings-divider"></div>
+            <div class="slider-row"><div class="slider-head"><span class="slider-label">Abdeckungsraster</span></div><div class="toggle-sub" style="margin-bottom:12px">Reale gemähte Fläche; 1 cm ist am genauesten, benötigt aber mehr Speicher.</div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-coverage-grid" min="1" max="10" step="1"/><div class="rng-bubble">2 cm</div></div></div>
+            <div class="settings-divider"></div>
+            <div class="slider-row"><div class="slider-head"><span class="slider-label">Radstand</span></div><div class="toggle-sub" style="margin-bottom:12px">Wird vom prädiktiven Ackermann-Fahrmodell verwendet.</div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-wheelbase" min="10" max="100" step="1"/><div class="rng-bubble">25 cm</div></div></div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Planungs-Engine</div>
+          <div class="settings-card">
+            <div class="toggle-row">
+              <div class="toggle-text"><div class="toggle-label">Aktiver Flächenplaner</div><div class="toggle-sub">MV2-Planer oder offizielle native Fields2Cover-Bibliothek</div></div>
+              <select id="s-planner-engine" class="modal-select" style="width:172px">
+                <option value="mv2">MV2 Hybrid</option>
+                <option value="fields2cover">Fields2Cover</option>
+              </select>
+            </div>
+            <div class="planner-native-status" id="fields2cover-native-status">Fields2Cover-Status wird geprüft…</div>
+            <div id="fields2cover-settings" class="hidden">
+              <div class="settings-divider"></div>
+              <div class="toggle-row"><div class="toggle-text"><div class="toggle-label">Zellzerlegung</div><div class="toggle-sub">Konkave Felder in besser planbare Teilflächen zerlegen</div></div><select id="s-f2c-decomposition" class="modal-select" style="width:160px"><option value="boustrophedon">Boustrophedon</option><option value="trapezoidal">Trapezoidal</option><option value="none">Keine</option></select></div>
+              <div class="settings-divider f2c-decomposition-row"></div>
+              <div class="slider-row f2c-decomposition-row"><div class="slider-head"><span class="slider-label">Zerlegungswinkel</span></div><div class="toggle-sub" style="margin-bottom:12px">Richtung, in der konkave Zellen aufgeteilt werden.</div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-f2c-split-angle" min="0" max="180" step="5"/><div class="rng-bubble">90°</div></div></div>
+              <div class="settings-divider"></div>
+              <div class="toggle-row"><div class="toggle-text"><div class="toggle-label">Swath-Zielfunktion</div><div class="toggle-sub">Bewertung der optimalen Bahnrichtung</div></div><select id="s-f2c-objective" class="modal-select" style="width:160px"><option value="n_swath_modified">Wenige Bahnen (schnell)</option><option value="n_swath">Wenige Bahnen (exakt)</option><option value="swath_length">Kurze Mähstrecke</option></select></div>
+              <div class="settings-divider"></div>
+              <div class="toggle-row"><div class="toggle-text"><div class="toggle-label">Bahnwinkel</div><div class="toggle-sub">Automatisch optimieren oder fest vorgeben</div></div><select id="s-f2c-angle-mode" class="modal-select" style="width:130px"><option value="best">Automatisch</option><option value="fixed">Fest</option></select></div>
+              <div class="settings-divider f2c-fixed-angle-row hidden"></div>
+              <div class="slider-row f2c-fixed-angle-row hidden"><div class="slider-head"><span class="slider-label">Fester Bahnwinkel</span></div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-f2c-angle" min="-180" max="180" step="5"/><div class="rng-bubble">0°</div></div></div>
+              <div class="settings-divider"></div>
+              <div class="toggle-row"><div class="toggle-text"><div class="toggle-label">Routenreihenfolge</div><div class="toggle-sub">OR-Tools-Optimierer oder bekanntes Muster</div></div><select id="s-f2c-route-order" class="modal-select" style="width:150px"><option value="optimized">OR-Tools optimiert</option><option value="boustrophedon">Boustrophedon</option><option value="snake">Snake</option><option value="spiral">Spiral</option></select></div>
+              <div class="settings-divider f2c-spiral-row hidden"></div>
+              <div class="toggle-row f2c-spiral-row hidden"><div class="toggle-text"><div class="toggle-label">Spiralblockgröße</div><div class="toggle-sub">Bahnen pro Spiralgruppe</div></div><select id="s-f2c-spiral-size" class="modal-select" style="width:92px"><option value="2">2</option><option value="4">4</option><option value="6">6</option><option value="8">8</option><option value="10">10</option><option value="12">12</option><option value="16">16</option><option value="20">20</option></select></div>
+              <div class="settings-divider"></div>
+              <div class="toggle-row"><div class="toggle-text"><div class="toggle-label">Wendeplanung</div><div class="toggle-sub">Wer plant die Wenden: MV2-Generator oder nativer Fields2Cover-Pfad (nur dort wirkt das Kurvenmodell)</div></div><select id="s-f2c-turning-backend" class="modal-select" style="width:168px"><option value="auto">MV2 (Standard)</option><option value="native">Fields2Cover nativ</option></select></div>
+              <div class="settings-divider"></div>
+              <div class="toggle-row"><div class="toggle-text"><div class="toggle-label">Kurvenmodell</div><div class="toggle-sub">Native Fields2Cover-Pfadplanung</div></div><select id="s-f2c-path-type" class="modal-select" style="width:168px"><option value="dubins">Dubins</option><option value="dubins_cc">Dubins kontinuierlich</option><option value="reeds_shepp">Reeds-Shepp</option><option value="reeds_shepp_cc">Reeds-Shepp kontinuierlich</option></select></div>
+              <div class="settings-divider"></div>
+              <div class="toggle-row"><div class="toggle-text"><div class="toggle-label">Vorgewende</div><div class="toggle-sub" id="fields2cover-headland-note">Automatisch aus Wenderadius und realer Fahrzeugkontur</div></div><select id="s-f2c-headland-mode" class="modal-select" style="width:130px"><option value="auto">Automatisch</option><option value="manual">Manuell</option></select></div>
+              <div class="settings-divider f2c-manual-headland-row hidden"></div>
+              <div class="slider-row f2c-manual-headland-row hidden"><div class="slider-head"><span class="slider-label">Vorgewendebreite</span></div><div class="toggle-sub" style="margin-bottom:12px">Direkter Abstand statt eines Mähbreiten-Faktors.</div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-f2c-headland-width" min="40" max="150" step="5"/><div class="rng-bubble">70 cm</div></div></div>
+              <div class="settings-divider"></div>
+              <div class="slider-row"><div class="slider-head"><span class="slider-label">Max. Krümmungsänderung</span></div><div class="toggle-sub" style="margin-bottom:12px">Fields2Cover-Glättung für kontinuierliche Kurven.</div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-f2c-max-diff-curv" min="0.01" max="0.5" step="0.01"/><div class="rng-bubble">0,10</div></div></div>
+              <div class="settings-divider"></div>
+              <div class="slider-row"><div class="slider-head"><span class="slider-label">Native Mindestabdeckung</span></div><div class="toggle-sub" style="margin-bottom:12px">Mindestwert innerhalb der von Fields2Cover erzeugten Innenfläche; die Gesamtfeld-Abdeckung wird weiterhin separat ausgewiesen.</div><div class="rng"><div class="rng-track"><div class="rng-fill"></div></div><input type="range" id="s-f2c-min-coverage" min="80" max="100" step="0.5"/><div class="rng-bubble">90,0 %</div></div></div>
+              <div class="settings-divider"></div>
+              <div class="toggle-row"><div class="toggle-text"><div class="toggle-label">OR-Tools Zeitlimit</div><div class="toggle-sub">Maximale Optimierungszeit je Planung</div></div><select id="s-f2c-optimizer-time" class="modal-select" style="width:105px"><option value="1">1 s</option><option value="2">2 s</option><option value="5">5 s</option><option value="10">10 s</option><option value="30">30 s</option></select></div>
+              <div class="settings-divider"></div>
+              <div class="toggle-row"><div class="toggle-text"><div class="toggle-label">Optimum weiter suchen</div><div class="toggle-sub">Guided Local Search bis zum Zeitlimit</div></div><label class="toggle-switch"><input type="checkbox" id="s-f2c-optimum"><span class="toggle-track"></span></label></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tractor turning -->
+        <div class="settings-section">
+          <div class="settings-section-title">Wendemanöver</div>
+          <div class="settings-card">
+            <div class="toggle-sub" id="turn-settings-engine-note" style="padding:12px 14px;line-height:1.5"></div>
+            <div class="settings-divider"></div>
+            <div class="toggle-row">
+              <div class="toggle-text"><div class="toggle-label">Bahnstrategie</div><div class="toggle-sub">Vorgewende schafft Platz für die späteren Innenbahn-Wenden</div></div>
+              <select id="s-coverage-strategy" class="modal-select" style="width:168px">
+                <option value="headland_first">Außenkante zuerst</option>
+                <option value="interior">Direkte Innenbahnen</option>
+              </select>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="toggle-row">
+              <div class="toggle-text"><div class="toggle-label">Außenbahnen</div><div class="toggle-sub" id="headland-pass-note">1 Bahn als Vorgewende</div></div>
+              <select id="s-headland-passes" class="modal-select" style="width:112px">
+                <option value="1">1 Bahn</option>
+                <option value="2">2 Bahnen</option>
+                <option value="3">3 Bahnen</option>
+              </select>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row">
+              <div class="slider-head"><span class="slider-label">Planpunkt-Abstand</span></div>
+              <div class="toggle-sub" style="margin-bottom:12px">Ausführung und Kurven werden mit 2–9 mm aufgelöst.</div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-route-resolution" min="0.2" max="0.9" step="0.1"/>
+                <div class="rng-bubble">0,5 cm</div>
+              </div>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="toggle-row mv2-only-setting">
+              <div class="toggle-text"><div class="toggle-label">Wendestrategie</div><div class="toggle-sub">Automatik berücksichtigt Spurbreite und Wenderadius</div></div>
+              <select id="s-turn-strategy" class="modal-select" style="width:150px">
+                <option value="auto">Automatisch</option>
+                <option value="forward">Vorwärtsbogen</option>
+                <option value="reverse">Rücksetzwende</option>
+                <option value="multi_point">Mehrzügig</option>
+              </select>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row">
+              <div class="slider-head"><span class="slider-label">Minimaler Wenderadius</span></div>
+              <div class="toggle-sub" id="turn-radius-note" style="margin-bottom:12px">Begrenzt die Krümmung der Ackermann-Bögen.</div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-turn-radius" min="10" max="100" step="5"/>
+                <div class="rng-bubble">25 cm</div>
+              </div>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row">
+              <div class="slider-head"><span class="slider-label">Tatsächliche Mindest-Randreserve</span></div>
+              <div class="toggle-sub" style="margin-bottom:12px">Mindestabstand von der äußersten Traktor-/Mähwerkskontur bis zum Geofence. Es werden keine pauschalen Zusatzreserven addiert.</div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-headland-margin" min="5" max="150" step="5"/>
+                <div class="rng-bubble">5 cm</div>
+              </div>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="toggle-row mv2-only-setting">
+              <div class="toggle-text"><div class="toggle-label">Maximale Züge</div><div class="toggle-sub">Fahrtrichtungswechsel bei engem Vorgewende</div></div>
+              <select id="s-turn-passes" class="modal-select" style="width:96px">
+                <option value="2">2 Züge</option><option value="4">4 Züge</option>
+                <option value="6">6 Züge</option>
+              </select>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row">
+              <div class="slider-head"><span class="slider-label">Wendegeschwindigkeit</span></div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-turn-speed" min="0.2" max="0.8" step="0.1"/>
+                <div class="rng-bubble">0,4 km/h</div>
+              </div>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="toggle-row">
+              <div class="toggle-text"><div class="toggle-label">Frontmähwerk beim Wenden anheben</div><div class="toggle-sub">Messer wird vorher automatisch ausgeschaltet</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="s-lift-front"><span class="toggle-track"></span></label>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="toggle-row">
+              <div class="toggle-text"><div class="toggle-label">Heckmähwerk beim Wenden anheben</div><div class="toggle-sub">Auch bei Rückwärts- und Mehrpunktwenden</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="s-lift-rear"><span class="toggle-track"></span></label>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="slider-row">
+              <div class="slider-head"><span class="slider-label">Hub-Wartezeit</span></div>
+              <div class="toggle-sub" style="margin-bottom:12px">Stillstand nach Anheben und Absenken</div>
+              <div class="rng">
+                <div class="rng-track"><div class="rng-fill"></div></div>
+                <input type="range" id="s-lift-settle" min="0" max="2000" step="100"/>
+                <div class="rng-bubble">700 ms</div>
               </div>
             </div>
           </div>
@@ -1747,11 +2337,31 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
           </div>
         </div>
 
+        <div class="settings-section">
+          <div class="settings-section-title">Betriebsplanung</div>
+          <div class="settings-card">
+            <div class="toggle-row">
+              <div class="toggle-text"><div class="toggle-label">Saisonmodus</div><div class="toggle-sub">Automatik oder Winterpause</div></div>
+              <select id="s-season" class="modal-select" style="width:132px"><option value="auto">Automatisch</option><option value="on">Aktiv</option><option value="off">Winterpause</option></select>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="toggle-row">
+              <div class="toggle-text"><div class="toggle-label">Wochenendbetrieb</div><div class="toggle-sub">Samstag und Sonntag erlauben</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="s-weekend"><span class="toggle-track"></span></label>
+            </div>
+            <div class="settings-divider"></div>
+            <div class="toggle-row">
+              <div class="toggle-text"><div class="toggle-label">Ruhezeit</div><div class="toggle-sub">Kein automatischer Start</div></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><input id="s-quiet-start" class="modal-input" type="time" style="width:102px"/><input id="s-quiet-end" class="modal-input" type="time" style="width:102px"/></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Advanced -->
         <div class="settings-section">
           <div class="settings-section-title">Erweitert</div>
           <div class="settings-card">
-            <button class="danger-row" id="reset-btn-settings">
+            <button class="danger-row" id="reset-btn-settings" data-online-command>
               <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
               Fehler zurücksetzen
             </button>
@@ -1770,12 +2380,32 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
 
   <!-- Map floating controls -->
   <div class="map-float">
+    <div class="gps-map-badge none" id="gps-map-badge">GPS: Kein Fix</div>
     <button class="map-fab" id="map-center-btn" title="Zum Roboter zentrieren">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
     </button>
     <button class="map-fab" id="map-layer-btn" title="Karten-Stil wechseln">
       <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
     </button>
+    <button class="map-fab map-follow-on" id="map-follow-btn" title="Roboter automatisch folgen">F</button>
+    <button class="map-fab" id="map-home-btn" title="Aktuelle Position als Ladestation speichern">H</button>
+    <button class="map-fab" id="map-edit-btn" title="Arbeitskarte bearbeiten" onclick="openMapEditor()">✎</button>
+  </div>
+
+  <div class="map-legend" aria-label="Kartenlegende">
+    <div class="map-legend-item"><span class="map-legend-line" style="--legend-color:#43c7ff"></span>Planbahn</div>
+    <div class="map-legend-item"><span class="map-legend-line turn" style="--legend-color:#b892ff"></span>Planwende</div>
+    <div class="map-legend-item"><span class="map-legend-line" style="--legend-color:#f4fbff"></span>Filterspur</div>
+    <div class="map-legend-item"><span class="map-legend-line turn" style="--legend-color:#ffd35a"></span>Sim-Wahrheit</div>
+    <div class="map-legend-item"><span class="map-legend-line swath" style="--legend-color:#42d66f"></span>Reale Deckfläche</div>
+    <div class="map-legend-item"><span class="map-legend-line turn" style="--legend-color:#45a8ff"></span>Verbindungsweg</div>
+  </div>
+
+  <div class="connection-banner" id="connection-banner"><span id="connection-banner-text">Verbindung unterbrochen · letzte Daten</span> <button onclick="reconnectNow()">Erneut verbinden</button></div>
+  <div class="command-dock">
+    <button class="command-btn soft" id="global-soft-stop">■ Soft-Stop</button>
+    <button class="command-btn home" id="global-return-home">⌂ Zur Station</button>
+    <button class="command-btn estop" id="global-estop">⚠ NOT-AUS</button>
   </div>
 
 </div><!-- /shell -->
@@ -1784,11 +2414,14 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
      TEACH-IN WIZARD (bottom sheet)
 ══════════════════════════════════════════════════════ -->
 <div class="overlay" id="teach-wizard">
-  <div class="modal-sheet">
+  <div class="modal-sheet teach-sheet">
     <div class="modal-handle"></div>
     <div class="modal-header">
       <span class="modal-title">Teach-In</span>
-      <button class="modal-close" onclick="wizClose()">✕</button>
+      <div class="teach-header-actions">
+        <button class="teach-header-estop" id="teach-header-estop" type="button">⚠ NOT-AUS</button>
+        <button class="modal-close" onclick="wizClose()">✕</button>
+      </div>
     </div>
 
     <!-- Step dots -->
@@ -1810,21 +2443,77 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
 
       <!-- Step 2: Record -->
       <div class="wiz-step" id="wiz-s2">
-        <div class="wiz-step-title">Grenze abfahren</div>
-        <div class="wiz-step-body">
-          Klicke auf „Aufnahme starten", dann fahre entlang der Bereichsgrenzen. Beende die Aufnahme, wenn du wieder am Startpunkt bist.
+        <div class="teach-record-head">
+          <div>
+            <div class="wiz-step-title">Grenze abfahren</div>
+            <div class="wiz-step-body">Joystick halten und den Roboter entlang der gewünschten Grenze führen. Loslassen stoppt sofort.</div>
+          </div>
+          <div class="rec-indicator hidden" id="wiz-rec-indicator">
+            <div class="rec-dot"></div>
+            <span class="rec-label" id="wiz-rec-label">Aufnahme läuft</span>
+            <span class="rec-time" id="wiz-rec-time">00:00</span>
+          </div>
         </div>
-        <div class="rec-indicator hidden" id="wiz-rec-indicator">
-          <div class="rec-dot"></div>
-          <span class="rec-label">Aufnahme läuft…</span>
-          <span class="rec-time" id="wiz-rec-time">00:00</span>
+
+        <div class="teach-reference">
+          <div class="teach-reference-title">Welche Fahrzeugkante zeichnet die Grenze auf?</div>
+          <div class="teach-reference-options" id="teach-reference-options">
+            <label><input type="radio" name="teach-reference" value="left">Links</label>
+            <label><input type="radio" name="teach-reference" value="center" checked>Mitte</label>
+            <label><input type="radio" name="teach-reference" value="right">Rechts</label>
+          </div>
+          <div class="teach-reference-hint">Links/rechts verwendet automatisch den äußersten Punkt von Traktor oder Mähwerk. Die gewählte Kante muss an der realen Mähflächengrenze geführt werden.</div>
         </div>
-        <div class="wiz-btn-row" id="wiz-s2-actions">
-          <button class="wiz-btn wiz-btn-primary" onclick="wizStartRecording()">⏺ Aufnahme starten</button>
-          <button class="wiz-btn wiz-btn-ghost" onclick="wizClose()">Abbrechen</button>
-        </div>
-        <div class="wiz-btn-row hidden" id="wiz-s2-stop">
-          <button class="wiz-btn wiz-btn-danger" onclick="wizStopRecording()">⏹ Aufnahme beenden</button>
+
+        <div class="teach-drive-layout">
+          <div class="teach-map-card">
+            <div id="teach-map" aria-label="Teach-In Live-Karte"></div>
+            <div class="teach-map-placeholder" id="teach-map-placeholder">Karte wird geladen…</div>
+            <button class="teach-map-follow on" id="teach-map-follow" type="button">◎ Folgen</button>
+            <div class="teach-map-gps" id="teach-map-gps">GPS: —</div>
+            <div class="teach-stats">
+              <div><span>Strecke</span><strong id="teach-length">0,0 m</strong></div>
+              <div><span>Punkte</span><strong id="teach-point-count">0</strong></div>
+              <div><span>Abstand Start</span><strong id="teach-start-distance">—</strong></div>
+            </div>
+          </div>
+
+          <div class="teach-control-card">
+            <div class="teach-control-title">Fahrsteuerung</div>
+            <div class="teach-joystick disabled" id="teach-joystick" role="application" aria-label="Fahr-Joystick">
+              <div class="teach-joystick-axis horizontal"></div>
+              <div class="teach-joystick-axis vertical"></div>
+              <div class="teach-joystick-knob" id="teach-joystick-knob"><span>●</span></div>
+            </div>
+            <div class="teach-drive-values">
+              <span>Tempo <b id="teach-drive-speed">0 %</b></span>
+              <span>Lenkung <b id="teach-drive-steering">0°</b></span>
+            </div>
+            <div class="teach-control-hint">Nach oben: vorwärts · seitlich: lenken</div>
+
+            <div class="teach-correction hidden" id="teach-correction">
+              <div class="teach-correction-icon">↶</div>
+              <div><strong>Korrekturfahrt</strong><p id="teach-correction-text">Fahre ohne Aufzeichnung zur violetten Zielmarke zurück.</p></div>
+              <button class="wiz-btn wiz-btn-ghost" type="button" onclick="teachContinueHere()">Ab hier neu fortsetzen</button>
+            </div>
+
+            <div class="teach-undo" id="teach-undo-actions">
+              <span>Letzte Strecke verwerfen</span>
+              <div>
+                <button type="button" onclick="teachUndo(1)">−1 m</button>
+                <button type="button" onclick="teachUndo(3)">−3 m</button>
+                <button type="button" onclick="teachUndo(5)">−5 m</button>
+              </div>
+            </div>
+
+            <div class="wiz-btn-row" id="wiz-s2-actions">
+              <button class="wiz-btn wiz-btn-primary" onclick="wizStartRecording()">⏺ Aufnahme starten</button>
+              <button class="wiz-btn wiz-btn-ghost" onclick="wizClose()">Abbrechen</button>
+            </div>
+            <div class="wiz-btn-row hidden" id="wiz-s2-stop">
+              <button class="wiz-btn wiz-btn-danger" onclick="wizStopRecording()">⏹ Aufnahme beenden</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1835,6 +2524,13 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
         <div class="modal-field">
           <label class="modal-field-label" for="zone-name-input">Bereichsname</label>
           <input type="text" id="zone-name-input" class="modal-input" placeholder="z. B. Vordergarten" maxlength="40"/>
+        </div>
+        <div class="modal-field">
+          <label class="modal-field-label" for="zone-type-input">Bereichstyp</label>
+          <select id="zone-type-input" class="modal-select">
+            <option value="mowing">Mähbereich</option>
+            <option value="no_go">No-Go-Zone</option>
+          </select>
         </div>
         <div class="wiz-btn-row">
           <button class="wiz-btn wiz-btn-primary" onclick="wizNext()">Speichern ✓</button>
@@ -1859,6 +2555,81 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
 </div>
 
 <!-- ══════════════════════════════════════════════════════
+     MAP EDITOR
+══════════════════════════════════════════════════════ -->
+<div class="overlay map-editor-overlay" id="map-editor-modal">
+  <div class="map-editor-sheet">
+    <div class="map-editor-header">
+      <div>
+        <div class="modal-title">Arbeitskarte bearbeiten</div>
+        <div class="map-editor-subtitle">Mähflächen, Sperrbereiche, Verbindungswege und Ladestation</div>
+      </div>
+      <button class="modal-close" type="button" onclick="closeMapEditor()">✕</button>
+    </div>
+    <div class="map-editor-layout">
+      <div class="map-editor-canvas-wrap">
+        <div id="map-editor-map" aria-label="Editor für die Arbeitskarte"></div>
+        <div class="map-editor-map-hint" id="map-editor-hint">Objekt auswählen oder ein Werkzeug starten</div>
+        <div class="map-editor-zoom-note">Tipp: Eckpunkte ziehen · Doppelklick entfernt einen Punkt</div>
+      </div>
+      <aside class="map-editor-panel">
+        <div class="map-editor-tools" role="toolbar" aria-label="Zeichenwerkzeuge">
+          <button type="button" class="map-editor-tool active" data-map-tool="select" onclick="setMapEditorTool('select')"><b>↖</b><span>Auswahl</span></button>
+          <button type="button" class="map-editor-tool" data-map-tool="mowing" onclick="setMapEditorTool('mowing')"><b>▱</b><span>Mähzone</span></button>
+          <button type="button" class="map-editor-tool danger" data-map-tool="no_go" onclick="setMapEditorTool('no_go')"><b>▱</b><span>No-Go</span></button>
+          <button type="button" class="map-editor-tool link" data-map-tool="connection" onclick="setMapEditorTool('connection')"><b>∿</b><span>Verbindung</span></button>
+          <button type="button" class="map-editor-tool dock" data-map-tool="home" onclick="setMapEditorTool('home')"><b>⌂</b><span>Station</span></button>
+        </div>
+
+        <div class="map-editor-draw-actions hidden" id="map-editor-draw-actions">
+          <button type="button" onclick="mapEditorUndoPoint()">↶ Punkt zurück</button>
+          <button type="button" class="primary" onclick="mapEditorFinishDraft()">✓ Zeichnung fertig</button>
+          <button type="button" onclick="mapEditorCancelDraft()">Abbrechen</button>
+        </div>
+
+        <div class="map-editor-object-form hidden" id="map-editor-object-form">
+          <div class="map-editor-form-title"><span id="map-editor-object-icon">▱</span><span id="map-editor-object-title">Objekt</span></div>
+          <label class="modal-field-label" for="map-editor-name">Name</label>
+          <input class="modal-input" id="map-editor-name" maxlength="80" placeholder="Name"/>
+
+          <div id="map-editor-zone-fields">
+            <label class="modal-field-label" for="map-editor-zone-type">Flächentyp</label>
+            <select class="modal-select" id="map-editor-zone-type">
+              <option value="mowing">Mähzone</option>
+              <option value="no_go">No-Go-Zone</option>
+            </select>
+          </div>
+
+          <div id="map-editor-connection-fields" class="hidden">
+            <label class="modal-field-label" for="map-editor-connection-type">Verbindung von</label>
+            <select class="modal-select" id="map-editor-connection-type">
+              <option value="dock_link">Ladestation</option>
+              <option value="zone_link">Mähzone</option>
+            </select>
+            <select class="modal-select hidden" id="map-editor-from-zone" aria-label="Startzone"></select>
+            <label class="modal-field-label" for="map-editor-to-zone">nach</label>
+            <select class="modal-select" id="map-editor-to-zone"></select>
+            <label class="modal-field-label" for="map-editor-corridor-width">Freigegebene Korridorbreite</label>
+            <div class="map-editor-unit-input"><input id="map-editor-corridor-width" type="number" min="110" max="1000" step="10" value="180"><span>cm</span></div>
+            <label class="map-editor-check"><input type="checkbox" id="map-editor-bidirectional" checked><span>In beiden Richtungen befahrbar</span></label>
+          </div>
+
+          <div class="map-editor-form-actions">
+            <button type="button" class="wiz-btn wiz-btn-primary" onclick="saveMapEditorObject()">Speichern</button>
+            <button type="button" class="wiz-btn wiz-btn-ghost" onclick="fitMapEditorSelection()">Auf Objekt zoomen</button>
+            <button type="button" class="wiz-btn wiz-btn-danger" id="map-editor-delete" onclick="deleteMapEditorObject()">Löschen</button>
+          </div>
+        </div>
+
+        <div class="map-editor-topology" id="map-editor-topology">Kartenstruktur wird geprüft…</div>
+        <div class="map-editor-list-head"><span>Kartenobjekte</span><button type="button" onclick="fitMapEditorAll()">Alle zeigen</button></div>
+        <div class="map-editor-object-list" id="map-editor-object-list"></div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
      SCHEDULE MODAL
 ══════════════════════════════════════════════════════ -->
 <div class="overlay" id="sched-modal">
@@ -1871,7 +2642,7 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
     <div class="modal-body">
 
       <div class="modal-field">
-        <label class="modal-field-label">Uhrzeit</label>
+        <label class="modal-field-label">Mähfenster von</label>
         <div style="display:flex;gap:8px">
           <select id="m-hour" class="modal-select" style="flex:1"></select>
           <select id="m-min" class="modal-select" style="width:90px">
@@ -1881,6 +2652,16 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
             <option value="45">:45</option>
           </select>
         </div>
+      </div>
+
+      <div class="modal-field">
+        <label class="modal-field-label">bis</label>
+        <input id="m-window-end" class="modal-input" type="time" value="15:00"/>
+      </div>
+
+      <div class="modal-field">
+        <label class="modal-field-label">Mähzone</label>
+        <select id="m-zone" class="modal-select"></select>
       </div>
 
       <div class="modal-field">
@@ -1934,10 +2715,43 @@ input[type="range"]::-webkit-slider-thumb{ background:var(--amber); box-shadow:0
 </div>
 
 <!-- TOAST STACK -->
+<div class="mission-planning-overlay" id="mission-planning-overlay" role="status" aria-live="polite" aria-hidden="true">
+  <div class="mission-planning-card">
+    <div class="mission-planning-spinner" aria-hidden="true"></div>
+    <div class="mission-planning-copy"><strong id="mission-planning-title">Mission wird geplant…</strong><span id="mission-planning-message">Sichere Route wird berechnet.</span></div>
+  </div>
+</div>
+
+<div class="overlay app-dialog-overlay" id="app-dialog" data-tone="warning" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="app-dialog-title" aria-describedby="app-dialog-message">
+  <div class="app-dialog-card">
+    <div class="app-dialog-head">
+      <div class="app-dialog-icon" id="app-dialog-icon" aria-hidden="true">?</div>
+      <div class="app-dialog-copy">
+        <h2 class="app-dialog-title" id="app-dialog-title">Aktion bestätigen</h2>
+        <p class="app-dialog-message" id="app-dialog-message"></p>
+      </div>
+    </div>
+    <div class="app-dialog-choices hidden" id="app-dialog-choices" role="listbox"></div>
+    <div class="app-dialog-actions">
+      <button class="app-dialog-button app-dialog-cancel" id="app-dialog-cancel" type="button">Abbrechen</button>
+      <button class="app-dialog-button app-dialog-confirm" id="app-dialog-confirm" type="button">Bestätigen</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-stack" id="toast-stack"></div>
+
+<div class="login-gate" id="login-gate">
+  <form class="login-card" id="login-form">
+    <h2>Mähroboter anmelden</h2>
+    <p>Gib die lokale Bedien-PIN ein.</p>
+    <input id="login-pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="PIN"/>
+    <button type="submit">Anmelden</button>
+  </form>
+</div>
 
 <!-- SCRIPTS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/app.js?v=8"></script>
+<script src="/static/app.js?v=50"></script>
 </body>
 </html>

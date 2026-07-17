@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from collections import deque
 from typing import Optional
 
 # Physical constants — tune to actual hardware
@@ -24,11 +25,19 @@ class Odometry:
     is handled via modular arithmetic.
     """
 
-    def __init__(self, meters_per_tick: float = METERS_PER_TICK):
+    def __init__(
+        self,
+        meters_per_tick: float = METERS_PER_TICK,
+        speed_window_s: float = 0.4,
+    ):
+        if speed_window_s <= 0:
+            raise ValueError("speed_window_s must be positive")
         self._meters_per_tick = meters_per_tick
+        self._speed_window_s = float(speed_window_s)
         self._prev_ticks: Optional[int] = None
         self._prev_timestamp: Optional[float] = None
         self._total_distance_m: float = 0.0
+        self._speed_history: deque[tuple[float, float]] = deque()
 
     def update(self, ticks: int, timestamp: float) -> Optional[OdometryUpdate]:
         """Call with encoder_ticks from HAL SENSORS telemetry.
@@ -38,6 +47,7 @@ class Odometry:
         if self._prev_ticks is None:
             self._prev_ticks = ticks
             self._prev_timestamp = timestamp
+            self._speed_history.append((timestamp, self._total_distance_m))
             return None
 
         dt = timestamp - self._prev_timestamp
@@ -48,11 +58,22 @@ class Odometry:
         # 32-bit unsigned wrap-around: delta = (new - old) mod 2^32
         delta_ticks = (ticks - self._prev_ticks) & 0xFFFFFFFF
         delta_m = delta_ticks * self._meters_per_tick
-        speed = delta_m / dt
-
         self._total_distance_m += delta_m
         self._prev_ticks = ticks
         self._prev_timestamp = timestamp
+        self._speed_history.append((timestamp, self._total_distance_m))
+        cutoff = timestamp - self._speed_window_s
+        # Retain one sample just before the window so the estimate spans a
+        # useful interval even when encoder ticks arrive between callbacks.
+        while len(self._speed_history) > 1 and self._speed_history[1][0] <= cutoff:
+            self._speed_history.popleft()
+        oldest_timestamp, oldest_distance = self._speed_history[0]
+        window_dt = timestamp - oldest_timestamp
+        speed = (
+            (self._total_distance_m - oldest_distance) / window_dt
+            if window_dt > 0
+            else 0.0
+        )
 
         return OdometryUpdate(
             speed_mps=speed,
@@ -65,3 +86,4 @@ class Odometry:
         self._prev_ticks = None
         self._prev_timestamp = None
         self._total_distance_m = 0.0
+        self._speed_history.clear()

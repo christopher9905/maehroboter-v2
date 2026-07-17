@@ -1,0 +1,97 @@
+ÄNDERUNGEN – FIELDS2COVER-INSPIRIERTER HYBRIDPLANER
+Stand: 15.07.2026
+
+Ziel
+====
+Die bisherige Bahnplanung wurde um die zentralen Fields2Cover-Konzepte
+Schwadgenerierung, Winkeloptimierung, getrennte Außen-/Innenbahnen und
+anschließende fahrdynamische Pfaderzeugung erweitert. Es wurde nicht die
+Fields2Cover-C++-Bibliothek eingebunden. Der vorhandene Python-Produktionscode
+bleibt die gemeinsame Grundlage von realem Betrieb und Simulation.
+
+Umgesetzte Änderungen
+=====================
+
+1. Schwad- und Winkeloptimierung
+--------------------------------
+- Mehrere deterministische Fahrwinkel werden bewertet (10-Grad-Raster,
+  Feldkanten und längste Kante des minimal gedrehten Rechtecks).
+- Bewertet werden Abdeckung, fragmentierte Schwade, Anzahl der Schwade und
+  unproduktive direkte Verbindungsstrecken.
+- Der gewählte Winkel und die Optimierungsmetriken werden in den Routendaten
+  ausgegeben.
+- Fahrspuren werden gegen eine separate, kollisionssichere
+  Hinterachs-/Centerline-Geometrie geschnitten.
+
+2. Außenbahn und Kurven
+-----------------------
+- Die Außenbahn wird vor den Innenbahnen geplant.
+- Gerade Außenabschnitte bleiben wandnah; Ecken werden anhand des realen
+  Front-/Hecküberhangs zusätzlich gerundet.
+- Die Eckrundung wird gegen den vollständigen überstrichenen Maschinenkörper
+  geprüft.
+- Unsichere Dubins-, Rückwärts- oder Mehrzug-Verbindungen werden bereits bei
+  der Kandidatenauswahl verworfen.
+- Der konfigurierte Mindestwenderadius gilt weiterhin für Wendemanöver und
+  Verbindungsfahrten.
+
+3. Vollständige Kollisionsgeometrie
+-----------------------------------
+- Die Geofence-Prüfung verwendet jetzt Traktorkörper, Frontmähwerk und beide
+  Heckmähwerke statt nur Fahrzeugmitte oder einer Querlinie.
+- Auch angehobene Mähwerke bleiben Bestandteil der Kollisionsgeometrie.
+- Zwischen zwei Posen wird eine konservative Sweep-Fläche geprüft.
+- No-Go-Zonen und eine separate 5-cm-Trackingreserve werden berücksichtigt.
+- Ein Plan wird vor der Freigabe verworfen, sobald der reale Maschinenkörper
+  den harten Geofence verlässt.
+
+4. Richtungsabhängige Bahnenden
+--------------------------------
+- Bahnstart und Bahnende werden nicht mehr symmetrisch um den langen
+  Frontüberhang gekürzt.
+- Am Start wird der kürzere Hecküberhang verwendet, am Ende der
+  Frontüberhang. Dadurch verschwinden die zuvor abwechselnd ausgelassenen
+  Flächen an den Bahnenden.
+
+5. Kein 180-Grad-Spin beim Gangwechsel
+--------------------------------------
+- Die physische Fahrzeugrichtung wird am Vorwärts-/Rückwärts-Wechsel aus dem
+  tatsächlich zuletzt gefahrenen Segment bestimmt.
+- Die frühere Kombination aus nächstem Bewegungsvektor und altem Gang konnte
+  einen falschen 180-Grad-Sprung in Darstellung und Footprint-Prüfung erzeugen.
+
+6. Diagnosewerte der Route
+---------------------------
+- planner_version: coverage_hybrid_v3
+- swath_angle_deg: gewählter Schwadwinkel
+- route_metrics: Kandidatenzahl, Schwadzahl, Fragmentierung,
+  Verbindungsdistanz, Fahr-/Rückwärtsdistanz und Optimierungskosten
+- plan_safety: harte Sweep-Prüfung plus Ergebnis der 5-cm-Trackingreserve
+- estimated_mainland_coverage_percent: Abdeckung des regulären Innenfelds
+- estimated_coverage_percent: ungeschönte Abdeckung der kompletten Zielzone
+- headland_safety_area_m2: separat bilanzierter Außen-/Wendebereich
+
+Tests und Verifikation
+======================
+- Neue Tests für vollständige Mähwerk-Geofence-Kollision.
+- Neuer Test für die Kurvenschwenkweite des Frontmähwerks.
+- Neuer Test gegen den falschen 180-Grad-Spin beim Gangwechsel.
+- Neue Tests für sichere Centerline, richtungsabhängige Bahnenden und
+  deterministische Winkeloptimierung.
+- Konkave Test1-Fläche: harter Sweep-Geofence gültig.
+- Gespeichertes Simulationsfeld: harter Sweep-Geofence gültig.
+- Vollständiger Projekttest nach allen Anpassungen: 339 Tests bestanden.
+
+Wichtige transparente Restgrenze
+================================
+Die sichere Innenfeldabdeckung der aktuell gespeicherten Flächen liegt bei
+rund 99,7 bis 99,9 Prozent. Die ungeschönte Gesamtdeckung liegt derzeit je
+nach Geometrie nur bei rund 90 bis 91 Prozent. Ursache sind vor allem enge
+Außenecken: Ein kontinuierlicher Vorwärtsbogen kann dort mit dem langen
+Frontmähwerk nicht wandnah und gleichzeitig kollisionsfrei fahren.
+
+Für eine tatsächlich vollständige Randabdeckung ist als nächster Ausbau eine
+eigene Eck-/Restflächenplanung sinnvoll. Diese sollte offene Randsegmente,
+gezieltes Zurücksetzen und erneutes Ansetzen verwenden. Die neue Diagnose
+weist diese Restflächen bewusst aus; sie werden nicht mehr durch einen
+vereinfachten Arbeitsbreiten-Puffer als bereits gemäht gezählt.

@@ -46,8 +46,10 @@ class TeachIn:
         self._state = TeachInState.IDLE
         self._feature_type: Optional[str] = None
         self._points: list[tuple[float, float]] = []
+        self._point_times: list[float] = []
         self._last_point: Optional[tuple[float, float]] = None
         self._last_time: Optional[float] = None
+        self._left_start_area = False
 
     @property
     def state(self) -> TeachInState:
@@ -57,13 +59,22 @@ class TeachIn:
     def points(self) -> list[tuple[float, float]]:
         return list(self._points)
 
+    @property
+    def path_length_m(self) -> float:
+        return sum(
+            _distance(*self._points[index - 1], *self._points[index])
+            for index in range(1, len(self._points))
+        )
+
     def start(self, feature_type: str):
         if self._state == TeachInState.RECORDING:
             raise RuntimeError("TeachIn already recording")
         self._feature_type = feature_type
         self._points.clear()
+        self._point_times.clear()
         self._last_point = None
         self._last_time = None
+        self._left_start_area = False
         self._state = TeachInState.RECORDING
 
     def update(self, pose: Pose):
@@ -81,9 +92,15 @@ class TeachIn:
         if dist >= self._dist_thresh or elapsed >= self._time_thresh:
             self._record(x, y, ts)
 
-        if len(self._points) >= self._min_points:
+        if self._points:
             start_x, start_y = self._points[0]
-            if _distance(start_x, start_y, x, y) < self._close_thresh:
+            start_distance = _distance(start_x, start_y, x, y)
+            # Hysteresis: merely touching the close radius during the first
+            # straight/corner must not count as leaving and returning.
+            if start_distance >= self._close_thresh * 1.5:
+                self._left_start_area = True
+            if (self._left_start_area and len(self._points) >= self._min_points
+                    and start_distance < self._close_thresh):
                 # Record the closing pose so the final boundary segment is complete
                 self._record(x, y, ts)
                 logger.info("TeachIn auto-closed after %d points", len(self._points))
@@ -91,6 +108,51 @@ class TeachIn:
 
     def cancel(self):
         self._state = TeachInState.CANCELLED
+
+    def trim_last_distance(self, distance_m: float) -> float:
+        """Remove a distance from the recorded tail and reopen the recording.
+
+        The final segment is interpolated when only part of it must be removed,
+        so the correction target is not limited to the sampling interval.
+        At least the first point is retained as the boundary anchor.
+        """
+        if distance_m <= 0:
+            raise ValueError("distance_m must be positive")
+        if self._state not in (TeachInState.RECORDING, TeachInState.CLOSED):
+            raise RuntimeError("TeachIn is not recording")
+        removed = 0.0
+        while len(self._points) > 1 and removed < distance_m:
+            end = self._points[-1]
+            start = self._points[-2]
+            segment = _distance(*start, *end)
+            remaining = distance_m - removed
+            if segment <= remaining + 1e-9:
+                self._points.pop()
+                self._point_times.pop()
+                removed += segment
+                continue
+            ratio = remaining / segment
+            self._points[-1] = (
+                end[0] + (start[0] - end[0]) * ratio,
+                end[1] + (start[1] - end[1]) * ratio,
+            )
+            end_time = self._point_times[-1]
+            start_time = self._point_times[-2]
+            self._point_times[-1] = end_time + (start_time - end_time) * ratio
+            removed += remaining
+
+        self._last_point = self._points[-1] if self._points else None
+        self._last_time = self._point_times[-1] if self._point_times else None
+        if self._points:
+            start_x, start_y = self._points[0]
+            self._left_start_area = any(
+                _distance(start_x, start_y, x, y) >= self._close_thresh * 1.5
+                for x, y in self._points[1:]
+            )
+        else:
+            self._left_start_area = False
+        self._state = TeachInState.RECORDING
+        return removed
 
     def to_geojson_feature(self) -> dict:
         if not self._points:
@@ -115,5 +177,6 @@ class TeachIn:
 
     def _record(self, x: float, y: float, ts: float):
         self._points.append((x, y))
+        self._point_times.append(ts)
         self._last_point = (x, y)
         self._last_time = ts

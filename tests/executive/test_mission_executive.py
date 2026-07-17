@@ -1,10 +1,8 @@
 # tests/executive/test_mission_executive.py
-import threading
-import pytest
 from unittest.mock import MagicMock
 from mower.executive.mission_executive import (
     MissionExecutive, MowerState,
-    LOW_BATTERY_SOC, MAX_AVOIDANCE_ATTEMPTS,
+    MAX_AVOIDANCE_ATTEMPTS,
 )
 
 
@@ -85,6 +83,22 @@ class TestMowerStateTransitions:
         ex.on_charge_complete()         # → IDLE
         assert ex.state == MowerState.IDLE
 
+    def test_confirmed_mission_can_depart_while_charging(self):
+        ex = _executive()
+        ex.start_mission("old-zone")
+        ex.stop_mission()
+        ex.on_dock_success()
+        ex.on_charge_started()
+        assert ex.state == MowerState.CHARGING
+
+        ex.start_mission("next-zone")
+
+        assert ex.state == MowerState.MOWING
+        assert ex.active_zone_id == "next-zone"
+        assert ex._charge_timer is None
+        ex._charge_timeout()  # ein alter Timer darf die neue Mission nicht stoppen
+        assert ex.state == MowerState.MOWING
+
     def test_on_lift_from_mowing_goes_error(self):
         hw = MagicMock()
         ex = _executive(hw)
@@ -103,13 +117,36 @@ class TestMowerStateTransitions:
         ex.on_tilt(reading)
         assert ex.state == MowerState.ERROR
 
-    def test_on_geofence_violation_goes_error(self):
-        ex = _executive()
+    def test_on_geofence_violation_soft_stops_without_latching_estop(self):
+        hw = MagicMock()
+        ex = _executive(hw)
         ex.start_mission()
         pose = MagicMock()
         pose.utm_x, pose.utm_y = 1000.0, 2000.0
         ex.on_geofence_violation(pose)
-        assert ex.state == MowerState.ERROR
+        assert ex.state == MowerState.PAUSED
+        assert ex.pause_reason == "Geofence violation at (1000.00, 2000.00)"
+        assert ex.error_reason == ""
+        hw.drive.assert_called_with(0.0, 0.0)
+        hw.set_blade.assert_called_with(False)
+        hw.estop.assert_not_called()
+
+    def test_acknowledged_geofence_override_rearms_after_reentry(self):
+        ex = _executive()
+        ex.start_mission("zone-1")
+        pose = MagicMock(utm_x=1000.0, utm_y=2000.0)
+        ex.on_geofence_violation(pose)
+
+        assert ex.resume_with_geofence_override() is True
+        assert ex.state == MowerState.MOWING
+        assert ex.geofence_override_active is True
+        assert ex.on_geofence_violation(pose) is False
+        assert ex.state == MowerState.MOWING
+
+        assert ex.on_geofence_recovered() is True
+        assert ex.geofence_override_active is False
+        assert ex.on_geofence_violation(pose) is True
+        assert ex.state == MowerState.PAUSED
 
     def test_reset_error_from_error_goes_idle(self):
         ex = _executive()
@@ -136,6 +173,35 @@ class TestMowerStateTransitions:
         ex.on_state_change = lambda old, new: transitions.append((old, new))
         ex.start_mission()
         assert transitions == [(MowerState.IDLE, MowerState.MOWING)]
+
+    def test_pause_and_resume_mission(self):
+        hw = MagicMock()
+        ex = _executive(hw)
+        ex.start_mission("zone-1")
+        ex.pause_mission()
+        assert ex.state == MowerState.PAUSED
+        assert ex.active_zone_id == "zone-1"
+        hw.drive.assert_called_with(0.0, 0.0)
+        hw.set_blade.assert_called_with(False)
+        ex.resume_mission()
+        assert ex.state == MowerState.MOWING
+
+    def test_return_to_dock_from_pause(self):
+        ex = _executive()
+        ex.start_mission("zone-1")
+        ex.pause_mission()
+        ex.return_to_dock()
+        assert ex.state == MowerState.RETURNING
+
+    def test_operator_emergency_stop_latches_error(self):
+        hw = MagicMock()
+        ex = _executive(hw)
+        ex.start_mission("zone-1")
+        ex.emergency_stop("Operator test")
+        assert ex.state == MowerState.ERROR
+        assert ex.error_reason == "Operator test"
+        hw.estop.assert_called_once()
+
 
 
 class TestDockingRobustness:

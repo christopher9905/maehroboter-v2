@@ -1,0 +1,135 @@
+Mähroboter V2 – Arbeitskarte, Zonen und Verbindungswege
+Stand: 16.07.2026
+
+ZIEL
+Eine Roborock-ähnliche Arbeitskarte, auf der Mähzonen, No-Go-Zonen,
+Verbindungswege und die Ladestation direkt am Display angelegt und bearbeitet
+werden können. Die Wege werden nicht nur angezeigt, sondern von der echten
+Missionslaufzeit verwendet.
+
+1. NEUER KARTENEDITOR
+- Neuer Button "Karte" im Bereich Mähbereiche und zusätzlicher Stift-Button
+  direkt an der Hauptkarte.
+- Eigenständiger Vollbild-Karteneditor, auch bei 390 px Bildschirmbreite
+  ohne horizontales Abschneiden bedienbar.
+- Werkzeuge:
+  * Auswahl/Bearbeitung
+  * Mähzone zeichnen
+  * No-Go-Zone zeichnen
+  * Verbindungsweg zeichnen
+  * Ladestation setzen/verschieben
+- Eckpunkte können auf der Karte gezogen werden.
+- Doppelklick auf einen Eckpunkt entfernt diesen, solange die Mindestanzahl
+  für Polygon oder Linie erhalten bleibt.
+- Beim Zeichnen stehen "Punkt zurück", "Zeichnung fertig" und "Abbrechen"
+  zur Verfügung.
+- Objekte können benannt, auf der Karte fokussiert und gelöscht werden.
+- Mähzonen können nachträglich in No-Go-Zonen umgewandelt werden und
+  umgekehrt.
+- Objektliste zeigt Station, Flächen und Verbindungen mit unterschiedlichen
+  Farben und Typbezeichnungen.
+
+2. VERBINDUNGSWEGE
+- Zwei Verbindungstypen:
+  * Stationsweg: Ladestation -> Mähzone
+  * Zonenverbindung: Mähzone -> Mähzone
+- Start- und Zielzone werden im Editor ausgewählt.
+- Wege können als Einbahnweg oder bidirektional gespeichert werden.
+- Konfigurierbare freigegebene Korridorbreite; neuer Standard 180 cm.
+- Linienenden werden beim Speichern automatisch an Ladestation bzw.
+  Zonenrand eingerastet.
+- Die Hauptkarte zeigt Stationswege gelb und Zonenverbindungen blau gestrichelt.
+- Ein Stationsweg wird für die Rückkehr nur verwendet, wenn er bidirektional
+  freigegeben ist.
+
+3. ECHTE NUTZUNG IN DER MISSION
+- Dock -> Zone:
+  Liegt die Station weiter außerhalb, verwendet die Missionsplanung den
+  gespeicherten Stationsweg statt der bisherigen direkten 3-m-Ausnahme.
+- Zone -> Zone:
+  Steht der Traktor in einer anderen bekannten Mähzone, wird ein passender
+  gespeicherter Zonenweg gesucht und der Mähroute vorangestellt.
+- Zone -> Dock:
+  Die Rückkehr verwendet den Stationsweg in Gegenrichtung, wenn dieser
+  bidirektional ist.
+- Ein Kartenweg beeinflusst die Anfahrt, aber eine externe Startposition wird
+  nicht mehr fälschlich als Startpunkt der internen Mähbahnoptimierung benutzt.
+- Am Zonenrand erzeugt die Laufzeit automatisch einen sicheren Eintrittspunkt
+  innerhalb der Zielzone. Dadurch muss der Bediener den Kartenweg nicht
+  künstlich weit in die Mähzone hineinzeichnen.
+- Der gespeicherte Mindestwenderadius gilt für jeden Teil der Anfahrt.
+- Für jede Kurvenvariante wird vor der Auswahl der vollständige Traktor- und
+  Mähwerks-Footprint gegen Zielzone, Verbindungskorridor und No-Go-Zonen
+  geprüft.
+- Der aktive Verbindungsweg wird als active_connection_id in den Routendaten
+  ausgegeben.
+
+4. SERVERSEITIGE SPEICHERUNG UND APIS
+- Neue persistente Collection "connections" im ControlStore.
+- Neue Endpunkte:
+  GET    /api/connections
+  POST   /api/connections
+  PUT    /api/connections/{id}
+  DELETE /api/connections/{id}
+  GET    /api/map/topology
+  DELETE /api/home
+- /api/bootstrap liefert Verbindungswege direkt mit aus.
+- Zonenpolygone werden mit Shapely auf Typ, Fläche und Selbstüberschneidung
+  geprüft.
+- Verbindungslinien werden auf Mindestpunktzahl, Selbstkreuzung, gültige
+  Start-/Zielzonen und Korridorbreite geprüft.
+- Eine Zone kann nicht gelöscht werden, solange ein Zeitplan oder
+  Verbindungsweg auf sie verweist.
+- Die Ladestation kann nicht gelöscht werden, solange ein Stationsweg besteht.
+- Der Topologiecheck meldet fehlende Ladestation und nicht angebundene
+  Mähzonen direkt im Karteneditor.
+
+5. ZUSÄTZLICHE UX-FUNKTIONEN
+- "Alle zeigen" zoomt auf die komplette Arbeitskarte.
+- "Auf Objekt zoomen" fokussiert die aktuelle Auswahl.
+- Nicht gespeicherte Änderungen werden beim Schließen nicht unbemerkt verworfen.
+- Entwürfe lassen sich entfernen, ohne Serverdaten anzulegen.
+- Die Kartenfläche ist gegen horizontales Überlaufen abgesichert.
+- Offline-Cache auf mv2-ui-v31 angehoben; app.js Cachebuster auf v38.
+
+6. TESTS UND PRÜFUNGEN
+- JavaScript-Syntax mit node --check geprüft.
+- Python-Module kompiliert.
+- API-/Persistenztests für Verbindungen, Topologie, Referenzschutz,
+  ungültige Polygone und Ladestation ergänzt.
+- Ausführbare Laufzeittests ergänzt für:
+  * Ladestation -> entfernte Zone über Stationsweg
+  * Zone -> Zone über Zonenverbindung
+  * Zone -> Ladestation über bidirektionalen Stationsweg
+- Relevanter Regressionstestblock: 28 Tests bestanden.
+- Die drei neuen Korridor-Szenarien bestanden einzeln mit vollständiger
+  radius- und footprintbasierter Routenprüfung.
+- Browserprüfung bei 1280 x 720 und 390 x 844:
+  Editor öffnen, Objekt auswählen, Eckpunkte anzeigen, No-Go-Entwurf,
+  Verbindungsentwurf, Metadaten und mobile Darstellung erfolgreich getestet.
+  Die erzeugten Testentwürfe wurden anschließend verworfen.
+
+WICHTIGE GEÄNDERTE DATEIEN
+- mower/api/control_store.py
+- mower/api/app.py
+- mower/api/static/index.html
+- mower/api/static/app.js
+- mower/api/static/sw.js
+- mower/executive/mission_runtime.py
+- tests/api/test_control_store.py
+- tests/api/test_operational_api.py
+- tests/executive/test_mission_runtime.py
+
+BEDIENUNG
+1. In "Mähbereiche" auf "Karte" oder auf den Stift an der Hauptkarte klicken.
+2. Zonen/No-Go-Zonen zeichnen oder bestehende Flächen auswählen.
+3. Ladestation mit dem Stationswerkzeug setzen und speichern.
+4. "Verbindung" wählen, Linienverlauf setzen und Zeichnung fertigstellen.
+5. Verbindungstyp, Zielzone, Korridorbreite und Fahrtrichtung einstellen.
+6. Speichern. Der Topologiehinweis zeigt noch fehlende Anbindungen.
+
+HINWEIS ZUR SICHERHEIT
+Eine gezeichnete Linie ist nur ein Bediener-Korridor. Die Laufzeit akzeptiert
+daraus ausschließlich eine Route, die den Mindestwenderadius und den vollständigen
+physischen Maschinen-Footprint einhält. Zu schmale oder nicht erreichbare Wege
+werden mit einer konkreten Fehlermeldung abgelehnt.

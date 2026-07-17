@@ -1,0 +1,57 @@
+ÄNDERUNGEN AUSSENBAHNEN – LÜCKENLOSE KURVEN
+Stand: 16.07.2026
+
+PROBLEM
+- Mehrere Außenbahnen hatten auf geraden Abschnitten den eingestellten
+  Spurabstand, in 90-Grad-Kurven wurde der Abstand jedoch größer.
+- Beispiel mit 48 cm Spurabstand:
+  Gerade: 48,0 cm
+  Kurve vorher: bis zu 67,9 cm (48 cm × Wurzel 2)
+- Bei 60 cm realer Mähbreite konnte dadurch eine sichtbare ungemähte Lücke
+  zwischen den Außenbahnen entstehen.
+
+URSACHE
+- Jede Außenbahn wurde separat mit demselben Mindestkurvenradius erzeugt.
+- Die Mittelpunkte der Kurven lagen dadurch diagonal um den Spurabstand
+  versetzt. Die Bahnen waren keine echten parallelen Offsetkurven.
+
+UMSETZUNG
+- Alle Außenbahnen werden jetzt aus einem gemeinsamen gerundeten Kurvenkern
+  erzeugt.
+- Die äußere Bahn erhält einen entsprechend größeren Radius.
+- Jede folgende Bahn wird konzentrisch um exakt den Spurabstand nach innen
+  versetzt.
+- Die innerste Bahn hält weiterhin mindestens den eingestellten Mähradius ein.
+- Das Verfahren funktioniert identisch für eine, zwei oder drei Außenbahnen.
+- Die Berechnung erfolgt direkt aus dem gemeinsamen Kern, ohne doppeltes
+  Polygon-Puffern und ohne numerische Krümmungsspitzen.
+
+ERGEBNIS BEIM BEISPIEL
+- Abstand Außenbahn 1 zu 2: mindestens 48,0 cm, maximal 48,0 cm.
+- Abstand Außenbahn 2 zu 3: mindestens 48,0 cm, maximal 48,0 cm.
+- Bei 60 cm Mähbreite bleiben auch im Radius 12 cm Überlappung.
+- Es entsteht keine geometrisch bedingte Lücke mehr.
+
+SICHERHEIT
+- Mindestwenderadius bleibt für jede Bahn eine harte Bedingung.
+- Passt die komplette konzentrische Mehrfach-Außenbahn nicht in die Zone,
+  wird der Plan mit einer klaren Fehlermeldung abgelehnt, statt eine Lücke
+  oder einen zu kleinen Radius zu erzeugen.
+
+UI
+- Der Einstellungshinweis nennt jetzt den konstanten Spurabstand auch in
+  Kurven.
+- Service-Worker-Cache auf mv2-ui-v49 aktualisiert.
+
+PRÜFUNGEN
+- Neuer Regressionstest für drei konzentrische Außenbahnen.
+- 9 direkte Pfad-/Wende-/Außenbahntests bestanden.
+- 2 vollständige Runtime-Tests mit Mähwerk-Geofence bestanden.
+- Insgesamt 11 relevante Tests bestanden.
+- Lokale UI: verbunden, bereit zum Starten, keine Browserfehler.
+
+BETROFFENE DATEIEN
+- mower/path/tractor_route.py
+- mower/api/static/app.js
+- mower/api/static/sw.js
+- tests/path/test_tractor_route.py

@@ -1,0 +1,72 @@
+Mähroboter V2 – Geofence-Bedienung und Mindestwenderadius
+Stand: 16.07.2026
+
+1. Geofence-Schaltflächen flackern nicht mehr
+
+- Ursache: Während einer Pause wurde die komplette Aktionsleiste bei jedem
+  Telemetriepaket neu erzeugt. Die Telemetrie läuft mit 10 Hz. Dadurch wurde
+  ein gedrückter Button teilweise noch während des Klicks aus dem DOM entfernt.
+- Die Aktionsleiste besitzt jetzt einen stabilen Zustands-Schlüssel und wird nur
+  noch neu aufgebaut, wenn sich die tatsächlich angebotenen Aktionen ändern.
+- Online-/Offline-Sperren werden weiterhin separat aktualisiert, ohne die
+  Schaltflächen zu ersetzen.
+- Browserprüfung über mehrere Statuszyklen: Aktionsleiste und Button blieben
+  identisch; Fortsetzen und erneutes Pausieren funktionierten.
+- Die bestehende Sicherheitsabfrage „Geofence-Verletzung ignorieren?“ und der
+  serverseitige bestätigte Override bleiben erhalten.
+
+2. Zu enge Kurve in der Planung behoben
+
+- Die gemeldete Kurve war tatsächlich zu eng und nicht nur optisch verzerrt.
+- In der vorherigen Route wurde für Wendung 8 ein Radius von ungefähr 2,5 cm
+  gemessen, obwohl 25 cm eingestellt waren.
+- Ursache: Endeten zwei benachbarte Mähbahnen längs versetzt, wurde ihr
+  diagonaler Abstand fälschlich als reiner Spurabstand verwendet. Dadurch wurde
+  die kinematisch berechnete Wende geometrisch gestaucht.
+- Längs- und Querabstand werden jetzt getrennt behandelt.
+- Bei versetzten Bahnenden wird entweder ein orientierter radiusbegrenzter
+  Verbinder oder eine reale Traktor-Mehrzugstrategie verwendet: gerade in den
+  bereits gemähten Bereich, dort radiusbegrenzte Wende, anschließend gerade zum
+  versetzten Bahnstart.
+- Dadurch bleiben auch stark konkave Zonen planbar, ohne eine Kurve zu stauchen.
+
+3. Harte Radius-Endprüfung ergänzt
+
+- Jede Fields2Cover-Variante wird vor der Auswahl auf den tatsächlich aus den
+  Wegpunkten gemessenen Radius geprüft.
+- Der komplette fertige Missionsplan wird vor Freigabe erneut geprüft.
+- Auch ein persistenter Cache-Plan wird vor dem Laden geprüft.
+- Unterschreitet eine Route den eingestellten Radius außerhalb einer kleinen
+  numerischen Toleranz, wird sie verworfen und nicht gestartet.
+- Die gemessene Mindestgröße steht zusätzlich in plan_safety unter
+  minimum_measured_turn_radius_cm zur Diagnose bereit.
+- Alte Cache-Dateien werden durch den Planner-Quellcode-Fingerprint automatisch
+  nicht mehr wiederverwendet.
+
+4. Verifikation
+
+- Neuer vollständiger Simulationsplan für „Simulationsfeld“:
+  13.557 Wegpunkte, Geofence-/Randreserveprüfung bestanden.
+- Konfigurierter Mindestwenderadius: 25,0 cm.
+- Numerisch gemessener Radius der finalen Wegpunkte: 24,99948 cm
+  (auf Anzeigeauflösung 25,0 cm).
+- Der vorherige Fehlerfall lag bei ungefähr 2,5 cm.
+- 10/10 Traktor-Routen-Unit-Tests bestanden.
+- Konkaver Test1-Regressionsplan zusammen mit den Routentests bestanden:
+  11/11 Tests.
+- 5/5 Geofence-API-/Executive-Tests bestanden.
+- Browserprüfung: Button blieb über mindestens sechs 10-Hz-Telemetrieupdates
+  derselbe DOM-Knoten; Fortsetzen/Pausieren funktionierte.
+
+Geänderte Dateien
+
+- mower/api/static/app.js
+- mower/path/tractor_route.py
+- mower/executive/mission_runtime.py
+- tests/path/test_tractor_route.py
+- AENDERUNGEN_GEOFENCE_BUTTONS_UND_WENDERADIUS_2026-07-16.txt
+
+Aktueller Betriebszustand
+
+- Simulationsserver läuft unter http://127.0.0.1:8090/
+- Zustand nach dem abschließenden Neustart: IDLE / Bereit.

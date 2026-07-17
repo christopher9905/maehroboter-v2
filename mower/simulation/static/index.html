@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MV2 Simulationskonsole</title>
+  <link rel="stylesheet" href="/simulation/sim.css?v=2">
+</head>
+<body>
+  <header>
+    <div>
+      <div class="eyebrow">Mähroboter V2</div>
+      <h1>Simulationskonsole</h1>
+      <p>Virtuelle Hardwarebedingungen für den unveränderten Produktionscode.</p>
+    </div>
+    <div class="header-actions">
+      <span id="connection" class="pill pending">Verbinde…</span>
+      <a class="button secondary" href="/">Produktions-UI öffnen ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel overview">
+      <div class="section-title"><h2>Live-Zustand</h2><span id="app-state" class="state">—</span></div>
+      <div class="metrics">
+        <div><span>Position X / Y</span><strong id="position">—</strong></div>
+        <div><span>Tempo</span><strong id="speed">—</strong></div>
+        <div><span>Kurs</span><strong id="heading">—</strong></div>
+        <div><span>Akku</span><strong id="soc">—</strong></div>
+        <div><span>GPS</span><strong id="gps">—</strong></div>
+        <div><span>Messer</span><strong id="blade">—</strong></div>
+      </div>
+      <div class="simulation-speed">
+        <label for="simulation-speed-input">
+          <span><strong>Simulationsgeschwindigkeit</strong><small>Beschleunigt Bewegung, Ladezeit und Akkuverbrauch für Testläufe.</small></span>
+          <b id="simulation-speed-value">1×</b>
+        </label>
+        <input id="simulation-speed-input" type="range" min="1" max="5" step="0.25" value="1">
+        <div class="speed-marks"><span>1× realistisch</span><span>3×</span><span>5× schnell</span></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title"><div><h2>GPS & Umgebung</h2><p>Änderungen werden als virtuelle Rohsensorwerte eingespeist.</p></div></div>
+      <div class="button-grid">
+        <button data-patch='{"gps_fix_quality":4,"gps_hdop":0.7}'>RTK Fix</button>
+        <button data-patch='{"gps_fix_quality":5,"gps_hdop":1.8}'>RTK Float</button>
+        <button class="danger" data-patch='{"gps_fix_quality":0,"gps_hdop":99}'>GPS verloren</button>
+        <button data-toggle="charging">Laden umschalten</button>
+        <button data-patch='{"rain_adc":900}'>Regen starten</button>
+        <button data-patch='{"rain_adc":250}'>Regen beenden</button>
+        <button class="danger" data-patch='{"lifted":true}'>Lift auslösen</button>
+        <button data-patch='{"lifted":false}'>Lift zurücksetzen</button>
+      </div>
+      <div class="sliders">
+        <label><span>Akku <b id="soc-input-value">80 %</b></span><input id="soc-input" type="range" min="0" max="100" value="80"></label>
+        <label><span>Neigung Pitch <b id="pitch-input-value">0°</b></span><input id="pitch-input" type="range" min="-45" max="45" value="0"></label>
+        <label><span>Neigung Roll <b id="roll-input-value">0°</b></span><input id="roll-input" type="range" min="-45" max="45" value="0"></label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title"><div><h2>Fehlerszenarien</h2><p>Die Bits laufen durch STATUS, Sicherheitslogik und Ereignislog.</p></div><span id="error-flags" class="pill">Flags 0x00</span></div>
+      <div class="button-grid">
+        <button class="danger" data-error="1">Bumper links</button>
+        <button class="danger" data-error="2">Bumper rechts</button>
+        <button class="danger" data-error="4">RTK-Hardwarefehler</button>
+        <button class="danger" data-error="8">Messerstrom zu hoch</button>
+        <button id="clear-errors">Fehlerbits löschen</button>
+        <button id="operator-reset">Bedienfehler zurücksetzen</button>
+      </div>
+    </section>
+
+    <section class="panel actions">
+      <div><h2>Szenario zurücksetzen</h2><p>Pose, Sensoren, Akku und virtuelle Not-Aus-Verriegelung auf Startwerte setzen.</p></div>
+      <button id="reset-world" class="primary">Simulation vollständig zurücksetzen</button>
+    </section>
+  </main>
+
+  <div id="toast" role="status"></div>
+  <script src="/simulation/sim.js?v=2"></script>
+</body>
+</html>

@@ -51,6 +51,29 @@ class TestTeachInSampling:
         ti.update(_make_pose(0.6, 0.0, ts=0.2))    # 0.6 m — record
         assert len(ti.points) == 2
 
+    def test_trim_last_distance_interpolates_tail_and_updates_length(self):
+        ti = TeachIn(distance_threshold_m=0.1, time_threshold_s=999.0)
+        ti.start("boundary")
+        ti.update(_make_pose(0.0, 0.0, ts=0.0))
+        ti.update(_make_pose(2.0, 0.0, ts=1.0))
+        ti.update(_make_pose(4.0, 0.0, ts=2.0))
+
+        removed = ti.trim_last_distance(1.5)
+
+        assert removed == pytest.approx(1.5)
+        assert ti.points[-1] == pytest.approx((2.5, 0.0))
+        assert ti.path_length_m == pytest.approx(2.5)
+        assert ti.state == TeachInState.RECORDING
+
+    def test_trim_keeps_first_anchor_when_distance_exceeds_path(self):
+        ti = TeachIn(distance_threshold_m=0.1, time_threshold_s=999.0)
+        ti.start("boundary")
+        ti.update(_make_pose(10.0, 20.0, ts=0.0))
+        ti.update(_make_pose(11.0, 20.0, ts=1.0))
+
+        assert ti.trim_last_distance(5.0) == pytest.approx(1.0)
+        assert ti.points == [(10.0, 20.0)]
+
     def test_point_recorded_every_second_regardless_of_distance(self):
         ti = TeachIn(distance_threshold_m=999.0, time_threshold_s=1.0)
         ti.start("boundary")
@@ -70,6 +93,24 @@ class TestTeachInSampling:
 
 
 class TestTeachInAutoClose:
+    def test_does_not_close_before_robot_has_left_start_area(self):
+        ti = TeachIn(close_threshold_m=1.0, min_points=4)
+        ti.start("boundary")
+        ti.update(_make_pose(0.0, 0.0, ts=0.0))
+        ti.update(_make_pose(0.2, 0.0, ts=2.0))
+        ti.update(_make_pose(0.4, 0.0, ts=4.0))
+        ti.update(_make_pose(0.6, 0.0, ts=6.0))
+        assert ti.state == TeachInState.RECORDING
+
+    def test_radius_hysteresis_ignores_first_turn_near_start(self):
+        ti = TeachIn(close_threshold_m=1.0, min_points=4)
+        ti.start("boundary")
+        ti.update(_make_pose(0.0, 0.0, ts=0.0))
+        ti.update(_make_pose(0.5, 0.0, ts=2.0))
+        ti.update(_make_pose(1.1, 0.0, ts=4.0))
+        ti.update(_make_pose(0.9, 0.0, ts=6.0))
+        assert ti.state == TeachInState.RECORDING
+
     def test_auto_close_when_near_start(self):
         ti = TeachIn(close_threshold_m=1.0, min_points=4)
         ti.start("boundary")

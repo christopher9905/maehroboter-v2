@@ -3,6 +3,7 @@ crcmod==1.7
 pytest==8.3.5
 pytest-mock==3.14.0
 filterpy==1.4.5
+numpy>=1.26.0
 pynmea2==1.19.0
 utm==0.7.0
 shapely==2.0.6

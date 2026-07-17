@@ -49,3 +49,32 @@ class TestOdometry:
         odo.reset()
         result = odo.update(ticks=200, timestamp=2.0)
         assert result is None  # first update after reset
+
+    def test_quantized_ticks_produce_continuous_speed_estimate(self):
+        meters_per_tick = 0.0094
+        target_speed = 0.1944
+        odo = Odometry(meters_per_tick=meters_per_tick, speed_window_s=0.4)
+        estimates = []
+        for index in range(41):
+            timestamp = index * 0.05
+            ticks = int(target_speed * timestamp / meters_per_tick)
+            result = odo.update(ticks=ticks, timestamp=timestamp)
+            if result is not None and timestamp >= 0.5:
+                estimates.append(result.speed_mps)
+
+        assert estimates
+        assert max(estimates) - min(estimates) < 0.03
+        assert sum(estimates) / len(estimates) == pytest.approx(target_speed, abs=0.015)
+
+    def test_speed_decays_to_zero_only_after_measurement_window(self):
+        odo = Odometry(meters_per_tick=0.01, speed_window_s=0.4)
+        for index in range(5):
+            result = odo.update(ticks=index, timestamp=index * 0.1)
+        assert result is not None
+        assert result.speed_mps == pytest.approx(0.1)
+
+        shortly_stopped = odo.update(ticks=4, timestamp=0.5)
+        fully_stopped = odo.update(ticks=4, timestamp=0.9)
+
+        assert shortly_stopped is not None and shortly_stopped.speed_mps > 0.0
+        assert fully_stopped is not None and fully_stopped.speed_mps == 0.0

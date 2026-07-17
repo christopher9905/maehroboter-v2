@@ -1,0 +1,86 @@
+ÄNDERUNGEN – PERSISTENTER MISSIONSPLAN-CACHE
+Stand: 16.07.2026
+
+ZIEL
+- Eine bereits erfolgreich geplante und geprüfte Mission soll bei unveränderter
+  Zone und unveränderten Einstellungen nicht erneut berechnet werden.
+- Sobald sich eine relevante Eingabe ändert, muss automatisch neu geplant werden.
+
+UMSETZUNG
+- Vollständige, ausführbare Routen werden serverseitig gespeichert.
+- Gespeichert werden Wegpunkte, Gangrichtung, Mäh-/Wendeabschnitte,
+  Karten-Geometrien, Sicherheitsprüfung, Abdeckungswerte und Planermetriken.
+- Die Route wird beim Laden als neue ContinuousTrajectory aufgebaut.
+- Die reale gefahrene Spur und die reale Mähfläche werden weiterhin bei jedem
+  Missionsstart geleert und niemals aus dem Cache übernommen.
+
+CACHE-SCHLÜSSEL / AUTOMATISCHE INVALIDIERUNG
+Der Schlüssel enthält:
+- ausgewählte Mähzone und deren vollständige Geometrie,
+- alle weiteren Zonen und No-Go-Zonen,
+- alle Einstellungen,
+- Stations- und Zonenverbindungen,
+- gespeicherte Home-/Ladestationsposition,
+- Startzustand und RTK-Startpose,
+- Fingerabdruck des ausgeführten Planungscodes,
+- Cache-Schemaversion.
+
+Dadurch erfolgt automatisch eine Neuplanung bei:
+- geänderter Zone oder No-Go-Zone,
+- geänderter Einstellung, z. B. Mähbreite, Spurabstand oder Wenderadius,
+- geändertem Stations-/Verbindungsweg,
+- geänderter Home-Position,
+- anderer Startsituation,
+- geändertem Planer-Code oder Cacheformat.
+
+STARTPOSE UND SICHERHEIT
+- Die Startpose wird im Schlüssel auf RTK-Zentimetergenauigkeit berücksichtigt.
+- Zusätzlich wird die ungerundete Pose vor dem Laden nochmals geprüft.
+- Positionstoleranz: maximal 1,5 cm.
+- Winkeltoleranz: maximal 0,25 Grad.
+- Dadurch wird keine alte Anfahrtsroute verwendet, wenn der Roboter an einer
+  anderen Position oder in einer anderen Richtung steht.
+
+PERSISTENZ
+- Cachedateien liegen komprimiert unter mower/data/plan-cache/.
+- Die normale simulation-control.json wird nicht mit zehntausenden Wegpunkten
+  vergrößert.
+- Speicherung erfolgt atomar über eine temporäre Datei.
+- Maximal 12 Pläne werden vorgehalten; ältere Einträge werden entfernt.
+- Beschädigte oder ungültige Dateien werden ignoriert und gelöscht.
+- Fehlgeschlagene oder sicherheitsseitig verworfene Planungen werden niemals
+  gecacht.
+
+UI / API
+- Der Missionsstart liefert plan_cache_hit zurück.
+- Bei einem Treffer erscheint: "Gespeicherter Plan sofort geladen".
+- Bei einer echten Neuplanung erscheint: "Mission neu geplant und gestartet".
+- In den Routenmetriken stehen plan_cache_hit, plan_cache_key und bei einem
+  Treffer plan_cache_age_s.
+- Service-Worker-Cache auf mv2-ui-v50 aktualisiert.
+
+MESSUNG
+- Gültige 5-m-Testzone, erste Planung: 2,320 s.
+- Identischer Plan nach komplett neuem Store- und Runtime-Objekt: 0,131 s.
+- Trefferstatus beim zweiten Aufruf: true.
+- Geladene und ursprüngliche Kartenroute: identisch.
+- Persistente Cachedateien: 1.
+
+TESTS
+- 14 relevante Cache-, Speicher-, Runtime- und API-Tests bestanden.
+- Ein Test ersetzt den Planer beim zweiten Aufruf absichtlich durch einen
+  Fehler. Der zweite identische Aufruf funktioniert trotzdem aus dem Cache.
+- Geänderte Spurbreite erzeugt einen anderen Schlüssel.
+- Geänderte Zonengeometrie erzeugt einen anderen Schlüssel.
+- Persistenz über ein neu aufgebautes ControlStore-/MissionRuntime-Paar geprüft.
+
+BETROFFENE DATEIEN
+- mower/api/control_store.py
+- mower/executive/mission_runtime.py
+- mower/api/app.py
+- mower/api/static/app.js
+- mower/api/static/sw.js
+- tests/api/test_control_store.py
+- tests/api/test_operational_api.py
+- tests/executive/test_mission_runtime.py
+- .gitignore

@@ -11,3 +11,5 @@ build/
 venv/
 .venv/
 .worktrees/
+.native/
+mower/data/plan-cache/

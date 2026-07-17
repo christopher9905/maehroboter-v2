@@ -1,0 +1,296 @@
+ÄNDERUNGEN – NATIVE FIELDS2COVER-PLANUNG
+Datum: 16.07.2026
+
+Ziel
+----
+Fields2Cover ist jetzt als echte native Alternative zum vorhandenen MV2-Planer
+auswählbar. Beide Planer verwenden weiterhin dieselbe MissionRuntime, dieselbe
+Fahrzeug-/Mähwerkgeometrie, dieselbe Simulation und dieselbe abschließende
+Geofence-Sicherheitsprüfung.
+
+Native Bibliothek
+-----------------
+- Offizielle Fields2Cover-C++-Bibliothek mit Python-Bindings projektlokal gebaut.
+- Eingesetzte Fields2Cover-Version: 2.0.0.
+- Gepinnter Upstream-Commit: 92b9f2fcf72d26c44202f9d2ab54fbf25ed87426.
+- Native Abhängigkeiten: GDAL, GEOS, OR-Tools, SWIG und TBB.
+- Der reproduzierbare Build liegt in scripts/build_fields2cover_native.sh.
+- Installationsziel: .native/fields2cover (wird nicht in Git eingecheckt).
+
+Einstellungen im UI
+-------------------
+- Neue Planungs-Engine-Auswahl: „MV2 Hybrid“ oder „Fields2Cover“.
+- Native Verfügbarkeits- und Versionsanzeige.
+- Zellzerlegung: Boustrophedon, Trapezoidal oder keine Zerlegung.
+- Einstellbarer Zerlegungswinkel.
+- Swath-Zielfunktion: wenige Bahnen schnell, wenige Bahnen exakt oder kurze Strecke.
+- Bahnwinkel automatisch optimieren oder fest vorgeben.
+- Routenreihenfolge: OR-Tools optimiert, Boustrophedon, Snake oder Spiral.
+- Einstellbare Spiralblockgröße.
+- Kurvenmodell: Dubins, Dubins kontinuierlich, Reeds-Shepp oder
+  Reeds-Shepp kontinuierlich.
+- Einstellbare Vorgewendebreite als Faktor der Maschinenkontur.
+- Einstellbare maximale Krümmungsänderung.
+- OR-Tools-Zeitlimit und optionale weitere Optimumsuche.
+- Eigene native Mindestabdeckung. Standard: 90 % der von Fields2Cover
+  erzeugten Innenfläche. Die Abdeckung des gesamten Feldes wird zusätzlich
+  separat und unverändert ausgewiesen.
+
+Planungs- und Sicherheitslogik
+------------------------------
+- Native Pipeline: Headland-Generierung, Zellzerlegung, Swath-Erzeugung,
+  Routenplanung und Kurven-/Pfadplanung durch Fields2Cover.
+- Planung erfolgt lokal um den Polygon-Schwerpunkt und wird danach wieder in
+  UTM zurücktransformiert. Dadurch bleiben native Kurven bei großen
+  UTM-Koordinaten numerisch stabil.
+- Die Maschinenbreite berücksichtigt die vollständige Traktor- und
+  Mähwerk-Kontur, nicht nur den Fahrzeugmittelpunkt.
+- No-Go-Flächen werden vor der nativen Planung aus dem Arbeitsbereich entfernt.
+- Wenn nötig, wird der native Feldrand schrittweise weiter eingerückt, bis die
+  vollständige Traktor-/Mähwerk-Kontur den gemeinsamen Sicherheitscheck besteht.
+- Die resultierende Route läuft weiterhin durch den bestehenden exakten
+  Swept-Footprint-Geofence-Test.
+- Die tatsächliche Fields2Cover-Innenfläche wird separat übernommen und für
+  die native Mindestabdeckung verwendet.
+- Gesamtfeld-Abdeckung, Innenfeld-Abdeckung, ungemähte Fläche und native
+  Planungsmetriken werden getrennt ausgegeben.
+
+Robuster OR-Tools-Betrieb
+-------------------------
+- Der optimierte native Fields2Cover-Lauf wird in einem isolierten Prozess
+  ausgeführt. Ein nativer Fehler beschädigt dadurch nicht den dauerhaft
+  laufenden Mäherprozess.
+- Für den Fields2Cover-2.x-Sonderfall „CubicSpline x array is not sorted“ wird
+  die gleiche native Zerlegung automatisch mit dem nativen Boustrophedon-Sorter
+  wiederholt.
+- In den Routenmetriken stehen angeforderte und tatsächlich verwendete
+  Reihenfolge, z. B.:
+  route_order = optimized
+  effective_route_order = boustrophedon_fallback
+
+API und Speicherung
+-------------------
+- GET /api/planners/status meldet Verfügbarkeit, Version und Detailstatus.
+- /api/bootstrap liefert den Planerstatus an das UI.
+- Alle Fields2Cover-Einstellungen werden serverseitig im ControlStore
+  gespeichert, validiert und auf sichere Wertebereiche begrenzt.
+
+Wichtige Dateien
+----------------
+- scripts/build_fields2cover_native.sh
+- mower/path/fields2cover_native.py
+- mower/executive/mission_runtime.py
+- mower/api/control_store.py
+- mower/api/app.py
+- mower/api/static/index.html
+- mower/api/static/app.js
+- mower/api/static/sw.js
+- tests/path/test_fields2cover_native.py
+- tests/executive/test_mission_runtime.py
+- tests/api/test_control_store.py
+
+Prüfung
+-------
+- Native Fields2Cover-Tests für optimized, Boustrophedon, Snake und Spiral.
+- Gemeinsamer MissionRuntime-Geofence- und Mähwerk-Sicherheitscheck.
+- Backend-, ControlStore- und API-Regressionstests.
+- Ergebnis der relevanten Gesamttests nach den Nachbesserungen: 84 bestanden.
+- Python-Syntaxprüfung, JavaScript-Syntaxprüfung und Shell-Syntaxprüfung bestanden.
+- UI im laufenden Simulator geprüft:
+  Native Bibliothek bereit · 2.0.0
+  Fields2Cover-Konfiguration sichtbar und dynamische Optionen funktionieren.
+- Vorhandene Zone „Test1“ aus dem UI erfolgreich als native Mission gestartet.
+  Ergebnis beim Test:
+  planner_version = fields2cover_native_2x
+  plan_safety.valid = true
+  measured_mainland_coverage_percent = 93.28
+  effective_route_order = boustrophedon_fallback
+
+Start / erneuter Build
+----------------------
+1. Bei Bedarf: scripts/build_fields2cover_native.sh
+2. Simulation starten: python3 -m mower.simulation
+3. Im Einstellungstab unter „Planungs-Engine“ Fields2Cover auswählen.
+
+Hinweis zum Vergleich
+---------------------
+Fields2Cover erzeugt in seiner Standardpipeline Innenbahnen innerhalb eines
+reservierten Vorgewendes. Dieses Vorgewende ist nicht automatisch eine
+vollständig gemähte Außenbahn. Wenn in den allgemeinen Einstellungen
+„Außenkante zuerst“ gewählt ist, ergänzt MV2 deshalb jetzt auch beim nativen
+Fields2Cover-Innenplan eine maschinen- und geofencesichere Außenbahn. Die
+native Innenfeld-Abdeckung und die ehrliche Gesamtfeld-Abdeckung bleiben
+weiterhin getrennt ausgewiesen.
+
+Nachbesserung Missionstart
+--------------------------
+- Während der nativen Planung erscheint jetzt dauerhaft „Mission wird geplant“
+  inklusive des eingestellten Zeitlimits je Optimierungsversuch.
+- Startknöpfe werden währenddessen gegen Doppelstarts gesperrt.
+- Die rechenintensive Planung läuft außerhalb des Webserver-Event-Loops.
+  Status, Telemetrie, Soft-Stop und Not-Aus bleiben währenddessen erreichbar.
+- Ein hart beendeter oder zeitüberschreitender OR-Tools-Worker wird erkannt und
+  mit dem nativen Boustrophedon-Sorter erneut geplant.
+- Planungsfehler verschwinden nicht mehr nach wenigen Sekunden als Toast,
+  sondern bleiben als Dialog mit Ursache und Handlungsempfehlung sichtbar.
+- Bei einem Fields2Cover-Konfigurationsfehler führt „Einstellungen prüfen“
+  direkt in den Einstellungstab.
+- Zusätzlicher Regressionstest stellt sicher, dass /api/status während einer
+  laufenden Routenplanung antwortet.
+
+Korrektur Vorgewende und Maschinenbreite
+----------------------------------------
+- Fields2Cover erhält jetzt die reale seitliche Maschinenkontur. Beim aktuellen
+  Fahrzeug sind das 60 cm statt der zuvor übergebenen diagonalen 100-cm-Hülle.
+- Der diagonale Schwenk-/Sicherheitsradius bleibt ausschließlich für die exakte
+  Geofence-Prüfung und konservative Randrücksetzungen erhalten.
+- Der frühere dimensionslose Vorgewendefaktor wurde im UI ersetzt.
+- Neuer Automatikmodus berechnet die Vorgewendebreite aus Mindestwenderadius,
+  tatsächlichem Kurvenschwenk der Mähwerke und Trackingreserve.
+- Alternativ kann das Vorgewende direkt zwischen 40 und 150 cm eingestellt werden.
+- Für die aktuelle Geometrie berechnet die Automatik 69,3 cm statt zuvor bis
+  zu 180 cm.
+- Fields2Cover erhält außerdem die reale Mähbreite von 60 cm getrennt von der
+  eingestellten Bahnüberlappung.
+
+Korrektur Vor-/Rückwärtspendeln beim Wenden
+-------------------------------------------
+- Die Trajektorienprojektion darf den bestätigten Streckenfortschritt nicht
+  mehr rückwärts setzen.
+- Der aktuelle Wegpunkt wird aus dem verriegelten, monotonen Fortschritt
+  bestimmt und nicht mehr aus einer mehrdeutigen Rohprojektion.
+- Dadurch kann der Regler an räumlich überlappenden Vor-/Rückwärtssegmenten
+  nicht mehr zwischen zwei Gängen und den Zuständen Wenden/Mähen springen.
+- Regressionstest mit einem überlappenden Gangwechsel-Cusp ergänzt.
+- Live-Simulation geprüft: Fortschritt 3,69 m bis 10,01 m ohne Rücksprung;
+  genau ein Zustandswechsel Wenden → Mähwerk absenken → Mähen.
+
+Korrektur fehlende Bahn und zu frühes Einlenken
+-----------------------------------------------
+- Ursache der links fehlenden Bahn in „Test1“ bestimmt: Das 69,3-cm-
+  Fields2Cover-Vorgewende trennt die konkave Geometrie in eine 33,299-m²-
+  Hauptfläche und eine 0,910-m²-Insel. Zwischen beiden erzeugt der native
+  Swath-Generator deshalb keine reguläre Innenbahn.
+- Bei „Außenkante zuerst“ wird die maschinensichere Außenbahn nun auch mit dem
+  Fields2Cover-Innenplan erzeugt, gemäht und radiusbegrenzt verbunden. Sie
+  deckt den beim negativen Puffer herausgefallenen schmalen Feldhals ab.
+- Die Trajektorienprojektion berücksichtigt zusätzlich Fahrtrichtung und den
+  pro Regeltakt physikalisch möglichen Vorwärtsfortschritt. Eine nahe
+  Gegenbahn einer Haarnadel kann damit nicht mehr irrtümlich als bereits
+  erreicht gelten.
+- Die konstante MPC-Vorschau wurde von 1,0 s auf 0,5 s reduziert. Die alte
+  Vorschau lenkte bei 0,25 m Radius und 0,7 km/h etwa 15 cm vor dem geplanten
+  Tangentialpunkt ein; die neue Vorschau deckt weiterhin die vollständige
+  Lenkrampenzeit ab, ohne die Gerade vor der Kurve abzuschneiden.
+- Regressionstests für eine enge Haarnadel, richtungsabhängige Projektion,
+  Gangwechsel-Cusp und Dock-Endpunkt ergänzt beziehungsweise ausgeführt.
+- Prüfung: 97 Tests des Pfad-, Regler- und MissionRuntime-Pakets bestanden;
+  der einzige zunächst gefundene Dock-Endpunkt-Regressionsfall wurde
+  korrigiert und mit 8 gezielten Tests erneut erfolgreich geprüft.
+
+Korrektur Quersprünge in der beschleunigten Simulation
+-------------------------------------------------------
+- Vergleich 1× gegen 5× durchgeführt: Bei 1× folgte derselbe native Plan über
+  mehrere Wendungen mit typischerweise weniger als 1 cm Querfehler. Die
+  sprunghaften Abweichungen waren damit kein grundsätzlich zu kleiner
+  Wenderadius, sondern ein Fehler im beschleunigten Simulationsablauf.
+- Während der 800-ms-Mähwerkbewegung stand das Fahrzeug, der interne
+  Trajektorienfortschritt lief jedoch weiter. Der Fortschritt wird nun bei
+  stehendem Fahrzeug und während der Mähwerkbewegung vollständig eingefroren.
+- Die Mähwerk-Wartezeit wird im Simulator mit dem gewählten Zeitfaktor
+  skaliert; bei realer Hardware bleibt die konfigurierte Zeit unverändert.
+- Die 5×-Geschwindigkeit wird vor Projektionssuche und Fortschrittsgrenze auf
+  die physikalische Fahrzeuggeschwindigkeit zurückgerechnet.
+- Die Trajektorienprojektion besitzt nun eine harte statt nur gewichtete
+  Vorwärtsgrenze. Eine räumlich nahe spätere Bahn kann den bestätigten
+  Fortschritt nicht mehr um mehrere Meter versetzen.
+- Die Simulationswelt verwendet feste Physikschritte. Wenn ein Python-Thread
+  verspätet ausgeführt wird, läuft die Simulation kurz langsamer, statt die
+  verlorene Rechnerzeit in einem großen Positionssprung nachzuholen.
+- Der Leaflet-Marker interpoliert Positions- und Richtungsänderungen. Winkel
+  werden über den kürzesten Weg fortgesetzt, wodurch 359°→0° keinen optischen
+  Vollkreis/Seitensprung mehr erzeugt. Die Follow-Animation endet vor dem
+  nächsten 10-Hz-Telemetriepunkt.
+- Neue Regressionstests prüfen festen Physikschritt, eingefrorenen Fortschritt,
+  harte Projektionsgrenze und Lenkkorrektur. Letzte gezielte Prüfung:
+  16 Tests bestanden, JavaScript-Syntaxprüfung bestanden.
+- Die Längsposition darf kontrolliert aufholen, wenn die gemessene Position
+  bereits weiter auf derselben Bahntangente liegt. Seitlicher Abstand zu einer
+  anderen Bahn erhöht diese Grenze ausdrücklich nicht. Dadurch erkennt der
+  Regler auch unter 5×-Threadlast das tatsächliche Bahnende rechtzeitig.
+- Eine durch die negative Vorgewendepufferung erzeugte, nur 0,872 m² große
+  abgetrennte Mainland-Insel wurde als Ursache der problematischen 1,45-m-
+  Kurzbahn identifiziert. Bei aktivem Außenpass werden solche Fragmente unter
+  fünf Prozent der Mainland-Fläche nicht noch einmal als eigene Innenzelle
+  angefahren; der Außenpass deckt sie bereits sicher ab.
+- Abschließender Live-Test auf „Test1“ bei 5×: fünf aufeinanderfolgende native
+  Wendungen ohne Geofence-Stop, maximaler Querfehler 4,42 cm beim Wenden,
+  0,86 cm auf Mähbahnen und 1,15 cm auf der Außenbahn. Anschließend wurde die
+  Simulation wieder auf 1× gestellt und läuft weiter.
+- Letzte gezielte Prüfung nach allen Korrekturen: 18 Tests bestanden;
+  JavaScript-Syntaxprüfung weiterhin bestanden.
+
+Eigener Mindest-Kurvenradius beim Mähen
+---------------------------------------
+- Neue serverseitige Einstellung `mowing_turn_radius_cm`, Standard 50 cm.
+- Neuer Slider „Minimaler Kurvenradius beim Mähen“ im Abschnitt
+  Mähparameter, Bereich dynamisch mindestens 5 cm über dem allgemeinen
+  Wenderadius bis maximal 150 cm.
+- Der allgemeine `turn_radius_cm` bleibt bei aktuell 25 cm für Wendungen mit
+  angehobenen Mähwerken, Rücksetzwenden und Fields2Cover-Innenmanöver.
+- Außenbahnen und weitere Kurven mit abgesenktem Mähwerk verwenden den neuen
+  50-cm-Radius. Die Mähwerks-Schwenkreserve wird über einen zusätzlichen
+  inneren Bahnversatz abgesichert und vergrößert nicht mehr pauschal den
+  Kurvenradius auf ungefähr 1 m.
+- Route-API liefert beide Werte getrennt als `minimum_turn_radius_cm` und
+  `minimum_mowing_turn_radius_cm`.
+- Live auf „Test1“ geprüft: allgemeiner Radius 25 cm, Mähradius 50 cm,
+  gemessener enger Außenbahnradius 50 cm, vollständige Plan-Sicherheitsprüfung
+  gültig.
+- Prüfung: 11 gezielte Backend-/Planungstests bestanden und JavaScript-
+  Syntaxprüfung bestanden. UI-Cache auf v43 erhöht.
+
+Neue Mission und planerabhängige Einstellungen
+-----------------------------------------------
+- Beim bestätigten Start einer neuen Mission werden Planbahn, Planwendungen,
+  Außenbahn, Ist-Spur, Simulations-Wahrheit und gemähte Deckflächen sofort im
+  Browser geleert – bereits während die neue native Route berechnet wird.
+- Das Backend leert alte Soll-/Ist-Geometrien und das Abdeckungsraster vor dem
+  Planungsaufruf. Auch ein später abgelehnter neuer Plan zeigt dadurch nicht
+  irreführend die Linien der vorherigen Mission.
+- Bei aktivem Fields2Cover werden die wirkungslosen MV2-Optionen
+  „Wendestrategie“ und „Maximale Züge“ ausgeblendet.
+- Weiter sichtbar und aktiv bleiben die gemeinsamen Ausführungsgrenzen:
+  Hardware-Wenderadius, Mähradius, Außenbahnstrategie/-anzahl, Planauflösung,
+  Randreserve, Wendegeschwindigkeit, Mähwerk-Hub und Hub-Wartezeit.
+- Ein dynamischer Hinweis im Wendemanöver-Abschnitt erklärt, welche Engine die
+  Kurven erzeugt und welche Parameter weiterhin von der Ausführung benötigt
+  werden.
+- Browserprüfung mit aktivem Fields2Cover erfolgreich: beide MV2-Zeilen
+  verborgen, gemeinsamer Hinweis und 50-cm-Mähradius sichtbar.
+- Regressionstest für das Löschen vor der Planung ergänzt; letzte gezielte
+  Prüfung 11 Tests bestanden, JavaScript-Syntaxprüfung bestanden. UI-Cache v44.
+
+Randreserve als tatsächlicher Gesamtwert
+-----------------------------------------
+- Der Regler heißt jetzt „Tatsächliche Mindest-Randreserve“, beginnt bei 5 cm
+  und hat 5 cm als neuen Standardwert. Alte gespeicherte 0-cm-Werte werden beim
+  Laden auf 5 cm migriert.
+- `headland_margin_cm` ist nun der vollständige Abstand von der äußersten
+  Traktor-/Mähwerkskontur zum Geofence. Die Zone wird nicht mehr zuerst um den
+  Nutzerwert verkleinert und anschließend nochmals um feste 5 cm plus 3 cm
+  gepuffert.
+- Bahnplanung, Abdeckungsziel, Simulation-Startposition und abschließende
+  Konturprüfung verwenden denselben eingestellten Wert.
+- Die Kurvenlage berücksichtigt weiterhin den realen Ausschwenkweg von Front-
+  und Heckmähwerken. Das ist eine geometrische Korrektur, damit die eingestellten
+  5 cm auch in Kurven gelten, keine weitere pauschale Randreserve.
+- Fields2Cover akzeptiert nur native Pfade, deren vollständig ausgestrichene
+  Maschinenkontur die 5 cm einhält. Die abschließende Prüfung ist ein harter
+  Startfilter.
+- Live auf „Test1“ geprüft: `headland_margin_cm = 5.0`,
+  `geofence_tracking_reserve_cm = 5.0`, `tracking_reserve_ok = true`,
+  Prüfreserve exakt `0.05 m`, keine Fläche außerhalb.
+- Browserprüfung erfolgreich: Slider-Minimum 5, sichtbarer Wert 5 cm und neue
+  Erläuterung ohne pauschale Zusatzreserve. UI-Cache auf v45 erhöht.
+- Gezielte Regression: 15 Tests bestanden.

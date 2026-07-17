@@ -1,0 +1,6608 @@
+{
+  "version": 1,
+  "zones": [
+    {
+      "id": "sim-e2e-zone",
+      "name": "Simulationsfeld",
+      "type": "mowing",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              10.999953076243402,
+              48.49992232277641
+            ],
+            [
+              11.000050976872446,
+              48.49992187813029
+            ],
+            [
+              11.000034213066103,
+              48.49996385325923
+            ],
+            [
+              10.999954082071783,
+              48.49996896668534
+            ],
+            [
+              10.999953076243402,
+              48.49992232277641
+            ]
+          ]
+        ]
+      },
+      "created_at": "2026-07-15T12:30:23.049925+00:00",
+      "updated_at": "2026-07-16T10:25:16.239073+00:00",
+      "enabled": true
+    },
+    {
+      "name": "Test1",
+      "type": "mowing",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              11.000000000382178,
+              48.50000000863303
+            ],
+            [
+              11.000000000382052,
+              48.50000000863359
+            ],
+            [
+              11.000000000381924,
+              48.50000000863146
+            ],
+            [
+              11.000001247819412,
+              48.49999991879742
+            ],
+            [
+              11.00000425997693,
+              48.499999281545556
+            ],
+            [
+              11.000007248661419,
+              48.499998235009116
+            ],
+            [
+              11.000010247347301,
+              48.49999688422032
+            ],
+            [
+              11.00001295733192,
+              48.49999545022212
+            ],
+            [
+              11.000015603489702,
+              48.49999403759257
+            ],
+            [
+              11.000018396247036,
+              48.499992546706565
+            ],
+            [
+              11.000020848417394,
+              48.49999123763852
+            ],
+            [
+              11.000023519401262,
+              48.49998981175817
+            ],
+            [
+              11.000026250187014,
+              48.49998835395257
+            ],
+            [
+              11.000028982191429,
+              48.49998689550013
+            ],
+            [
+              11.00003162796701,
+              48.49998548307571
+            ],
+            [
+              11.000034320071313,
+              48.49998404591595
+            ],
+            [
+              11.000037133692068,
+              48.499982543893395
+            ],
+            [
+              11.000039744970437,
+              48.499981149885016
+            ],
+            [
+              11.000042675356504,
+              48.49997980111618
+            ],
+            [
+              11.000045288966627,
+              48.4999792019017
+            ],
+            [
+              11.000048364988816,
+              48.49997923910512
+            ],
+            [
+              11.000051025357495,
+              48.499979950427516
+            ],
+            [
+              11.000053297003207,
+              48.499981346299634
+            ],
+            [
+              11.00005474871457,
+              48.49998321128305
+            ],
+            [
+              11.000055394891197,
+              48.49998526507948
+            ],
+            [
+              11.00005526462303,
+              48.49998751044837
+            ],
+            [
+              11.000054533411449,
+              48.49998962458026
+            ],
+            [
+              11.000053194002394,
+              48.4999917290245
+            ],
+            [
+              11.000051600711135,
+              48.49999365341243
+            ],
+            [
+              11.000050036047336,
+              48.49999585453114
+            ],
+            [
+              11.000048867685686,
+              48.4999980208126
+            ],
+            [
+              11.000048030902615,
+              48.50000021351416
+            ],
+            [
+              11.000047500003282,
+              48.500002512837234
+            ],
+            [
+              11.00004731008002,
+              48.50000473726411
+            ],
+            [
+              11.000047437954477,
+              48.50000710072383
+            ],
+            [
+              11.000047831236577,
+              48.50000937034127
+            ],
+            [
+              11.000048250431037,
+              48.50001162460562
+            ],
+            [
+              11.000048670257742,
+              48.5000138822632
+            ],
+            [
+              11.000049109638267,
+              48.50001624506744
+            ],
+            [
+              11.00004953134964,
+              48.50001851285902
+            ],
+            [
+              11.000049962494362,
+              48.50002083137823
+            ],
+            [
+              11.000050377604914,
+              48.50002306367725
+            ],
+            [
+              11.000050805435725,
+              48.50002536437325
+            ],
+            [
+              11.000051227404827,
+              48.50002763354772
+            ],
+            [
+              11.000051653997257,
+              48.50002992758623
+            ],
+            [
+              11.000052080801792,
+              48.500032222765306
+            ],
+            [
+              11.000052504065277,
+              48.500034498902
+            ],
+            [
+              11.000052819212675,
+              48.500036743628996
+            ],
+            [
+              11.000052851813335,
+              48.50003902557004
+            ],
+            [
+              11.000052596526572,
+              48.500041288745294
+            ],
+            [
+              11.000052058010446,
+              48.5000435214921
+            ],
+            [
+              11.000051213286014,
+              48.500045780232306
+            ],
+            [
+              11.000050101687394,
+              48.500047941603604
+            ],
+            [
+              11.000048692584091,
+              48.500050068915925
+            ],
+            [
+              11.000047113120713,
+              48.50005199330603
+            ],
+            [
+              11.000045223044287,
+              48.50005390285867
+            ],
+            [
+              11.000043083866895,
+              48.50005570879074
+            ],
+            [
+              11.00004081317334,
+              48.500057326497306
+            ],
+            [
+              11.000038222570002,
+              48.50005888632393
+            ],
+            [
+              11.000035463418078,
+              48.500060277350904
+            ],
+            [
+              11.000032529192293,
+              48.50006147726256
+            ],
+            [
+              11.000029412962498,
+              48.50006247494938
+            ],
+            [
+              11.000026160597406,
+              48.500063254416496
+            ],
+            [
+              11.000022830218319,
+              48.50006380439114
+            ],
+            [
+              11.000019366523281,
+              48.500064131445704
+            ],
+            [
+              11.000016021023608,
+              48.500064216128564
+            ],
+            [
+              11.000012574496823,
+              48.50006407307333
+            ],
+            [
+              11.000009415222623,
+              48.50006372937686
+            ],
+            [
+              11.00000610214957,
+              48.50006314474991
+            ],
+            [
+              11.00000284937668,
+              48.50006232460742
+            ],
+            [
+              10.999999772371927,
+              48.50006129660807
+            ],
+            [
+              10.999996881792132,
+              48.500060079432
+            ],
+            [
+              10.999994084275645,
+              48.50005879248241
+            ],
+            [
+              10.999991236746565,
+              48.50005748298916
+            ],
+            [
+              10.999988234431516,
+              48.50005615986013
+            ],
+            [
+              10.999985350485085,
+              48.50005514084229
+            ],
+            [
+              10.999982219902261,
+              48.50005429731456
+            ],
+            [
+              10.999978852872474,
+              48.500053658890934
+            ],
+            [
+              10.999975499431235,
+              48.50005326891839
+            ],
+            [
+              10.999972036878475,
+              48.50005306714778
+            ],
+            [
+              10.999968522239602,
+              48.50005294646732
+            ],
+            [
+              10.99996513410953,
+              48.50005297630111
+            ],
+            [
+              10.999961697910997,
+              48.50005315572454
+            ],
+            [
+              10.999958312329085,
+              48.50005336046749
+            ],
+            [
+              10.999954812772351,
+              48.50005357210844
+            ],
+            [
+              10.999951414087597,
+              48.50005377764658
+            ],
+            [
+              10.999947979327006,
+              48.50005398536763
+            ],
+            [
+              10.99994454773669,
+              48.50005417487253
+            ],
+            [
+              10.999941224676036,
+              48.50005419284199
+            ],
+            [
+              10.99993796419712,
+              48.50005392355398
+            ],
+            [
+              10.999934795642288,
+              48.50005324574733
+            ],
+            [
+              10.999931847246394,
+              48.50005209965971
+            ],
+            [
+              10.999929421130505,
+              48.5000505967943
+            ],
+            [
+              10.999927552977006,
+              48.50004880117986
+            ],
+            [
+              10.99992629389795,
+              48.50004674191771
+            ],
+            [
+              10.999925687843993,
+              48.50004451406764
+            ],
+            [
+              10.999925624629043,
+              48.50004232762946
+            ],
+            [
+              10.999926080818902,
+              48.50003996495929
+            ],
+            [
+              10.999926974796185,
+              48.50003783719069
+            ],
+            [
+              10.99992819516433,
+              48.50003575317772
+            ],
+            [
+              10.999929691993259,
+              48.50003369146181
+            ],
+            [
+              10.999931442005103,
+              48.500031700586106
+            ],
+            [
+              10.999933341325365,
+              48.50002979673728
+            ],
+            [
+              10.99993519887413,
+              48.50002794496067
+            ],
+            [
+              10.999937119688683,
+              48.500026030117986
+            ],
+            [
+              10.999939048139874,
+              48.500024107662135
+            ],
+            [
+              10.999940461142893,
+              48.50002269905193
+            ],
+            [
+              10.99994046113732,
+              48.5000226990576
+            ],
+            [
+              10.999940461137651,
+              48.500022699056174
+            ],
+            [
+              10.999940461137523,
+              48.500022699057276
+            ],
+            [
+              10.99994046113727,
+              48.50002269905707
+            ],
+            [
+              10.999940461137523,
+              48.500022699057205
+            ],
+            [
+              10.999940665292037,
+              48.50002249520599
+            ],
+            [
+              10.999941137913837,
+              48.500022000159
+            ],
+            [
+              10.999941559262576,
+              48.50002151915172
+            ],
+            [
+              10.99994199356569,
+              48.50002097591657
+            ],
+            [
+              10.99994236698861,
+              48.500020460734895
+            ],
+            [
+              10.999942732352563,
+              48.50001990186002
+            ],
+            [
+              10.99994304557855,
+              48.500019365003375
+            ],
+            [
+              10.999943334948545,
+              48.50001879337035
+            ],
+            [
+              10.999943581203985,
+              48.50001815699935
+            ],
+            [
+              10.999943699485122,
+              48.50001756008225
+            ],
+            [
+              10.999943684682059,
+              48.50001687322491
+            ],
+            [
+              10.999943480942367,
+              48.50001608226048
+            ],
+            [
+              10.99994310482366,
+              48.50001518094935
+            ],
+            [
+              10.99994252664383,
+              48.5000140924316
+            ],
+            [
+              10.999941803549481,
+              48.500012849667435
+            ],
+            [
+              10.999940984869795,
+              48.50001144274506
+            ],
+            [
+              10.999940324764651,
+              48.500010308333344
+            ],
+            [
+              10.999939540630981,
+              48.50000896077688
+            ],
+            [
+              10.999938771246255,
+              48.500007602434835
+            ],
+            [
+              10.999938213919641,
+              48.50000629298902
+            ],
+            [
+              10.999937832796904,
+              48.50000477117411
+            ],
+            [
+              10.999937726688536,
+              48.500003410235216
+            ],
+            [
+              10.999937839196358,
+              48.50000201943707
+            ],
+            [
+              10.99993825032422,
+              48.50000041854331
+            ],
+            [
+              10.999938865812567,
+              48.49999906402621
+            ],
+            [
+              10.999939586937465,
+              48.49999794008419
+            ],
+            [
+              10.999939582653207,
+              48.49999794596802
+            ],
+            [
+              10.999939582653106,
+              48.49999794597346
+            ],
+            [
+              10.999939582653308,
+              48.49999794597081
+            ],
+            [
+              10.9999395826528,
+              48.49999794596857
+            ],
+            [
+              10.99993958265313,
+              48.499997945969774
+            ],
+            [
+              10.99993958265313,
+              48.49999794596976
+            ],
+            [
+              10.999939582653512,
+              48.49999794597019
+            ],
+            [
+              10.999939804380615,
+              48.49999766292546
+            ],
+            [
+              10.999940161870787,
+              48.4999972622628
+            ],
+            [
+              10.999940966703,
+              48.49999648848905
+            ],
+            [
+              10.999942103595426,
+              48.49999557644229
+            ],
+            [
+              10.999943391609898,
+              48.49999471159427
+            ],
+            [
+              10.999945041898199,
+              48.499993816846526
+            ],
+            [
+              10.9999466628984,
+              48.49999315105087
+            ],
+            [
+              10.999948342891276,
+              48.49999269177663
+            ],
+            [
+              10.999950210974852,
+              48.49999241056204
+            ],
+            [
+              10.999951989630517,
+              48.499992321212794
+            ],
+            [
+              10.999954114544241,
+              48.49999234482257
+            ],
+            [
+              10.999956101559011,
+              48.49999246654588
+            ],
+            [
+              10.999958213688432,
+              48.49999269470982
+            ],
+            [
+              10.999960292511311,
+              48.49999302129915
+            ],
+            [
+              10.99996263399852,
+              48.499993495958265
+            ],
+            [
+              10.999965005093484,
+              48.49999399837883
+            ],
+            [
+              10.999967504361344,
+              48.49999452795984
+            ],
+            [
+              10.999970255377688,
+              48.49999511088244
+            ],
+            [
+              10.999973653752148,
+              48.49999583098037
+            ],
+            [
+              10.999976971125946,
+              48.499996533910945
+            ],
+            [
+              10.999980159547258,
+              48.49999720951874
+            ],
+            [
+              10.999983473642718,
+              48.49999791070472
+            ],
+            [
+              10.99998467673096,
+              48.49999813717576
+            ],
+            [
+              10.999984676731419,
+              48.4999981371764
+            ],
+            [
+              10.999984676730579,
+              48.49999813717584
+            ],
+            [
+              10.999984676731318,
+              48.499998137173016
+            ],
+            [
+              10.999984676731165,
+              48.49999813717283
+            ],
+            [
+              10.999984676730325,
+              48.499998137173996
+            ],
+            [
+              10.999984676731012,
+              48.499998137175204
+            ],
+            [
+              10.999984676731012,
+              48.499998137175226
+            ],
+            [
+              10.999984676731012,
+              48.49999813717521
+            ],
+            [
+              10.999984676731012,
+              48.499998137175204
+            ],
+            [
+              10.999984676731012,
+              48.49999813717518
+            ],
+            [
+              10.9999848508331,
+              48.49999816642813
+            ],
+            [
+              10.9999853822745,
+              48.49999825214712
+            ],
+            [
+              10.999986060608343,
+              48.49999835445418
+            ],
+            [
+              10.99998675169107,
+              48.49999845712051
+            ],
+            [
+              11.000000000382178,
+              48.50000000863303
+            ]
+          ]
+        ]
+      },
+      "id": "7d0918b14d034c8f8a5b842a881b0624",
+      "created_at": "2026-07-15T15:47:58.791942+00:00",
+      "updated_at": "2026-07-15T15:47:58.791951+00:00"
+    }
+  ],
+  "connections": [
+    {
+      "name": "Verbindungsweg 1",
+      "type": "dock_link",
+      "from_zone_id": null,
+      "to_zone_id": "7d0918b14d034c8f8a5b842a881b0624",
+      "corridor_width_cm": 180.0,
+      "bidirectional": true,
+      "enabled": true,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.000064052641394,
+            48.50000834042163
+          ],
+          [
+            11.000048481234849,
+            48.50001286577482
+          ]
+        ]
+      },
+      "id": "64ef0cebf28349268b32bd81233a56e9",
+      "created_at": "2026-07-16T10:19:29.136349+00:00",
+      "updated_at": "2026-07-16T11:03:05.538646+00:00"
+    },
+    {
+      "name": "Verbindungsweg 2",
+      "type": "zone_link",
+      "from_zone_id": "7d0918b14d034c8f8a5b842a881b0624",
+      "to_zone_id": "sim-e2e-zone",
+      "corridor_width_cm": 180.0,
+      "bidirectional": true,
+      "enabled": true,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            10.999997708035634,
+            48.49999974018354
+          ],
+          [
+            10.999995095765804,
+            48.49996634946468
+          ]
+        ]
+      },
+      "id": "023c802915944830928c61522f140c40",
+      "created_at": "2026-07-16T10:20:15.641218+00:00",
+      "updated_at": "2026-07-16T10:20:34.465484+00:00"
+    },
+    {
+      "name": "Verbindungsweg 3",
+      "type": "dock_link",
+      "from_zone_id": null,
+      "to_zone_id": "sim-e2e-zone",
+      "corridor_width_cm": 180.0,
+      "bidirectional": true,
+      "enabled": true,
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.000064052641394,
+            48.50000834042163
+          ],
+          [
+            11.000065729022026,
+            48.499968723296874
+          ],
+          [
+            11.000040120184943,
+            48.49994906234183
+          ]
+        ]
+      },
+      "id": "3f4a1586f6644603a00ab29f72a7a605",
+      "created_at": "2026-07-16T12:31:28.222160+00:00",
+      "updated_at": "2026-07-16T12:31:28.222191+00:00"
+    }
+  ],
+  "schedules": [],
+  "settings": {
+    "robot_name": "MV2-Alpha",
+    "mowing_width_cm": 60.0,
+    "front_mower_width_percent": 50.0,
+    "mower_deck_depth_cm": 10.0,
+    "front_mower_offset_cm": 10.0,
+    "rear_mower_offset_cm": 22.0,
+    "rear_mower_gap_cm": 16.0,
+    "show_mower_footprints": false,
+    "coverage_grid_resolution_cm": 2,
+    "minimum_plan_coverage_percent": 98.5,
+    "vehicle_wheelbase_cm": 25.0,
+    "vehicle_width_cm": 34,
+    "vehicle_front_overhang_cm": 12,
+    "vehicle_rear_overhang_cm": 12,
+    "lane_width_cm": 48.0,
+    "route_resolution_cm": 0.5,
+    "speed_kmh": 1.8,
+    "planner_engine": "fields2cover",
+    "coverage_strategy": "headland_first",
+    "headland_passes": 1,
+    "turn_strategy": "auto",
+    "turn_radius_cm": 25,
+    "mowing_turn_radius_cm": 50,
+    "headland_margin_cm": 10.0,
+    "turn_maneuver_passes": 6,
+    "turn_speed_kmh": 0.7,
+    "lift_front_on_turn": true,
+    "lift_rear_on_turn": true,
+    "deck_lift_settle_ms": 800,
+    "fields2cover_decomposition": "boustrophedon",
+    "fields2cover_headland_mode": "auto",
+    "fields2cover_headland_width_cm": 135.0,
+    "fields2cover_headland_width_factor": 1.0,
+    "fields2cover_swath_objective": "n_swath",
+    "fields2cover_route_order": "optimized",
+    "fields2cover_path_type": "reeds_shepp_cc",
+    "fields2cover_turning_backend": "native",
+    "fields2cover_optimizer_time_s": 30.0,
+    "fields2cover_search_optimum": false,
+    "fields2cover_spiral_size": 6,
+    "fields2cover_angle_mode": "best",
+    "fields2cover_angle_deg": 0.0,
+    "fields2cover_split_angle_deg": 90.0,
+    "fields2cover_max_diff_curvature": 0.1,
+    "fields2cover_minimum_mainland_coverage_percent": 91.0,
+    "manual_speed_limit": 0.5,
+    "manual_steering_limit_deg": 40.0,
+    "tilt_limit_deg": 20,
+    "rain_enabled": true,
+    "rain_threshold_adc": 600,
+    "rain_wait_minutes": 30,
+    "geofence_enabled": true,
+    "require_rtk_fix": true,
+    "low_battery_soc": 20,
+    "quiet_hours_start": "20:00",
+    "quiet_hours_end": "08:00",
+    "season_mode": "auto",
+    "weekend_mode": true,
+    "demo_data": true
+  },
+  "home": {
+    "lat": 48.50000834042163,
+    "lon": 11.000064052641394,
+    "name": "Ladestation",
+    "heading_deg": null,
+    "updated_at": "2026-07-16T07:43:37.818461+00:00"
+  },
+  "events": [
+    {
+      "id": "657d70701c2f497895f1e7b9fc0874fe",
+      "timestamp": "2026-07-17T14:55:18.218292+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "bcd95e0438c84cd98ae7927475129c5e",
+      "timestamp": "2026-07-17T14:55:18.207490+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "7cb33468fbcc4f2894ce254106e707b6",
+      "timestamp": "2026-07-17T14:55:00.456744+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "0b8a2849e12c4c409d17003afcea164a",
+      "timestamp": "2026-07-17T14:52:20.920890+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "23c6692842564fae907248b6e38d7484",
+      "timestamp": "2026-07-17T14:46:15.415756+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5e64d7d9c3b346919a94c1244d0832d5",
+      "timestamp": "2026-07-17T14:46:15.402940+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "c7a1b5ba27874a2da21f2c9c5e52fb1d",
+      "timestamp": "2026-07-17T14:45:46.616065+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8f7f13e258f8475593e5cc61dcea830a",
+      "timestamp": "2026-07-17T14:42:34.828110+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "c74d56dc546b461fbd0a1cd9109db029",
+      "timestamp": "2026-07-17T14:18:26.077544+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "97231f634cc546438e77b06e7280a8d1",
+      "timestamp": "2026-07-17T14:16:07.166090+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "835640d85dfa47d4b472ae24f1acc246",
+      "timestamp": "2026-07-17T14:16:07.144862+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "704ded674b554175835e1b6f3f8f2a8c",
+      "timestamp": "2026-07-17T14:15:51.998062+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "508d06030f1c42658faf600042171c2d",
+      "timestamp": "2026-07-17T14:13:52.125345+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ec1a935c8b704e68a2c41fb99c75f7e2",
+      "timestamp": "2026-07-17T14:11:22.706899+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "cde00257a789471b89f5ae271a3eed37",
+      "timestamp": "2026-07-17T14:01:12.555059+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "971085c1ed07407aa29ead7c2ecd82cf",
+      "timestamp": "2026-07-17T14:01:12.545580+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1c0368cc94da4dde93da6f3f275669e2",
+      "timestamp": "2026-07-17T14:00:57.528284+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "6a09175c8034453ca512057668a78de2",
+      "timestamp": "2026-07-17T13:58:58.142446+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d3b281fbf439430faf30ee183563daa8",
+      "timestamp": "2026-07-17T13:58:31.312470+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "6021a69d57544270a76b283c1b225e8d",
+      "timestamp": "2026-07-17T13:58:31.301121+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "3262d455dd354b2a91af5ebe7fd512f3",
+      "timestamp": "2026-07-17T13:57:57.867262+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "533ba3639acb462abc88a4e74513ad8a",
+      "timestamp": "2026-07-17T13:57:57.839094+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d5093f81ad694ed990e9a2e07f16ada1",
+      "timestamp": "2026-07-17T13:57:31.071161+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "7428880e1b834dcdbbf72a22b406186d",
+      "timestamp": "2026-07-17T13:54:12.728236+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "45f6bf99e65a48fe97961a442753c374",
+      "timestamp": "2026-07-17T13:46:26.975157+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "65d96bfebdf444f4975a7ea862dcd029",
+      "timestamp": "2026-07-17T13:46:26.963676+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "45f5820b56bb4100a6d74e772dd449c6",
+      "timestamp": "2026-07-17T13:46:12.080418+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "82ef543847b24e60a7d19b5009a89e60",
+      "timestamp": "2026-07-17T13:44:12.335296+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "3414b48a3e3d449e839ced4b7fd7af99",
+      "timestamp": "2026-07-17T13:41:52.187449+00:00",
+      "level": "warning",
+      "code": "state_change",
+      "message": "Geofence-Stopp: Geofence violation at (647741.77, 5373798.89)",
+      "action": "Grenze und Mähwerkskontur prüfen; nur bewusst quittiert fortsetzen",
+      "details": {
+        "reason": "Geofence violation at (647741.77, 5373798.89)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "204307cb6bee4950b08a81728fce3b53",
+      "timestamp": "2026-07-17T13:37:23.264677+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d653d84327b0408b93b331aa2d67d74b",
+      "timestamp": "2026-07-17T13:29:31.871335+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "d2e56fa4569b40baa0d09102b9817947",
+      "timestamp": "2026-07-17T13:19:23.192148+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "0a9a2f0aaff641d689e80ee3cb54d5c6",
+      "timestamp": "2026-07-17T13:19:23.106870+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "c70a2e35c3e44c888e7d047bb4b15d7f",
+      "timestamp": "2026-07-17T13:19:07.604936+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8e51b64961bd496182e48e38699d4651",
+      "timestamp": "2026-07-17T13:17:10.644636+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1b3e433cb405403b9d39a26b600a8cdf",
+      "timestamp": "2026-07-17T13:14:39.348225+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "Wendemanöver abgebrochen: 35 cm Spurabweichung — Position prüfen und fortsetzen",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2f3a87f82526459687e3386c41b03cd9",
+      "timestamp": "2026-07-17T13:13:47.975651+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "b93574d58c5a43d99d022325f3f84489",
+      "timestamp": "2026-07-17T13:13:19.161202+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "d005fdf41dc44a6897763a6d50c4c33c",
+      "timestamp": "2026-07-17T13:13:19.147505+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "770c1ac220f24eff81ca7b0f71a50164",
+      "timestamp": "2026-07-17T13:13:19.055072+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5f1b21b768404ce1bb4358c35cae8cb9",
+      "timestamp": "2026-07-17T13:11:27.365501+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "Wendemanöver abgebrochen: 36 cm Spurabweichung — Position prüfen und fortsetzen",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ec29de7b76df4d97a837c55cff70161d",
+      "timestamp": "2026-07-17T13:10:22.467618+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "4bf595e85d97449b9138ff71848b00b5",
+      "timestamp": "2026-07-17T13:09:47.767331+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "0f89fde4eb7b4960944a3736fd00681c",
+      "timestamp": "2026-07-17T12:52:42.064779+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Charging did not complete within 7200 s",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Charging did not complete within 7200 s",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d470db2acdac4d32a44be6cafa47a14c",
+      "timestamp": "2026-07-17T10:52:42.042555+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1f387fd0bae749b287eb13e782c7c523",
+      "timestamp": "2026-07-17T10:52:42.002048+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "4a2e29307c6747a9bbcf586dbab2c19f",
+      "timestamp": "2026-07-17T10:51:45.502681+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "df8e5a2c0796411789ab2f67f93c3b44",
+      "timestamp": "2026-07-17T10:51:45.475373+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "4cafb4c6c7df40a8a78828fe90c389ca",
+      "timestamp": "2026-07-17T10:50:53.942328+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "Wendemanöver abgebrochen: 35 cm Spurabweichung — Position prüfen und fortsetzen",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "97f921c4ceb9496c8ae47261dab93ffa",
+      "timestamp": "2026-07-17T10:49:44.515241+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "45f03045ce03460ea0ea69e8f069a047",
+      "timestamp": "2026-07-17T10:49:36.602658+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "63531de903f047a6903b651211e45e83",
+      "timestamp": "2026-07-17T10:48:42.962881+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "39ce1c6e7c8d43e08361ff824bf5a6a8",
+      "timestamp": "2026-07-17T10:48:03.399576+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "e1cd708326ad4d98b206715e66b80393",
+      "timestamp": "2026-07-17T10:48:03.382689+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "eebe905499134084ac52a8d714ea0c50",
+      "timestamp": "2026-07-17T10:47:48.074579+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "31d05de99dea4694a8ab4af6e7187213",
+      "timestamp": "2026-07-17T10:47:43.354773+00:00",
+      "level": "info",
+      "code": "geofence_rearmed",
+      "message": "Fahrzeug wieder vollständig in der Zone — Geofence-Schutz erneut aktiv",
+      "action": "",
+      "details": {
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8dcb80cc1d9147119a41f4eaac26f293",
+      "timestamp": "2026-07-17T10:47:42.910574+00:00",
+      "level": "critical",
+      "code": "geofence_override",
+      "message": "Geofence-Verletzung durch Bediener ignoriert — Mission fortgesetzt",
+      "action": "Fahrzeug beobachten und so schnell wie möglich vollständig in die Zone fahren",
+      "details": {
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "93762e14999e4cb4a6bc872b413a9fbf",
+      "timestamp": "2026-07-17T10:47:42.899564+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "80c925f323394fe19980ec2ccb5f3b20",
+      "timestamp": "2026-07-17T10:47:38.259775+00:00",
+      "level": "warning",
+      "code": "state_change",
+      "message": "Geofence-Stopp: Geofence violation at (647741.99, 5373798.82)",
+      "action": "Grenze und Mähwerkskontur prüfen; nur bewusst quittiert fortsetzen",
+      "details": {
+        "reason": "Geofence violation at (647741.99, 5373798.82)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "c3c37bffadda45169812c7df2f89b855",
+      "timestamp": "2026-07-17T10:47:36.141008+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ad9432fe434d4a49b9ddb584ac11a30a",
+      "timestamp": "2026-07-17T09:24:19.170385+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "Wendemanöver abgebrochen: 36 cm Spurabweichung — Position prüfen und fortsetzen",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "bd3a83312def4430b96b17ba6be9f357",
+      "timestamp": "2026-07-17T09:23:28.626697+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d646effa3b734054bc3c2c278cdd5095",
+      "timestamp": "2026-07-17T09:23:26.272223+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "a88086cb649c4f12876649b68b7c14d6",
+      "timestamp": "2026-07-17T09:23:26.265448+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "122d3493d6ec4f169d993f16b28fa278",
+      "timestamp": "2026-07-17T09:23:26.200272+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "a39ddd47fa0b49dba9fa745516807ea6",
+      "timestamp": "2026-07-17T09:22:16.056983+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "Wendemanöver abgebrochen: 35 cm Spurabweichung — Position prüfen und fortsetzen",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "349a7577d0b34194a02005a10c431874",
+      "timestamp": "2026-07-17T09:21:24.799841+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "044bcdc3a6dd4d3294660eec57b02420",
+      "timestamp": "2026-07-17T09:20:59.037845+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "a524da0140074dfa9ec9ddd7a276d09f",
+      "timestamp": "2026-07-17T09:20:59.008909+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "fe84c490084c4d11b4b9141ee8ba2c93",
+      "timestamp": "2026-07-17T09:20:58.973003+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "53f66645f2f84ad5986a0d9131b73d62",
+      "timestamp": "2026-07-17T09:14:58.061861+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "Wendemanöver abgebrochen: 35 cm Spurabweichung — Position prüfen und fortsetzen",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "a5d3e9ee5dd547928a87a09d165e9b95",
+      "timestamp": "2026-07-17T09:14:06.693551+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "232d15dedf224170a1b06b5ca62c9d6a",
+      "timestamp": "2026-07-17T09:12:20.501915+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "5701b31f0cf84149a47c968430af36f7",
+      "timestamp": "2026-07-17T09:12:20.491076+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d9483fd9dec54e42b53a7c25f4e033d7",
+      "timestamp": "2026-07-17T09:12:20.417505+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "780e005373b349688860b5e4848ec19e",
+      "timestamp": "2026-07-17T09:08:23.349876+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "Wendemanöver abgebrochen: 36 cm Spurabweichung — Position prüfen und fortsetzen",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "814cf7f9438740b1a73227b8db75493f",
+      "timestamp": "2026-07-17T09:07:32.951431+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "4648bd5b83e340fabe601407cf3efc2d",
+      "timestamp": "2026-07-17T09:07:07.247312+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "31e342d1233e424d82826ecbf369ef94",
+      "timestamp": "2026-07-17T09:07:07.240365+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "f6a429373c904ca48ba349e302a5292f",
+      "timestamp": "2026-07-17T09:07:06.204603+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "fe44f5102b05498b8ef848e7c341e069",
+      "timestamp": "2026-07-17T09:05:45.175221+00:00",
+      "level": "warning",
+      "code": "state_change",
+      "message": "Geofence-Stopp: Geofence violation at (647741.95, 5373798.84)",
+      "action": "Grenze und Mähwerkskontur prüfen; nur bewusst quittiert fortsetzen",
+      "details": {
+        "reason": "Geofence violation at (647741.95, 5373798.84)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "a2c95d6408a9434a9c8ae945bafc3a4c",
+      "timestamp": "2026-07-17T09:05:42.967825+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2ce40f724c2342a0a80dd4c646228f6b",
+      "timestamp": "2026-07-17T09:01:04.390591+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "Wendemanöver abgebrochen: 36 cm Spurabweichung — Position prüfen und fortsetzen",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2e77e2f9f1dc4880b1ef4ae68e3232aa",
+      "timestamp": "2026-07-17T08:59:41.598743+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "375d05aeb70643279bb526ea7f56bdb3",
+      "timestamp": "2026-07-17T08:52:21.596108+00:00",
+      "level": "warning",
+      "code": "state_change",
+      "message": "Geofence-Stopp: Geofence violation at (647742.54, 5373802.54)",
+      "action": "Grenze und Mähwerkskontur prüfen; nur bewusst quittiert fortsetzen",
+      "details": {
+        "reason": "Geofence violation at (647742.54, 5373802.54)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "b1004673729645a4aac43e5e11b1226e",
+      "timestamp": "2026-07-17T08:50:08.054189+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8d921f037c4941dfaf5181704e97c983",
+      "timestamp": "2026-07-17T08:50:01.817869+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "40a3932589a14c5d82ef2506b15917f8",
+      "timestamp": "2026-07-17T08:50:01.807756+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "3923b4f0ef97445d88852b906b5e1956",
+      "timestamp": "2026-07-16T20:30:47.414167+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "c5b24ae07b984dd68c3c574d0bb42b58",
+      "timestamp": "2026-07-16T20:30:38.568394+00:00",
+      "level": "critical",
+      "code": "geofence_override",
+      "message": "Geofence-Verletzung durch Bediener ignoriert — Mission fortgesetzt",
+      "action": "Fahrzeug beobachten und so schnell wie möglich vollständig in die Zone fahren",
+      "details": {
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "897c81c963a849f680bb07837d720d64",
+      "timestamp": "2026-07-16T20:30:38.560792+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "7e11f77987584ae4abf339a2cb87924e",
+      "timestamp": "2026-07-16T20:30:25.260561+00:00",
+      "level": "warning",
+      "code": "state_change",
+      "message": "Geofence-Stopp: Geofence violation at (647742.70, 5373802.08)",
+      "action": "Grenze und Mähwerkskontur prüfen; nur bewusst quittiert fortsetzen",
+      "details": {
+        "reason": "Geofence violation at (647742.70, 5373802.08)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "c59b40dbc65d4eecaca8b71a7f5bf798",
+      "timestamp": "2026-07-16T20:28:09.966580+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "c5f9fdc7597e44e2a234fa12acbcbb1c",
+      "timestamp": "2026-07-16T20:24:06.871193+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "c6e9d956263d445284935c3f59c0a177",
+      "timestamp": "2026-07-16T20:24:06.865097+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "9ebd483b628b41dab86e50e9810564dd",
+      "timestamp": "2026-07-16T20:23:35.882133+00:00",
+      "level": "critical",
+      "code": "geofence_override",
+      "message": "Geofence-Verletzung durch Bediener ignoriert — Mission fortgesetzt",
+      "action": "Fahrzeug beobachten und so schnell wie möglich vollständig in die Zone fahren",
+      "details": {
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "342517e347c649f8ab9fe211fd086b64",
+      "timestamp": "2026-07-16T20:23:35.874991+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "793a1fd738014abb924b04850553308c",
+      "timestamp": "2026-07-16T20:23:27.396523+00:00",
+      "level": "warning",
+      "code": "state_change",
+      "message": "Geofence-Stopp: Geofence violation at (647737.06, 5373802.94)",
+      "action": "Grenze und Mähwerkskontur prüfen; nur bewusst quittiert fortsetzen",
+      "details": {
+        "reason": "Geofence violation at (647737.06, 5373802.94)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ad815a69e70b4c4da89cfd68868cb8f6",
+      "timestamp": "2026-07-16T20:21:36.506170+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "f66aff5e3c4746df9c7de8e179901d34",
+      "timestamp": "2026-07-16T20:20:46.113335+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "aedda21739374ba8b71734433bff50bd",
+      "timestamp": "2026-07-16T20:20:46.107027+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d7c2dbaffdaf4bdab7a1c0af77848877",
+      "timestamp": "2026-07-16T20:20:36.301560+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2571730a9ce44abaa15f796294f7ebca",
+      "timestamp": "2026-07-16T20:20:30.040741+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "41bce1fade834fefab6f4524a2684cc3",
+      "timestamp": "2026-07-16T20:19:11.117000+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "06997f083fc54812ac8f2b2ee5efd74d",
+      "timestamp": "2026-07-16T20:15:01.839453+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "910d26a062944653a9e8c1e71caaa2fd",
+      "timestamp": "2026-07-16T20:14:51.854502+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "76f471c2a2ce4b83b47461be3d9efef5",
+      "timestamp": "2026-07-16T20:03:18.501516+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1522fb50538546ff83fc89d29cb58fd6",
+      "timestamp": "2026-07-16T20:03:11.214018+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5bc750dd489a477d9bae2b97ab8052fd",
+      "timestamp": "2026-07-16T20:01:56.531441+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "418f2e86341f4fbcb0e373a66d5b3e47",
+      "timestamp": "2026-07-16T20:01:56.471229+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8de601d1065b47e18517f1615ba23c8d",
+      "timestamp": "2026-07-16T19:48:53.124973+00:00",
+      "level": "warning",
+      "code": "state_change",
+      "message": "Geofence-Stopp: Geofence violation at (647737.06, 5373802.97)",
+      "action": "Grenze und Mähwerkskontur prüfen; nur bewusst quittiert fortsetzen",
+      "details": {
+        "reason": "Geofence violation at (647737.06, 5373802.97)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "b3bca8c5dd3540dea7edd876a06f91a9",
+      "timestamp": "2026-07-16T19:47:03.753037+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "3f67ca0bfab046008b17cad3a4bdda7f",
+      "timestamp": "2026-07-16T19:34:57.636245+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "cdc19c6cf11e417192c712f57eea8fe9",
+      "timestamp": "2026-07-16T19:34:16.989327+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "38d895d573644f3abf0d4bd137e9fa87",
+      "timestamp": "2026-07-16T17:10:22.074228+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "6fe3fbfd335f445f8706fbc2e3868a50",
+      "timestamp": "2026-07-16T17:10:22.066130+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "6912b6a2248440879f130572dff473a6",
+      "timestamp": "2026-07-16T17:10:04.823945+00:00",
+      "level": "warning",
+      "code": "soft_stop",
+      "message": "Soft-Stop durch Bediener",
+      "action": "Umgebung prüfen",
+      "details": {}
+    },
+    {
+      "id": "2e827e8b5f494f779c37243b0b4081ee",
+      "timestamp": "2026-07-16T15:22:15.738454+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "7aeef2d85d3d4ffb934fa57221ca46a7",
+      "timestamp": "2026-07-16T15:22:15.694080+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "5af0299d41ac48e38a5e24035b3b6099",
+      "timestamp": "2026-07-16T15:16:25.687106+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "2e245fee4c5d48b3ab8a8ec80bf7b36c",
+      "timestamp": "2026-07-16T15:14:12.517633+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "04a32ce2d4784d26ad3a324a547dd5d3",
+      "timestamp": "2026-07-16T15:14:02.070883+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "f2459b7e188c4912abae50585f7b8925",
+      "timestamp": "2026-07-16T15:09:18.583607+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d6e681f7e1dc4d4c9d5c574b90135c24",
+      "timestamp": "2026-07-16T15:09:18.529716+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2c6163bf47eb4ac9aa22a42ce63344e6",
+      "timestamp": "2026-07-16T15:08:05.181817+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5304f3b210344f36b99323e9e326377a",
+      "timestamp": "2026-07-16T15:02:06.835264+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "18b1840d3e1047099243538688af25fe",
+      "timestamp": "2026-07-16T15:01:19.329722+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "6ed2effe0b1f499a9834f332c7b2aef1",
+      "timestamp": "2026-07-16T15:01:16.032346+00:00",
+      "level": "critical",
+      "code": "operator_estop",
+      "message": "Not-Aus durch Bediener",
+      "action": "Gefahrenbereich sichern und Ursache prüfen",
+      "details": {}
+    },
+    {
+      "id": "9040d56ff6354b3f9188f04f978f9136",
+      "timestamp": "2026-07-16T15:01:16.023021+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Not-Aus durch Bediener",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Not-Aus durch Bediener",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "21e3825007c14ff9b8fef5107abc1fbf",
+      "timestamp": "2026-07-16T15:01:11.110685+00:00",
+      "level": "warning",
+      "code": "soft_stop",
+      "message": "Soft-Stop durch Bediener",
+      "action": "Umgebung prüfen",
+      "details": {}
+    },
+    {
+      "id": "e1e84cd4f57947ada1c41562a670cc2d",
+      "timestamp": "2026-07-16T15:01:11.100692+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "a93e42a08e014230a54f84aec493695e",
+      "timestamp": "2026-07-16T14:59:53.006993+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "bbd4a3b4570a43fd89f9a7bb0eb3ab20",
+      "timestamp": "2026-07-16T14:57:23.042872+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "3744afee84e945a88e03f45d280873f2",
+      "timestamp": "2026-07-16T14:54:45.434261+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "23b7caff5262485ba7c1ade3df74e511",
+      "timestamp": "2026-07-16T14:54:45.399208+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "63154d04a4414101a89dd430d7807ed3",
+      "timestamp": "2026-07-16T14:53:49.616536+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "ed978a0878a34e189148431b636f252f",
+      "timestamp": "2026-07-16T14:53:49.604147+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ac5810bac52444759ebb20ebd07873c9",
+      "timestamp": "2026-07-16T14:53:38.047839+00:00",
+      "level": "warning",
+      "code": "soft_stop",
+      "message": "Soft-Stop durch Bediener",
+      "action": "Umgebung prüfen",
+      "details": {}
+    },
+    {
+      "id": "ac7c10dcbe894cc59458cd377a2fb0be",
+      "timestamp": "2026-07-16T14:53:35.585946+00:00",
+      "level": "warning",
+      "code": "soft_stop",
+      "message": "Soft-Stop durch Bediener",
+      "action": "Umgebung prüfen",
+      "details": {}
+    },
+    {
+      "id": "0b47ca844f144ab08f1bb0e4483600d7",
+      "timestamp": "2026-07-16T14:53:35.576128+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "091d1c6b1f3a4e41bc855bc98180467c",
+      "timestamp": "2026-07-16T14:52:16.791315+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "db994f9b12494727ac1fd7bc6122e26b",
+      "timestamp": "2026-07-16T14:49:42.297251+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "6ed5b3268dea431aa64ea238ac1ed442",
+      "timestamp": "2026-07-16T14:49:42.286541+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "3627b6b4a8eb49e58be333f8863ab01a",
+      "timestamp": "2026-07-16T14:49:24.570842+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "fb7a43d764dd4017b199144b50c91955",
+      "timestamp": "2026-07-16T14:36:06.366302+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "68db3274a5ff4819b1415e0b35d8fb08",
+      "timestamp": "2026-07-16T14:36:06.358255+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "55a904e8609742adbbf7e4239b8b5bd1",
+      "timestamp": "2026-07-16T14:35:53.485284+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "f450185ab8ad4592a5fb6cf037d2c61a",
+      "timestamp": "2026-07-16T14:35:35.698679+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "5ec0a288b2d94a78a66ac471dfe28944",
+      "timestamp": "2026-07-16T14:33:58.287827+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "bf2a9cc417414b7cb36fbac5a93d1803",
+      "timestamp": "2026-07-16T14:33:31.314690+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647739.93, 5373807.51)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647739.93, 5373807.51)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "594bb173f1dc4cfa85d90dc9e0f5b343",
+      "timestamp": "2026-07-16T14:32:29.197584+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "5c8cb3209d57411a894f81a8ced6a802",
+      "timestamp": "2026-07-16T14:26:09.726790+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "64cb54cbd3924846ba94dc3eaf876303",
+      "timestamp": "2026-07-16T14:17:43.375138+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "4f4025b1ff064bbb82d61932af4a82c4",
+      "timestamp": "2026-07-16T14:17:37.225986+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647737.54, 5373798.83)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647737.54, 5373798.83)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "b6cadbfb9d704cd0ba69ca24fc072139",
+      "timestamp": "2026-07-16T14:17:36.390643+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1a3e539ae2a3407a929a715804134b68",
+      "timestamp": "2026-07-16T14:11:46.802657+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "2447d995d63f427f8ae868b66afaf46f",
+      "timestamp": "2026-07-16T14:08:22.456364+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647736.95, 5373806.67)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647736.95, 5373806.67)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "3733eb1204fb4dadbf71e301d1db6c01",
+      "timestamp": "2026-07-16T14:03:29.873252+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "5d138fffa5fb437cb13b98dfcc4f9b50",
+      "timestamp": "2026-07-16T14:01:50.582075+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "6fadc7f9b5c74f74bd9bb4ae6e88b011",
+      "timestamp": "2026-07-16T14:01:50.523340+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "a59f949d49dd4ee9b79375753a056c4c",
+      "timestamp": "2026-07-16T14:01:15.765585+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "28ffae86f0c84a8799359bc97be9259a",
+      "timestamp": "2026-07-16T13:53:42.460928+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "cd8984d964ff42be93677626e77f0732",
+      "timestamp": "2026-07-16T13:52:52.541969+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "77045172c0f04323a930d21d18f7a7ee",
+      "timestamp": "2026-07-16T13:52:52.476210+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "0628748529d642af9c15b7dbdbb7aa14",
+      "timestamp": "2026-07-16T13:52:17.622352+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "51b1c96e757c42adb3fb92de6ba62f74",
+      "timestamp": "2026-07-16T13:49:10.883288+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "79fb272b53224b22b574904d0181a28f",
+      "timestamp": "2026-07-16T13:46:59.100423+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647736.96, 5373806.67)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647736.96, 5373806.67)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "635c4764a0bf43dc9380e3e1dd7966f0",
+      "timestamp": "2026-07-16T13:45:24.333747+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "08bc4e57f59541da9b52b76ee165f69d",
+      "timestamp": "2026-07-16T13:41:44.048007+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647735.78, 5373812.70)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647735.78, 5373812.70)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "978ceea9460147a19fa99438033b7e7c",
+      "timestamp": "2026-07-16T13:40:24.967007+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "58cbb783396f4464bdf3b293973213d5",
+      "timestamp": "2026-07-16T13:39:53.173696+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "62491aabb88742f68bd0052494690d65",
+      "timestamp": "2026-07-16T13:39:53.120015+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "bc2449200b9647ba85fc0961aa465b5f",
+      "timestamp": "2026-07-16T13:39:20.771499+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "1c8aa99e3c0a48128a578e32d8a75d6b",
+      "timestamp": "2026-07-16T13:34:28.590706+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "e137ce437fc64076a0fb4831feb11272",
+      "timestamp": "2026-07-16T13:32:09.500676+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647736.16, 5373812.80)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647736.16, 5373812.80)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "463a92f855354c10b4b5a8808b680f9d",
+      "timestamp": "2026-07-16T13:31:06.755084+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "5880737418384284b827c620daa610bf",
+      "timestamp": "2026-07-16T13:21:34.584519+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647736.01, 5373812.76)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647736.01, 5373812.76)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "cc6df264d4d3406c97ffcd751177c265",
+      "timestamp": "2026-07-16T13:20:07.186234+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "fe9436607c87475daf02e5accd6695a9",
+      "timestamp": "2026-07-16T13:17:30.083282+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647740.40, 5373807.47)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647740.40, 5373807.47)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "3943de0a014a4981bd890643c01ff4d0",
+      "timestamp": "2026-07-16T13:15:33.786414+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "a8f660ad893540a4aeb9a9e11d7785a5",
+      "timestamp": "2026-07-16T13:12:17.519538+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647736.22, 5373812.66)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647736.22, 5373812.66)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "59409a0569b9440bad3b06861516c902",
+      "timestamp": "2026-07-16T13:10:30.868014+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "dfaafbade8c243bba40c216e654b1a1d",
+      "timestamp": "2026-07-16T12:57:02.097325+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647737.42, 5373806.75)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647737.42, 5373806.75)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "49731585a45a46b78588c04c463634b8",
+      "timestamp": "2026-07-16T12:55:46.990093+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "5f21c59547ed40209deb32b4c1bedf58",
+      "timestamp": "2026-07-16T12:50:55.346590+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647735.74, 5373812.82)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647735.74, 5373812.82)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "e2a2b9fa2d6d4e2490d497fc203f5e9e",
+      "timestamp": "2026-07-16T12:49:06.196041+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "ab45262de2184e95a925f17633d57bcd",
+      "timestamp": "2026-07-16T12:45:43.345762+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "6435f91bdcbe48ba8b65c753e7b50c76",
+      "timestamp": "2026-07-16T12:45:43.295401+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "6bb82a8745394f16b8fcaff5dcd2d6aa",
+      "timestamp": "2026-07-16T12:44:48.087736+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "8c3c26f7cb0b4674ac0a4ea5942cb1f3",
+      "timestamp": "2026-07-16T12:40:02.900057+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "63c0a95b238f4496b32e974a9a8ff66f",
+      "timestamp": "2026-07-16T12:35:44.973008+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "457adb641d0243a0a10e8dfb33527ed6",
+      "timestamp": "2026-07-16T12:35:44.912537+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "0c0c50ff26be44798beee29a66018067",
+      "timestamp": "2026-07-16T12:34:31.934289+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "680ad23223674abcb0c368bb04b4e093",
+      "timestamp": "2026-07-16T12:31:53.220307+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5783e7bfb6514775812335caf865ca56",
+      "timestamp": "2026-07-16T12:30:08.953425+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "07206c562cf549f2be7d5cac9d769e84",
+      "timestamp": "2026-07-16T12:30:08.944610+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "37ad5786121b426dac1a6089a1e50485",
+      "timestamp": "2026-07-16T12:29:34.656698+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "688cc9ae816d4b3fa195d7c1597ff7a8",
+      "timestamp": "2026-07-16T12:24:42.471030+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "b38ebae6928642348d044a7462334c0e",
+      "timestamp": "2026-07-16T12:19:45.248335+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "09ed16db572445f29178698d8e84d54f",
+      "timestamp": "2026-07-16T12:19:45.242210+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "0fccc073372b49a58070b8e3d4641542",
+      "timestamp": "2026-07-16T12:18:54.084752+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "11055b42f6d3423ea3c5a0b1c5f623ab",
+      "timestamp": "2026-07-16T12:18:08.041257+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "d17af3111564452c9fd119fba64ade4c",
+      "timestamp": "2026-07-16T12:18:08.034925+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "296d8a99791e40a486ef2a33f675900f",
+      "timestamp": "2026-07-16T12:12:50.570465+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "91440272409142c88b16a2e7095715d1",
+      "timestamp": "2026-07-16T12:01:09.285298+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "846126ce6f6d44afb05ea171480cbf9a",
+      "timestamp": "2026-07-16T12:01:09.274572+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "f6c815859cfa42dd92c98895c71df347",
+      "timestamp": "2026-07-16T12:00:54.447769+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "c65472a6ecbf42dca2f2a18e9deab767",
+      "timestamp": "2026-07-16T11:50:54.073734+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "de04860655d649cba5782cafec92a305",
+      "timestamp": "2026-07-16T11:50:54.062476+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "13e51f57f318425589110c4f61ffb108",
+      "timestamp": "2026-07-16T11:50:39.911840+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "7da053a24a4742cb921e44d9a2e3de92",
+      "timestamp": "2026-07-16T11:37:33.244813+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "b322473e7d1b4c3a959e8a15d63e9e11",
+      "timestamp": "2026-07-16T11:37:33.237918+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "239238b4392f4221b5b2b47c4d260033",
+      "timestamp": "2026-07-16T11:34:40.979564+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "8e41f8b6bf0a46fc8ba49eda14590e4d",
+      "timestamp": "2026-07-16T11:29:41.895669+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "4aead01d2982457f9c1f19c5dd9dfe22",
+      "timestamp": "2026-07-16T11:29:41.887631+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "d1f476b444e649dd8e5fa98aee9952fd",
+      "timestamp": "2026-07-16T11:28:31.160124+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "0e3e0e2a47ec420aadeeaa06f0bcb8a1",
+      "timestamp": "2026-07-16T11:28:12.394843+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "7ce424328e8944c6960856771fbe4c94",
+      "timestamp": "2026-07-16T11:27:49.516712+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "4cde3fd9e88348e2b9311e0c772fc5f8",
+      "timestamp": "2026-07-16T11:27:49.490565+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "7ec65486ff9f4e87aeb18698a6e73dd4",
+      "timestamp": "2026-07-16T11:23:35.826907+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "43e5bc5c6afd4cb483c135ed20064e1a",
+      "timestamp": "2026-07-16T11:23:29.276749+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "4bcb0c9e1edc4505b42145a6db23d083",
+      "timestamp": "2026-07-16T10:25:01.851870+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "4a971a8683414ca0b989dfb9d1da7a65",
+      "timestamp": "2026-07-16T10:21:01.555028+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "4ef6e61bbc0745ffab350760a98091d8",
+      "timestamp": "2026-07-16T08:29:01.113366+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "2ce0e6d8a1e34ce4b4cafe1b84ec3db3",
+      "timestamp": "2026-07-16T08:29:01.083365+00:00",
+      "level": "critical",
+      "code": "operator_estop",
+      "message": "Not-Aus durch Bediener",
+      "action": "Gefahrenbereich sichern und Ursache prüfen",
+      "details": {}
+    },
+    {
+      "id": "7a5ec6ecd13d448b815b243b8af3342e",
+      "timestamp": "2026-07-16T08:29:01.079518+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Not-Aus durch Bediener",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Not-Aus durch Bediener",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "febb3555a7d64f5180261c2cfc8cd2e2",
+      "timestamp": "2026-07-16T08:28:38.566186+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "70c5091a66d94c749debcefcb635e76e",
+      "timestamp": "2026-07-16T07:58:52.688239+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "c523bedc2a6547a89fdf0d74ac61b237",
+      "timestamp": "2026-07-16T07:58:52.668842+00:00",
+      "level": "critical",
+      "code": "operator_estop",
+      "message": "Not-Aus durch Bediener",
+      "action": "Gefahrenbereich sichern und Ursache prüfen",
+      "details": {}
+    },
+    {
+      "id": "64dff409a69e406188aae0873360daed",
+      "timestamp": "2026-07-16T07:58:52.662963+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Not-Aus durch Bediener",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Not-Aus durch Bediener",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "3c9b5257202e4f44a9f6dcb1ed4da386",
+      "timestamp": "2026-07-16T07:58:17.060015+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "e1d93657f2c04f22adb4b538c945dbed",
+      "timestamp": "2026-07-16T07:58:05.644783+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "78fbb89a49c74c9688c5b0c26edbd624",
+      "timestamp": "2026-07-15T22:43:58.397916+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "34302402d240469d839325ac034781b9",
+      "timestamp": "2026-07-15T22:10:26.280590+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647735.90, 5373809.57)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647735.90, 5373809.57)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "1e8850d930714d3f9843c7f81ddccf79",
+      "timestamp": "2026-07-15T22:07:23.173088+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "c260471e91fd4585b423ce3716b93a4c",
+      "timestamp": "2026-07-15T21:34:42.489976+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "f9ea0a717dde4ca596564bf6b5b5250d",
+      "timestamp": "2026-07-15T21:34:42.483848+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "282ca61f2b7744fd94a1693cfa1d50a6",
+      "timestamp": "2026-07-15T21:33:15.921342+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "7689bb60f43249f8830a88346fdd94b5",
+      "timestamp": "2026-07-15T21:32:14.043261+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "0d417a33db83403d9bbf695b7eb38ebb",
+      "timestamp": "2026-07-15T21:31:16.372109+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "6ee05df443a744cf92e2bef3dabeb757",
+      "timestamp": "2026-07-15T21:16:53.074180+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647735.90, 5373809.53)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647735.90, 5373809.53)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "0ef6fe99dda14032843324164e022cba",
+      "timestamp": "2026-07-15T21:13:50.233227+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "9c721e8b28c5429d96a6b4f6923c4191",
+      "timestamp": "2026-07-15T21:00:58.216276+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "436ff9bd83404feb9aa9a2649a71374e",
+      "timestamp": "2026-07-15T21:00:26.241194+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647743.15, 5373805.45)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647743.15, 5373805.45)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "5fb44456b30a4da090e26f372ac59f9c",
+      "timestamp": "2026-07-15T20:58:41.471063+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "2f962dec73d84c8d945519ee0d33d04b",
+      "timestamp": "2026-07-15T20:57:41.084029+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647735.71, 5373812.79)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647735.71, 5373812.79)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "a654f7cd463849ab95d89c37e6c7a2d2",
+      "timestamp": "2026-07-15T20:57:19.401096+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "4a8d9a2e21424885b9ed45290293db9a",
+      "timestamp": "2026-07-15T20:51:32.608543+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647734.75, 5373811.83)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647734.75, 5373811.83)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "948e87ea2f484d0dabf7884cfb1f65b2",
+      "timestamp": "2026-07-15T20:51:20.308425+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "1d4a4ed127c14c03a296c95a0dd4aa29",
+      "timestamp": "2026-07-15T20:48:06.165416+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647740.16, 5373807.44)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647740.16, 5373807.44)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "1356718dd50b4e36a5c4cf1420b80d01",
+      "timestamp": "2026-07-15T20:47:51.273527+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "9200514d373d47349d11fe01ecf3f03e",
+      "timestamp": "2026-07-15T20:44:52.127060+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647740.16, 5373807.43)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647740.16, 5373807.43)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "df77e29a206145128fc7500ced1e6727",
+      "timestamp": "2026-07-15T20:44:37.353192+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "50bf395175e6429f81a19dce1aa459c5",
+      "timestamp": "2026-07-15T20:39:47.069699+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647735.65, 5373812.78)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647735.65, 5373812.78)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "5bf11a6a546048b484ec4909c34294bc",
+      "timestamp": "2026-07-15T20:39:35.579623+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "aea359a877b744a1af4cbfd7c81234d2",
+      "timestamp": "2026-07-15T20:38:26.977399+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647735.30, 5373812.72)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647735.30, 5373812.72)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "eedfbca8ec504858b65fe5879e27313d",
+      "timestamp": "2026-07-15T20:38:16.483660+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "b78254984f08429987ab77d13b0f26ec",
+      "timestamp": "2026-07-15T20:36:14.151135+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647735.33, 5373812.72)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647735.33, 5373812.72)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "fe934c5ab9514d36ba5d46e4125e3772",
+      "timestamp": "2026-07-15T20:36:03.604865+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "ec8db4e59b954c73b21b9a7242d0167d",
+      "timestamp": "2026-07-15T20:19:14.635507+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647739.91, 5373807.55)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647739.91, 5373807.55)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "38a8437f579842649250a114764c8e9f",
+      "timestamp": "2026-07-15T20:19:02.755245+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "a93c07591cbe499f8013e55163fe59ec",
+      "timestamp": "2026-07-15T20:18:42.705913+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "fb16392d31434ae1b57081060d02c765",
+      "timestamp": "2026-07-15T20:18:40.080131+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647739.91, 5373807.56)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647739.91, 5373807.56)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "420914de4baa436eb4617dd4a50e4fdc",
+      "timestamp": "2026-07-15T20:18:27.366791+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "1b25f7b99f8b47b29c4dd60877bc3254",
+      "timestamp": "2026-07-15T20:15:05.688214+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647740.08, 5373807.17)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647740.08, 5373807.17)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "1042e7a250334699aef4f04b81a7fddb",
+      "timestamp": "2026-07-15T20:15:05.616477+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "60faae77f64c48f495d3059e23c35200",
+      "timestamp": "2026-07-15T20:04:25.072473+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "0336bfbc083c48848157c36c830ddd25",
+      "timestamp": "2026-07-15T20:04:25.067663+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1eb8e60980af4309b4d9cc46e5b4b90c",
+      "timestamp": "2026-07-15T20:04:24.786993+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d05b5ff33d264dd4b4ca5f7c5424f733",
+      "timestamp": "2026-07-15T20:04:23.914242+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "1166c57f73ef463bb8bbead6662d710a",
+      "timestamp": "2026-07-15T20:03:40.429569+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647740.11, 5373807.17)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647740.11, 5373807.17)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "83a5a1f06a3544829a01080568adea23",
+      "timestamp": "2026-07-15T20:03:40.320852+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "acb22ad500f749e38a2288d9edd3785d",
+      "timestamp": "2026-07-15T19:59:25.817191+00:00",
+      "level": "warning",
+      "code": "mission_blocked",
+      "message": "Mission gesperrt: Geofence nicht gültig",
+      "action": "Sperrgrund beheben",
+      "details": {}
+    },
+    {
+      "id": "e44d65b38d624b7581ea02308db853f7",
+      "timestamp": "2026-07-15T19:59:15.989038+00:00",
+      "level": "warning",
+      "code": "mission_blocked",
+      "message": "Mission gesperrt: Geofence nicht gültig",
+      "action": "Sperrgrund beheben",
+      "details": {}
+    },
+    {
+      "id": "4af76eb0f18446e1a55eb0968cd04afb",
+      "timestamp": "2026-07-15T19:58:51.842330+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "f8fb09a2fca544f69256c37e797bf472",
+      "timestamp": "2026-07-15T19:58:22.278091+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647740.08, 5373807.17)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647740.08, 5373807.17)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "b894e626470f44e788011bab4d946462",
+      "timestamp": "2026-07-15T19:58:22.215435+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "fd8e969da228461782c4a289abd0a58b",
+      "timestamp": "2026-07-15T19:49:12.917543+00:00",
+      "level": "warning",
+      "code": "soft_stop",
+      "message": "Soft-Stop durch Bediener",
+      "action": "Umgebung prüfen",
+      "details": {}
+    },
+    {
+      "id": "1eb97d7e8e8d4801b3a8bcdf4b774efc",
+      "timestamp": "2026-07-15T19:48:38.997030+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "3a2bcf73cb67413792b1ccb6fb4583a0",
+      "timestamp": "2026-07-15T19:48:38.991422+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "d9bde883e9734876bdf7f284c04f6263",
+      "timestamp": "2026-07-15T19:47:00.121628+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "1e977aeae5844b559583752708e152cf",
+      "timestamp": "2026-07-15T19:47:00.087823+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "3206d357714b485b8eb1f9e90dfd9b87",
+      "timestamp": "2026-07-15T19:43:13.636929+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647735.58, 5373808.04)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647735.58, 5373808.04)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "bcb5e479f26947fab0d288ce326d0c88",
+      "timestamp": "2026-07-15T18:57:58.592851+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "dbecb86f66a14c709416b7ad3b3a8c2e",
+      "timestamp": "2026-07-15T18:56:13.740375+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "49f6595d92854b32a057863c60197b6e",
+      "timestamp": "2026-07-15T18:56:13.734973+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8f09535b80be4d83978bf3996ab71c60",
+      "timestamp": "2026-07-15T18:54:12.849802+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2fe3a83578ed46ff898821909514864c",
+      "timestamp": "2026-07-15T18:54:12.842402+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "743e82847bb844c8a6f06c5d9fe6ec6b",
+      "timestamp": "2026-07-15T18:53:58.706310+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "acbe13b439bd4ea0b7a70a4743adb0bb",
+      "timestamp": "2026-07-15T18:52:34.951415+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "f2daca9948854762872a251d17445f74",
+      "timestamp": "2026-07-15T18:50:42.706956+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647738.29, 5373810.46)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647738.29, 5373810.46)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "6645a607869742e6991254198b3c0fd6",
+      "timestamp": "2026-07-15T18:49:42.977894+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "4aef4f21b3514c7dbe892dc7d2adad8d",
+      "timestamp": "2026-07-15T18:47:19.259303+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "cd0599d11a0c4bb5b4858aee8f3a53c4",
+      "timestamp": "2026-07-15T18:37:25.174351+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647737.01, 5373804.26)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647737.01, 5373804.26)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "1d61fc722ea54897b9ba7db6a9b9e7a3",
+      "timestamp": "2026-07-15T18:28:04.124261+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "b1078a7890914d9eb08ef08681f581b5",
+      "timestamp": "2026-07-15T18:26:31.765360+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "ffabc3cf98a54925a444f4e637c4ec16",
+      "timestamp": "2026-07-15T18:26:31.759785+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1b0ecbf72c5d44068395353c268dff0e",
+      "timestamp": "2026-07-15T18:26:23.000974+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "153a7817183146778be685e72f308a18",
+      "timestamp": "2026-07-15T18:25:34.957933+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "bd3db87c9bea4822b2ec128071933a06",
+      "timestamp": "2026-07-15T18:24:29.216560+00:00",
+      "level": "warning",
+      "code": "mission_blocked",
+      "message": "Mission gesperrt: Geofence nicht gültig",
+      "action": "Sperrgrund beheben",
+      "details": {}
+    },
+    {
+      "id": "09db371995d44af79df411394c57c7cf",
+      "timestamp": "2026-07-15T18:24:15.646092+00:00",
+      "level": "warning",
+      "code": "mission_blocked",
+      "message": "Mission gesperrt: Geofence nicht gültig",
+      "action": "Sperrgrund beheben",
+      "details": {}
+    },
+    {
+      "id": "3f21109d1267423383e1ebc8988d480d",
+      "timestamp": "2026-07-15T18:24:09.614619+00:00",
+      "level": "warning",
+      "code": "mission_blocked",
+      "message": "Mission gesperrt: Geofence nicht gültig",
+      "action": "Sperrgrund beheben",
+      "details": {}
+    },
+    {
+      "id": "809b3b385ad644d189b33cd14e520034",
+      "timestamp": "2026-07-15T18:23:26.152172+00:00",
+      "level": "warning",
+      "code": "mission_blocked",
+      "message": "Mission gesperrt: Geofence nicht gültig",
+      "action": "Sperrgrund beheben",
+      "details": {}
+    },
+    {
+      "id": "51167593009248bd9d4b65e9f6b59e6c",
+      "timestamp": "2026-07-15T18:23:01.167313+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "b09363bbb9be4a2bbfe892fcd4f6fec5",
+      "timestamp": "2026-07-15T18:22:10.424177+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647741.85, 5373806.07)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647741.85, 5373806.07)",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "6eecfc9ac8ee468aa6cece92d3f3144f",
+      "timestamp": "2026-07-15T18:14:15.754124+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "707c7a96f2a6405e9e7fc597c329f672",
+      "timestamp": "2026-07-15T17:49:56.999494+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "82f4ca2984cb4d4ba794b06e8df2ad3a",
+      "timestamp": "2026-07-15T17:49:56.994884+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "1eebc4623f2a49a29f7580f1e1c9469c",
+      "timestamp": "2026-07-15T17:49:56.711335+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "0da6263659374e0dae9a1c11b4fd7db5",
+      "timestamp": "2026-07-15T17:49:39.211440+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "76ffced2d63140b8b8b4d25ae4f0e286",
+      "timestamp": "2026-07-15T17:46:49.959118+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "b570790fdb3f407b878599a6778ecb22",
+      "timestamp": "2026-07-15T17:46:49.952321+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "de13934905fb4ff5a9273b1c6ad05350",
+      "timestamp": "2026-07-15T17:46:49.594924+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "2d15e71952644fb39f3db751623b812d",
+      "timestamp": "2026-07-15T17:46:27.121988+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "b4ae130fd6d447f99198bbb44377eab1",
+      "timestamp": "2026-07-15T17:24:12.574989+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "be727c9fa61149a2934672c801cb45aa",
+      "timestamp": "2026-07-15T17:24:12.570427+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8736dcd22efa4930bf319ddbb7ee0484",
+      "timestamp": "2026-07-15T17:24:12.353071+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "fbef394564b1453d8787705628fcd36d",
+      "timestamp": "2026-07-15T17:23:19.956353+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ed7b40ec6ad546afab3c255a9fdd14f0",
+      "timestamp": "2026-07-15T17:09:08.310905+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "559378d4f59a42bf8c5fc6f7e08f5ff1",
+      "timestamp": "2026-07-15T17:09:08.306738+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "b9ff12072f9d4f5aa5f54f3199c2f6f3",
+      "timestamp": "2026-07-15T17:09:08.252944+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "67354691d76d44268826705a0338b46d",
+      "timestamp": "2026-07-15T17:08:25.763172+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "eaf6c88dd53041e798f38ba4445c64ae",
+      "timestamp": "2026-07-15T16:55:16.868783+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "9557e76de0b64e1b90a71a6c5c585791",
+      "timestamp": "2026-07-15T16:41:58.236087+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "9fd7bd9892744b96985f36547bdd232e",
+      "timestamp": "2026-07-15T16:41:58.193372+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "e95d1e6ff1bb41afa581768bea59411b",
+      "timestamp": "2026-07-15T16:41:36.139335+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "fb1ec2e61e0647d0b68bedf0d77ee119",
+      "timestamp": "2026-07-15T16:38:53.879518+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "4f61a79e45e04af29fad4ade122c6ef2",
+      "timestamp": "2026-07-15T16:28:17.064308+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "c49e053d466e476d82b30dce292c8e1e",
+      "timestamp": "2026-07-15T16:28:17.055512+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "eb4150af39d1490d8247a335c1e343a8",
+      "timestamp": "2026-07-15T16:27:32.072453+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "374b0ab9ad9f49c9a3b005d73f5efcaf",
+      "timestamp": "2026-07-15T16:27:10.276800+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "cd1de6e2d70c47c686a2ec0b80e5f21c",
+      "timestamp": "2026-07-15T16:27:10.263847+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "56b91313dd7444b39489c5324d15b538",
+      "timestamp": "2026-07-15T16:23:01.310426+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "a9123d5939564dffb9fa39ae732faa43",
+      "timestamp": "2026-07-15T16:21:38.056965+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "a45aeb232cb348b08662029f4d07caf1",
+      "timestamp": "2026-07-15T16:21:38.051804+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "24d6111080e944dfa90318f237a5a000",
+      "timestamp": "2026-07-15T16:21:36.835365+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5731f5a6789a4344b119e5fcf4c3efdd",
+      "timestamp": "2026-07-15T16:21:14.402007+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "faa5ac72277a4f16bee15233f14da1c0",
+      "timestamp": "2026-07-15T16:21:14.397608+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "0ff02744a9904e5cb4030ff3d6a3da37",
+      "timestamp": "2026-07-15T16:20:20.318203+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2d70f57a00404c2fb5f1b4b64d0c3f47",
+      "timestamp": "2026-07-15T16:19:06.696556+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "7a91ec574fdd4e7eac1453826d1f0015",
+      "timestamp": "2026-07-15T16:19:06.692043+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "972ce39c7c6b4e60ac3d4ad3b1f0f2bc",
+      "timestamp": "2026-07-15T16:18:47.783571+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "eaa21d23fdbc493496d535a9de4ce545",
+      "timestamp": "2026-07-15T16:17:57.817147+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1eef5fb508dc4790b7d02494552e50c4",
+      "timestamp": "2026-07-15T16:13:33.369645+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "171fd70dd12b47e8903342055f652a31",
+      "timestamp": "2026-07-15T16:13:33.317379+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "c3dcce1ca8da4e3fa082a7cc0ef72034",
+      "timestamp": "2026-07-15T16:11:59.143181+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "47075c2fbb8247d8bce087d813086c2d",
+      "timestamp": "2026-07-15T15:58:41.216495+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "7d0918b14d034c8f8a5b842a881b0624"
+      }
+    },
+    {
+      "id": "d56c66a335ab4929a4ca477eaf6d9d12",
+      "timestamp": "2026-07-15T15:54:32.976606+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "ab0f3480f02d41229fad347c26f7eb0b",
+      "timestamp": "2026-07-15T15:54:32.960066+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "536db47b119449be97226cb75aef1479",
+      "timestamp": "2026-07-15T15:54:32.843248+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "19769b69fb994742871efc27c24648df",
+      "timestamp": "2026-07-15T15:54:14.038587+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8412dbeca3794a7ea893987782cfca23",
+      "timestamp": "2026-07-15T15:47:51.314048+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: TEACH_IN → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "768310b17e0f420f9da04885d0a8c41b",
+      "timestamp": "2026-07-15T15:44:25.031778+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → TEACH_IN",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "94d52273e6854c4ba42d0934fd3e7052",
+      "timestamp": "2026-07-15T15:34:38.981826+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "07721649b5354ff5b1ea9b1bc0ab2907",
+      "timestamp": "2026-07-15T15:34:38.973488+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "fe0deedba2cb4d769b74d8655fe7bf0a",
+      "timestamp": "2026-07-15T15:34:38.904481+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "61e9bd2d02c3424f9891d9c25f0c3892",
+      "timestamp": "2026-07-15T15:34:15.156715+00:00",
+      "level": "warning",
+      "code": "soft_stop",
+      "message": "Soft-Stop durch Bediener",
+      "action": "Umgebung prüfen",
+      "details": {}
+    },
+    {
+      "id": "b477bd621e454ebbbdd05820dc6f0ab6",
+      "timestamp": "2026-07-15T15:34:15.063535+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8f881449c3b843af9f572873695317aa",
+      "timestamp": "2026-07-15T15:33:14.599406+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5a794dc0c2f14e3b8f344d48d0bdb188",
+      "timestamp": "2026-07-15T15:12:20.144874+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "e651fb1a40f74b3f8c48ed783d54a55d",
+      "timestamp": "2026-07-15T15:12:20.102665+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "40a1de01b8d34fff8e541194dce03319",
+      "timestamp": "2026-07-15T15:11:25.001776+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2416ed628bec4a168e305dc906e60fe5",
+      "timestamp": "2026-07-15T15:08:16.990008+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "bd854341398b4604905a1e0f13bab250",
+      "timestamp": "2026-07-15T15:08:14.379757+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "7b5bcd3937734c62aed13dc5266987eb",
+      "timestamp": "2026-07-15T15:02:18.064006+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "57228fe7f87249c7b917d3beba183f10",
+      "timestamp": "2026-07-15T15:01:04.466739+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "b94067a693fe442fb8dbb2bc159f0fff",
+      "timestamp": "2026-07-15T15:01:04.462868+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8b10d8fd70144ac88f1b685cc39e542c",
+      "timestamp": "2026-07-15T15:00:34.035176+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "322a5a76bf5b43e49578ddc862ecdf2f",
+      "timestamp": "2026-07-15T15:00:33.384892+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "e88e500bfbbd4ce79ec84518892bed97",
+      "timestamp": "2026-07-15T15:00:33.368317+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8cd2c58734c34743b2629fc72208ce77",
+      "timestamp": "2026-07-15T15:00:25.260490+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "5ae2e6c44ab741798716e48d6eddc224",
+      "timestamp": "2026-07-15T15:00:25.256939+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8860174d179941b2bf3049cb8d2cc364",
+      "timestamp": "2026-07-15T15:00:25.172620+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "347513ec2ddb4b338483fda5aed5bc7e",
+      "timestamp": "2026-07-15T14:58:28.611469+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "f15f5416025342e0afd4ecb62d43b845",
+      "timestamp": "2026-07-15T14:57:45.191536+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "7d4c336ab37c45a4b782d567bf092e09",
+      "timestamp": "2026-07-15T14:57:45.149775+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "93fdaa617794471f8405c7645881c254",
+      "timestamp": "2026-07-15T14:57:37.089532+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "fa7e7b05dc8740c486690c995a91dee2",
+      "timestamp": "2026-07-15T14:57:37.073553+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "87e434432be9469bbe24976b2fdef842",
+      "timestamp": "2026-07-15T14:57:36.813731+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "a6021eaffcde483e89d3dc46067a4ce7",
+      "timestamp": "2026-07-15T14:55:18.821002+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647744.09, 5373806.83)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647744.09, 5373806.83)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "24a8eb5dde03462ca308c84065da032e",
+      "timestamp": "2026-07-15T14:55:17.723643+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: CHARGING → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "fae97a1073ba4ee3808c88e003baba1d",
+      "timestamp": "2026-07-15T14:54:48.486349+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ca250cce39af4560b5cdbe4f7066c065",
+      "timestamp": "2026-07-15T14:54:48.429850+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "bad8bea5872f47b8a1de1ef0454c9bb7",
+      "timestamp": "2026-07-15T14:54:40.283750+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "9c7a9752074d4624b0a4f2dbefe161a9",
+      "timestamp": "2026-07-15T14:54:40.277305+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "17c1fc5472394e5bbe77fb7cc000110c",
+      "timestamp": "2026-07-15T14:54:40.150985+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "455ae0427e204ac68daf523161c04ffb",
+      "timestamp": "2026-07-15T14:49:48.616817+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "22c22cb5dc5f435bb45c984aca127fed",
+      "timestamp": "2026-07-15T14:49:48.595830+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1ac44f0297c44decbd795b5cb41a3837",
+      "timestamp": "2026-07-15T14:49:14.756849+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "b62d0e9d40ac416ea185748dd6b930de",
+      "timestamp": "2026-07-15T14:49:14.746027+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "9a0a6d094a4845888e3dec77e672d721",
+      "timestamp": "2026-07-15T14:49:14.662176+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "49ee27ccd08b44ac938b39c22cfd573f",
+      "timestamp": "2026-07-15T14:41:35.641057+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "f935bac350974a649db650984211e6b3",
+      "timestamp": "2026-07-15T14:41:35.635289+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1c33e8bbbad142aa81491ae5e7b38569",
+      "timestamp": "2026-07-15T14:41:16.320034+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "673d67a5fea74af79320dac187fe9748",
+      "timestamp": "2026-07-15T14:40:34.829793+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "904f6c239c954b7b871b6119b99aa9c3",
+      "timestamp": "2026-07-15T14:40:34.826531+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ae59ee01f4a249df98b07debe2bb4b58",
+      "timestamp": "2026-07-15T14:40:34.488970+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "bc5befd7cb6f4003b3419e49d710b76f",
+      "timestamp": "2026-07-15T14:40:32.765669+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "178d1ddab21a4853b247e4464b05022e",
+      "timestamp": "2026-07-15T14:40:32.755517+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "f754c352ce61492daf156b335bb94078",
+      "timestamp": "2026-07-15T14:40:10.043602+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5b83a5b010ce42619a5a276864a36aed",
+      "timestamp": "2026-07-15T14:37:47.806254+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "8b668d1ec38f430fb18a6d28ae78e23d",
+      "timestamp": "2026-07-15T14:29:06.209712+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "cacbc4001e2542e393af354bd1b8f517",
+      "timestamp": "2026-07-15T14:29:06.155411+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "57e2358fd71143c5b7fdab154e567962",
+      "timestamp": "2026-07-15T14:28:29.140693+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "db90cdc4aa4c463c81ceb1398ebece28",
+      "timestamp": "2026-07-15T14:28:29.131456+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2015f2749870424aaf8efc5f89784572",
+      "timestamp": "2026-07-15T14:28:23.575632+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ae72ff6862a14c03bef5d492503835b0",
+      "timestamp": "2026-07-15T14:28:06.147947+00:00",
+      "level": "warning",
+      "code": "soft_stop",
+      "message": "Soft-Stop durch Bediener",
+      "action": "Umgebung prüfen",
+      "details": {}
+    },
+    {
+      "id": "028e5aabf11b43ccaf75a2c582e91109",
+      "timestamp": "2026-07-15T14:19:55.931489+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "bfd96f526e1b49f09be231ca54220980",
+      "timestamp": "2026-07-15T14:19:55.927995+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "40702d005c274f71a0414781b95c7da0",
+      "timestamp": "2026-07-15T14:18:00.591369+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "db913fe21fc6403ea6b9150f9fbac1b6",
+      "timestamp": "2026-07-15T14:05:34.279310+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "735ca55d012f416d86ebf0a328f19ee4",
+      "timestamp": "2026-07-15T14:05:33.858413+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "bd73c37e73024042a8941c79bf14bcce",
+      "timestamp": "2026-07-15T13:50:27.912517+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "c19fd4762b7141b79aa3a39351c81cb0",
+      "timestamp": "2026-07-15T13:50:27.907770+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ac3c4f55d508479682e25e5e5234faff",
+      "timestamp": "2026-07-15T13:50:09.424257+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2fe2041c073e4814871c24f0aab8cf86",
+      "timestamp": "2026-07-15T13:49:41.840336+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "00a2c3e651d54a7ab4a480324f78846a",
+      "timestamp": "2026-07-15T13:49:41.838043+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "7d70708115414d988bf5ba8a08d92972",
+      "timestamp": "2026-07-15T13:49:30.469030+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: DOCKING → CHARGING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "97783e35b40544ca816430863883e8ee",
+      "timestamp": "2026-07-15T13:49:30.432038+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "521cbbf92aa3432595c0a10145678de7",
+      "timestamp": "2026-07-15T13:49:07.667006+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "36f109b9a1184ec999c0cc9d29d79728",
+      "timestamp": "2026-07-15T13:49:07.664715+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "dd5dfbfa40a14c3e8c58ce9f61872192",
+      "timestamp": "2026-07-15T13:48:59.810557+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "41f1396c4f6a42cd8232e35cbd936917",
+      "timestamp": "2026-07-15T13:48:26.913668+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "eced38cc81ac4a958dd368c2e913a895",
+      "timestamp": "2026-07-15T13:48:26.909896+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "3d8079672c164ea4b4e0af8e632d7e60",
+      "timestamp": "2026-07-15T13:46:41.593658+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "94e341f4941645d7b319318efe15e200",
+      "timestamp": "2026-07-15T13:44:20.206460+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647737.34, 5373810.44)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647737.34, 5373810.44)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "091f35a6e7a14441b6ea37da7e646947",
+      "timestamp": "2026-07-15T13:43:59.638094+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ee220b4eb27d4757ba4decbec1655f48",
+      "timestamp": "2026-07-15T13:42:10.087466+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647737.73, 5373803.66)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647737.73, 5373803.66)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "22d38763ca2546218b2e04e8936d19e4",
+      "timestamp": "2026-07-15T13:41:59.033501+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "085c169865ac42548a787dc898c59e84",
+      "timestamp": "2026-07-15T13:39:11.002575+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Geofence violation at (647742.68, 5373810.59)",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Geofence violation at (647742.68, 5373810.59)",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "989ce20dfcd44ca7bdaee20a58db5083",
+      "timestamp": "2026-07-15T13:38:48.503044+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5d19badb620b47228b6a260bca5cd973",
+      "timestamp": "2026-07-15T13:21:06.153188+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "c1f000538bdc40438f83c2d341382cd7",
+      "timestamp": "2026-07-15T13:21:00.523005+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "e2ef4266f10e45d5bb8ff95107a1ae81",
+      "timestamp": "2026-07-15T13:21:00.519333+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "a74f2a75eff14903841f1f6bfbb4a059",
+      "timestamp": "2026-07-15T13:20:25.658076+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2065a4440829430cb9854ef1e0b128d8",
+      "timestamp": "2026-07-15T13:15:08.021709+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "df82db3c73674ab7bd22dc9fa97a2dcf",
+      "timestamp": "2026-07-15T13:15:08.004753+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "08844b993cbc40538d1e7cc8b5b27403",
+      "timestamp": "2026-07-15T13:14:58.464215+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "b498c77943414c84a6afebcac6a1a671",
+      "timestamp": "2026-07-15T13:14:58.433998+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "8b891fd2eced475aa37d7a7d42c86d29",
+      "timestamp": "2026-07-15T13:14:58.427434+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2765e3f2721648b0a5353da88c3ab2dd",
+      "timestamp": "2026-07-15T13:14:28.302374+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: RETURNING → DOCKING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "d29f2a26fbb54390b7d6527c114e8441",
+      "timestamp": "2026-07-15T13:14:19.882093+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "b52a7d6bb67e42af8ba2e92053928ab8",
+      "timestamp": "2026-07-15T13:14:19.875913+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2879ec70adfd4f56a7ab7a257a0cbf47",
+      "timestamp": "2026-07-15T13:14:04.506085+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "ca814f0b96104168bf534723358f59ce",
+      "timestamp": "2026-07-15T13:09:55.227060+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "d6f38576551246afaee2bff817eccb1d",
+      "timestamp": "2026-07-15T13:09:55.221492+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "5e89a83eaafe4f4bb6fcdc2ee8e1fd8d",
+      "timestamp": "2026-07-15T13:07:36.440350+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "f966f0f0fc454db98eccf01a211b0d50",
+      "timestamp": "2026-07-15T13:07:36.432472+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "73b5e8302d0142deb4e3e181ab187fb0",
+      "timestamp": "2026-07-15T13:07:33.396788+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1e3b91731fbc4b15be66dcb38f51fa71",
+      "timestamp": "2026-07-15T13:06:57.205040+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "59cc963c5e0448348733c62c417248e0",
+      "timestamp": "2026-07-15T13:00:23.920869+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: TEACH_IN → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "7407571c2ee14f75a46508ded111fcd9",
+      "timestamp": "2026-07-15T13:00:19.807189+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → TEACH_IN",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "126ec01aad9e4044b68096d37bb79f5b",
+      "timestamp": "2026-07-15T12:56:44.562680+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: TEACH_IN → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "8e6037b5c7d34e8c951c3d80d714f77e",
+      "timestamp": "2026-07-15T12:54:33.390802+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → TEACH_IN",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "d4bd8f2130b046bb86284f6b85e1f022",
+      "timestamp": "2026-07-15T12:48:28.906953+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "24d1ce9248b94492b930298c7b4d854b",
+      "timestamp": "2026-07-15T12:48:17.724584+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Messerstrom zu hoch",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Messerstrom zu hoch",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "edd01c4efa7b46f5b34ac6dbd1659b30",
+      "timestamp": "2026-07-15T12:48:17.721714+00:00",
+      "level": "critical",
+      "code": "hardware_fault",
+      "message": "Messerstrom zu hoch",
+      "action": "Mähwerk spannungsfrei auf Blockade prüfen",
+      "details": {
+        "flag": 8
+      }
+    },
+    {
+      "id": "6824ac84133445a1b2294a97c9c1aac7",
+      "timestamp": "2026-07-15T12:47:11.525058+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "95ba9caabded4acfbe6d5ce98d823293",
+      "timestamp": "2026-07-15T12:47:11.521454+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "48cf043c39f947c383a0cd47659d5629",
+      "timestamp": "2026-07-15T12:46:15.561423+00:00",
+      "level": "info",
+      "code": "return_home",
+      "message": "Rückkehr zur Ladestation angefordert",
+      "action": "",
+      "details": {}
+    },
+    {
+      "id": "7ba5f7ea714e4f1489c6fadb5c4164e1",
+      "timestamp": "2026-07-15T12:46:15.558355+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → RETURNING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "809578ee521a43768dae257e44561af2",
+      "timestamp": "2026-07-15T12:45:45.511012+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "cbc2bc946cf443229a9eee58a90bcce0",
+      "timestamp": "2026-07-15T12:41:50.920093+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "b86a46e252104b65bc674379cedc8e34",
+      "timestamp": "2026-07-15T12:41:50.907854+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Simulation zurückgesetzt",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Simulation zurückgesetzt",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "1af02a5297e6436b9d887942d8821137",
+      "timestamp": "2026-07-15T12:41:42.279806+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "3bfa36c07a324a138c089a0e04c186e6",
+      "timestamp": "2026-07-15T12:39:43.845781+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: TEACH_IN → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "dde199e273ad497baf97f7ba810a7519",
+      "timestamp": "2026-07-15T12:39:36.604176+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → TEACH_IN",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "8498cd7b49e749bd91917a6020f24516",
+      "timestamp": "2026-07-15T12:37:35.374982+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: ERROR → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "c047f988cedc47769314edcd292f136f",
+      "timestamp": "2026-07-15T12:37:29.082744+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Bumper links blockiert",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Bumper links blockiert",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "d8634ffc28964bc6ba237431cc89cf22",
+      "timestamp": "2026-07-15T12:37:29.076327+00:00",
+      "level": "critical",
+      "code": "hardware_fault",
+      "message": "Bumper links blockiert",
+      "action": "Bumper und Fahrweg links prüfen",
+      "details": {
+        "flag": 1
+      }
+    },
+    {
+      "id": "b00771787caf4d82809b7319e26e3f92",
+      "timestamp": "2026-07-15T12:36:15.711406+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: PAUSED → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "0f717e400c3343bb8c53d6cce6882ac9",
+      "timestamp": "2026-07-15T12:36:11.772814+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: MOWING → PAUSED",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "c44b8c8e2c734b5287bdfd1272baccb0",
+      "timestamp": "2026-07-15T12:33:57.175718+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "a2104b4c2c7649b0b02c15dcb71ac43a",
+      "timestamp": "2026-07-15T12:31:00.916290+00:00",
+      "level": "error",
+      "code": "state_change",
+      "message": "Sicherheitsstopp: Bumper links blockiert",
+      "action": "Ursache prüfen, Gefahrenbereich sichern und Fehler anschließend zurücksetzen",
+      "details": {
+        "reason": "Bumper links blockiert",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "2715ae9375d64b528ae8969962214bc0",
+      "timestamp": "2026-07-15T12:31:00.913451+00:00",
+      "level": "critical",
+      "code": "hardware_fault",
+      "message": "Bumper links blockiert",
+      "action": "Bumper und Fahrweg links prüfen",
+      "details": {
+        "flag": 1
+      }
+    },
+    {
+      "id": "8547dbd4be3042a3a7c8b4809f392550",
+      "timestamp": "2026-07-15T12:30:23.069060+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → MOWING",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": "sim-e2e-zone"
+      }
+    },
+    {
+      "id": "75fffce74f1f44ce85ecfa15709e7484",
+      "timestamp": "2026-07-15T12:29:26.056619+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: TEACH_IN → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "2ac9e57cc00c41f8b69170fbc304ef89",
+      "timestamp": "2026-07-15T12:29:01.681436+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → TEACH_IN",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "8dba170a29e84bee9ce29f9787178b64",
+      "timestamp": "2026-07-15T12:28:13.960962+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: TEACH_IN → IDLE",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    },
+    {
+      "id": "073569534c0e45be8f26146cfa50efc2",
+      "timestamp": "2026-07-15T12:27:53.622640+00:00",
+      "level": "info",
+      "code": "state_change",
+      "message": "Status: IDLE → TEACH_IN",
+      "action": "",
+      "details": {
+        "reason": "",
+        "zone_id": null
+      }
+    }
+  ],
+  "missions": []
+}
